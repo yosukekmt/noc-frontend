@@ -83,12 +83,12 @@ export default function NewDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>メンバーを追加</ModalHeader>
+          <ModalHeader>Invite team members</ModalHeader>
           <ModalCloseButton />
           <Divider />
           <ModalBody bg="gray.100">
             <FormControl>
-              <FormLabel fontSize="sm">メールアドレス</FormLabel>
+              <FormLabel fontSize="sm">Email</FormLabel>
               <Input
                 size="sm"
                 bg="white"
@@ -109,7 +109,7 @@ export default function NewDialog(props: {
                           color="red"
                           ml={2}
                         >
-                          メールアドレスを入力してください。
+                          Provided email is invalid.
                         </Text>
                       </Flex>
                     );
@@ -137,10 +137,10 @@ export default function NewDialog(props: {
           <Divider />
           <ModalFooter>
             <Button size="sm" onClick={onClose}>
-              キャンセル
+              Cancel
             </Button>
             <Button type="submit" size="sm" isLoading={isLoading} ml={2}>
-              作成
+              Invite
             </Button>
           </ModalFooter>
         </ModalContent>

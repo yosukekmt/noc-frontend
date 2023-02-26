@@ -24,18 +24,19 @@ import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-export type MenuItemType = "coupons" | "treasuries" | "members" | "";
+export type MenuItemType = "gasback_nfts" | "members" | "";
 
 const NavigationBar = () => {
   const { pathname } = useRouter();
-  const [_menuItemType, _setMenuItemType] = useState("");
+  const [_menuItemType, _setMenuItemType] = useState<MenuItemType>("");
   useEffect(() => {
-    if (pathname === "/dashboard/treasuries") {
-      _setMenuItemType("treasuries");
-    } else if (pathname === "/dashboard/members") {
+    if (pathname === "/dashboard/members") {
       _setMenuItemType("members");
-    } else if (pathname === "/dashboard") {
-      _setMenuItemType("coupons");
+    } else if (
+      pathname === "/dashboard" ||
+      pathname.startsWith("/dashboard/coupons/")
+    ) {
+      _setMenuItemType("gasback_nfts");
     }
   }, [pathname]);
 
@@ -49,22 +50,10 @@ const NavigationBar = () => {
               fontSize="sm"
               size="xs"
               style={{ borderRadius: 20 }}
-              colorScheme={_menuItemType === "coupons" ? "blue" : "white"}
-              variant={_menuItemType === "coupons" ? "solid" : "ghost"}
+              colorScheme={_menuItemType === "gasback_nfts" ? "blue" : "white"}
+              variant={_menuItemType === "gasback_nfts" ? "solid" : "ghost"}
             >
-              Coupon NFTs
-            </Button>
-          </NextLink>
-          <NextLink href="/dashboard/treasuries">
-            <Button
-              fontWeight="bold"
-              fontSize="sm"
-              size="xs"
-              style={{ borderRadius: 20 }}
-              colorScheme={_menuItemType === "treasuries" ? "blue" : "white"}
-              variant={_menuItemType === "treasuries" ? "solid" : "ghost"}
-            >
-              Treasuries
+              Gasback NFTs
             </Button>
           </NextLink>
           <NextLink href="/dashboard/members">

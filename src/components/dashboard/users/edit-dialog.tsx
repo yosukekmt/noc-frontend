@@ -95,12 +95,12 @@ export default function EditDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>パスワードの変更</ModalHeader>
+          <ModalHeader>Change password</ModalHeader>
           <ModalCloseButton />
           <Divider />
           <ModalBody bg="gray.100">
             <FormControl mt={8}>
-              <FormLabel fontSize="sm">現在のパスワード</FormLabel>
+              <FormLabel fontSize="sm">Current password</FormLabel>
               <InputGroup size="lg">
                 <Input
                   type="password"
@@ -114,14 +114,14 @@ export default function EditDialog(props: {
                   <Flex align="center">
                     <WarningTwoIcon color="red" />
                     <Text fontSize="sm" fontWeight="normal" color="red" ml={2}>
-                      現在のパスワードを入力してください。
+                      Provide current password
                     </Text>
                   </Flex>
                 )}
               </Box>
             </FormControl>
             <FormControl mt={8}>
-              <FormLabel fontSize="sm">新しいパスワード</FormLabel>
+              <FormLabel fontSize="sm">New password</FormLabel>
               <InputGroup size="lg">
                 <Input
                   type="password"
@@ -135,14 +135,14 @@ export default function EditDialog(props: {
                   <Flex align="center">
                     <WarningTwoIcon color="red" />
                     <Text fontSize="sm" fontWeight="normal" color="red" ml={2}>
-                      新しいパスワードを入力してください。
+                      Provide new password
                     </Text>
                   </Flex>
                 )}
               </Box>
             </FormControl>
             <FormControl mt={8}>
-              <FormLabel fontSize="sm">新しいパスワード（確認）</FormLabel>
+              <FormLabel fontSize="sm">New password (confirmation)</FormLabel>
               <InputGroup size="lg">
                 <Input
                   type="password"
@@ -165,7 +165,7 @@ export default function EditDialog(props: {
                           color="red"
                           ml={2}
                         >
-                          新しいパスワード（確認）を入力してください。
+                          Provide new password
                         </Text>
                       </Flex>
                     );
@@ -193,10 +193,10 @@ export default function EditDialog(props: {
           <Divider />
           <ModalFooter>
             <Button size="sm" onClick={onClose}>
-              キャンセル
+              Cancel
             </Button>
             <Button type="submit" size="sm" isLoading={isLoading} ml={2}>
-              パスワードの変更
+              Change password
             </Button>
           </ModalFooter>
         </ModalContent>

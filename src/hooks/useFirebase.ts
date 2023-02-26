@@ -6,19 +6,19 @@ import { useCallback } from "react";
 const ERROR_MESSAGES = [
   {
     code: "auth/invalid-email",
-    message: "メールアドレスが有効でありません",
+    message: "The email is invalid.",
   },
   {
     code: "auth/user-disabled",
-    message: "無効なメールアドレスです。",
+    message: "The email is invalid.",
   },
   {
     code: "auth/user-not-found",
-    message: "登録されていないメールアドレスです。",
+    message: "No existing user found with this email.",
   },
   {
     code: "auth/wrong-password",
-    message: "このメールアドレスに対応するパスワードが無効です。",
+    message: "The password is incorrect.",
   },
 ];
 /*
@@ -38,7 +38,6 @@ export const useFirebase = () => {
   const [isInitialized, setIsInitialized] = useAtom(isInitializedAtom);
 
   setTimeout(() => {
-    console.log("hoge");
     setIsInitialized(true);
     setAuthToken(item);
   }, 300);

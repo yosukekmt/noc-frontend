@@ -1,27 +1,19 @@
-import DeleteDialog from "@/components/dashboard/coupons/delete-dialog";
 import NewDialog from "@/components/dashboard/coupons/new-dialog";
+import { Coupon, useCouponsApi } from "@/hooks/useCouponsApi";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useFirebase } from "@/hooks/useFirebase";
-import { Coupon, useCouponsApi } from "@/hooks/useCouponsApi";
 import DashboardLayout from "@/layouts/dashboard-layout";
-import { CheckIcon, DeleteIcon, HamburgerIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
   Card,
-  Center,
   CardHeader,
+  Center,
   Divider,
   Flex,
   Grid,
-  Tooltip,
   GridItem,
   Heading,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Skeleton,
   Spacer,
   Table,
@@ -32,10 +24,11 @@ import {
   Th,
   Thead,
   Tr,
-  useDisclosure,
   useClipboard,
+  useDisclosure,
 } from "@chakra-ui/react";
 import Head from "next/head";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 
@@ -57,10 +50,6 @@ const LoadingTBody = () => {
             <Td>
               <Skeleton h={4} />
             </Td>
-            <Td>
-              <Skeleton h={4} />
-            </Td>
-            <Td></Td>
           </Tr>
         );
       })}
@@ -68,7 +57,7 @@ const LoadingTBody = () => {
   );
 };
 
-const LoadedTbodyRow = (props: { clickDelete: () => void; item: Coupon }) => {
+const LoadedTbodyRow = (props: { item: Coupon }) => {
   const { onCopy, value, setValue, hasCopied } = useClipboard("");
   const { authToken } = useFirebase();
 
@@ -77,69 +66,44 @@ const LoadedTbodyRow = (props: { clickDelete: () => void; item: Coupon }) => {
   };
 
   return (
-    <Tr key={`coupon_${props.item.uuid}`} h={16}>
+    <Tr key={`coupon_${props.item.uuid}`} h={8}>
       <Td fontWeight="normal" fontSize="sm">
-        {props.item.name}
+        <NextLink
+          href="/dashboard/coupons/uuid"
+          style={{ width: "100%", display: "block" }}
+        >
+          <Text>{props.item.name}</Text>
+        </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
-        {props.item.rewardType}
+        <NextLink
+          href="/dashboard/coupons/uuid"
+          style={{ width: "100%", display: "block" }}
+        >
+          Gas fee cashback
+        </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
-        <Tooltip label="Click to copy address">
-          <Text fontWeight="normal" fontSize="sm" onClick={clickCopy}>
-            {props.item.address}
-          </Text>
-        </Tooltip>
-        {hasCopied && (
-          <Flex align="center" mt={1}>
-            <CheckIcon color="blue" />
-            <Text color="blue" fontWeight="normal" fontSize="xs" ml={1}>
-              Copied
-            </Text>
-          </Flex>
-        )}
+        <NextLink
+          href="/dashboard/coupons/uuid"
+          style={{ width: "100%", display: "block" }}
+        >
+          {props.item.startAt.toLocaleString()}
+        </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
-        <Tooltip label="Click to copy address">
-          <Text fontWeight="normal" fontSize="sm" onClick={clickCopy}>
-            {props.item.targetAddress}
-          </Text>
-        </Tooltip>
-        {hasCopied && (
-          <Flex align="center" mt={1}>
-            <CheckIcon color="blue" />
-            <Text color="blue" fontWeight="normal" fontSize="xs" ml={1}>
-              Copied
-            </Text>
-          </Flex>
-        )}
-      </Td>
-      <Td fontWeight="normal" fontSize="sm">
-        {props.item.createdAt.toLocaleString()}
-      </Td>
-      <Td textAlign="end">
-        <Menu>
-          <MenuButton
-            as={IconButton}
-            aria-label="Options"
-            icon={<HamburgerIcon />}
-            variant="ghots"
-          />
-          <MenuList>
-            <MenuItem icon={<DeleteIcon />} onClick={() => props.clickDelete()}>
-              Invalidate
-            </MenuItem>
-          </MenuList>
-        </Menu>
+        <NextLink
+          href="/dashboard/coupons/uuid"
+          style={{ width: "100%", display: "block" }}
+        >
+          {props.item.duration}
+        </NextLink>
       </Td>
     </Tr>
   );
 };
 
-const LoadedTbody = (props: {
-  clickDelete: (item: Coupon) => void;
-  items: Coupon[];
-}) => {
+const LoadedTbody = (props: { items: Coupon[] }) => {
   return (
     <Tbody>
       {0 === props.items.length && (
@@ -151,12 +115,7 @@ const LoadedTbody = (props: {
       )}
       {0 < props.items.length &&
         props.items.flatMap((item) => {
-          return (
-            <LoadedTbodyRow
-              item={item}
-              clickDelete={() => props.clickDelete(item)}
-            />
-          );
+          return <LoadedTbodyRow item={item} />;
         })}
     </Tbody>
   );
@@ -170,11 +129,7 @@ export default function Dashboard() {
   const [items, setItems] = useState<Coupon[]>([]);
   const { authToken, isFirebaseInitialized } = useFirebase();
   const [isInitialized, setIsInitialized] = useState(false);
-  const [targetCoupon, setTargetCoupon] = useState<Coupon | null>(null);
-
   const newDialog = useDisclosure();
-  const deleteDialog = useDisclosure();
-
   const getCoupons = useCallback(
     async (authToken: string): Promise<void> => {
       const items = await callGetCoupons(authToken);
@@ -195,7 +150,6 @@ export default function Dashboard() {
     }
 
     (async () => {
-      console.log("callGetCoupons");
       await getCoupons(authToken);
       setIsInitialized(true);
     })();
@@ -212,19 +166,7 @@ export default function Dashboard() {
     newDialog.onOpen();
   };
 
-  const clickDelete = (item: Coupon) => {
-    setTargetCoupon(item);
-    deleteDialog.onOpen();
-  };
-
   const onCreated = (item: Coupon) => {
-    if (!authToken) {
-      return;
-    }
-    getCoupons(authToken);
-  };
-
-  const onDeleted = () => {
     if (!authToken) {
       return;
     }
@@ -249,7 +191,7 @@ export default function Dashboard() {
               <GridItem colSpan={{ base: 12, sm: 6 }}>
                 <Box>
                   <Heading as="h3" fontSize="2xl" fontWeight="bold">
-                    Coupon NFT
+                    Gasback NFTs
                   </Heading>
                 </Box>
               </GridItem>
@@ -261,7 +203,7 @@ export default function Dashboard() {
                     w={{ base: "100%", sm: "inherit" }}
                     onClick={clickNew}
                   >
-                    New Coupon NFT
+                    New Gasback NFT
                   </Button>
                 </Flex>
               </GridItem>
@@ -273,18 +215,12 @@ export default function Dashboard() {
               <Thead>
                 <Tr>
                   <Th>NAME</Th>
-                  <Th>TYPE</Th>
-                  <Th>ADDRESS</Th>
-                  <Th>TARGET ADDRESS</Th>
-                  <Th>CREATED</Th>
-                  <Th></Th>
+                  <Th>REWARD TYPE</Th>
+                  <Th>START</Th>
+                  <Th>DURATION</Th>
                 </Tr>
               </Thead>
-              {isInitialized ? (
-                <LoadedTbody items={items} clickDelete={clickDelete} />
-              ) : (
-                <LoadingTBody />
-              )}
+              {isInitialized ? <LoadedTbody items={items} /> : <LoadingTBody />}
             </Table>
           </TableContainer>
         </Card>
@@ -295,15 +231,6 @@ export default function Dashboard() {
         onOpen={newDialog.onOpen}
         onCreated={onCreated}
       />
-      {targetCoupon && (
-        <DeleteDialog
-          item={targetCoupon}
-          isOpen={deleteDialog.isOpen}
-          onClose={deleteDialog.onClose}
-          onOpen={deleteDialog.onOpen}
-          onDeleted={onDeleted}
-        ></DeleteDialog>
-      )}
     </>
   );
 }

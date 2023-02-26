@@ -61,7 +61,7 @@ export default function DeleteDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>チームからメンバーを削除</ModalHeader>
+          <ModalHeader>Remove user from team</ModalHeader>
           <ModalCloseButton />
           <Divider />
           <ModalBody bg="gray.100">
@@ -69,16 +69,16 @@ export default function DeleteDialog(props: {
               <Text as="span" fontWeight="bold">
                 {props.user.email}
               </Text>{" "}
-              は今後アクセスできません。
+              will no longer be able to access this account.
             </Text>
           </ModalBody>
           <Divider />
           <ModalFooter>
             <Button size="sm" onClick={onClose}>
-              キャンセル
+              Cancel
             </Button>
             <Button type="submit" size="sm" isLoading={isLoading} ml={2}>
-              メンバーを削除
+              Remove user
             </Button>
           </ModalFooter>
         </ModalContent>

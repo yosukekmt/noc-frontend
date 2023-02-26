@@ -7,7 +7,8 @@ export type Coupon = {
   name: string;
   address: string;
   targetAddress: string;
-  rewardType: "Percentage discount" | "Fixed amount discount" | "Gas fee";
+  startAt: Date;
+  duration: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -40,14 +41,20 @@ export const useCouponsApi = () => {
           name: faker.git.branch(),
           address: faker.finance.ethereumAddress(),
           targetAddress: faker.finance.ethereumAddress(),
-          rewardType: [
-            "Percentage discount",
-            "Fixed amount discount",
-            "Gas fee",
-          ][Math.floor(Math.random() * 3)] as
-            | "Percentage discount"
-            | "Fixed amount discount"
-            | "Gas fee",
+          startAt: faker.date.soon(),
+          duration: [
+            "1d",
+            "2d",
+            "3d",
+            "1w",
+            "2w",
+            "3w",
+            "1m",
+            "2m",
+            "3m",
+            "6m",
+            "1y",
+          ][Math.floor(Math.random() * 11)],
           createdAt: faker.date.recent(),
           updatedAt: faker.date.recent(),
         };
@@ -81,9 +88,20 @@ export const useCouponsApi = () => {
         name: faker.git.branch(),
         address: faker.finance.ethereumAddress(),
         targetAddress: faker.finance.ethereumAddress(),
-        rewardType: ["Percentage discount", "Fixed amount discount", "Gas fee"][
-          Math.floor(Math.random() * 3)
-        ] as "Percentage discount" | "Fixed amount discount" | "Gas fee",
+        startAt: faker.date.soon(),
+        duration: [
+          "1d",
+          "2d",
+          "3d",
+          "1w",
+          "2w",
+          "3w",
+          "1m",
+          "2m",
+          "3m",
+          "6m",
+          "1y",
+        ][Math.floor(Math.random() * 11)],
         createdAt: faker.date.recent(),
         updatedAt: faker.date.recent(),
       };
@@ -112,9 +130,20 @@ export const useCouponsApi = () => {
         name: faker.git.branch(),
         address: faker.finance.ethereumAddress(),
         targetAddress: faker.finance.ethereumAddress(),
-        rewardType: ["Percentage discount", "Fixed amount discount", "Gas fee"][
-          Math.floor(Math.random() * 3)
-        ] as "Percentage discount" | "Fixed amount discount" | "Gas fee",
+        startAt: faker.date.soon(),
+        duration: [
+          "1d",
+          "2d",
+          "3d",
+          "1w",
+          "2w",
+          "3w",
+          "1m",
+          "2m",
+          "3m",
+          "6m",
+          "1y",
+        ][Math.floor(Math.random() * 11)],
         createdAt: faker.date.recent(),
         updatedAt: faker.date.recent(),
       };
