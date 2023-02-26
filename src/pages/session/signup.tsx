@@ -150,7 +150,9 @@ export default function Login() {
               <form onSubmit={clickSubmit}>
                 <Card overflow="hidden" boxShadow="2xl" mt={8}>
                   <CardBody p={12}>
-                    <Heading size="md">Create your Stripe account</Heading>
+                    <Heading as="h2" size="md">
+                      Create your Stripe account
+                    </Heading>
                     <FormControl mt={8}>
                       <FormLabel fontSize="sm">Email</FormLabel>
                       <InputGroup size="lg">

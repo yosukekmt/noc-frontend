@@ -81,7 +81,9 @@ export default function Password() {
               <form onSubmit={clickSubmit}>
                 <Card overflow="hidden" boxShadow="2xl" mt={8}>
                   <CardBody p={12}>
-                    <Heading size="md">Reset your password</Heading>
+                    <Heading as="h2" size="md">
+                      Reset your password
+                    </Heading>
                     <Text fontSize="md" pt={4}>
                       Enter the email address associated with your account and
                       we&apos;ll send you a link to reset your password.
