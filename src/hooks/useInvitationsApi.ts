@@ -6,13 +6,10 @@ export const useInvitationsApi = () => {
   const { apiClient } = useApiClient();
 
   const callGetInvitations = useCallback(
-    async (authToken: string): Promise<Invitation[]> => {
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-
+    async (authToken: string, projectId: string): Promise<Invitation[]> => {
       const resp = await apiClient.get("/invitations", {
-        headers: {
-          Authorization: authToken,
-        },
+        params: { project_id: projectId },
+        headers: { Authorization: authToken },
       });
       const items = resp.data.map((d: any) => {
         return {
@@ -30,16 +27,13 @@ export const useInvitationsApi = () => {
   );
 
   const callCreateInvitation = useCallback(
-    async (authToken: string, email: string): Promise<Invitation> => {
-      const resp = await apiClient.post(
-        "/invitations",
-        { email },
-        {
-          headers: {
-            Authorization: authToken,
-          },
-        }
-      );
+    async (
+      authToken: string,
+      data: { projectId: string; email: string }
+    ): Promise<Invitation> => {
+      const resp = await apiClient.post("/invitations", data, {
+        headers: { Authorization: authToken },
+      });
       const item = {
         id: resp.data.id,
         email: resp.data.email,
@@ -54,11 +48,10 @@ export const useInvitationsApi = () => {
   );
 
   const callDeleteInvitation = useCallback(
-    async (authToken: string, email: string): Promise<void> => {
-      await apiClient.delete(`/invitations/${email}`, {
-        headers: {
-          Authorization: authToken,
-        },
+    async (authToken: string, projectId: string, id: string): Promise<void> => {
+      await apiClient.delete(`/invitations/${id}`, {
+        params: { project_id: projectId },
+        headers: { Authorization: authToken },
       });
       return;
     },

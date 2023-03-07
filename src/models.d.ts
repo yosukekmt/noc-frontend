@@ -5,6 +5,7 @@ export type Coupon = {
   description: string;
   contractAddress: string;
   treasuryAddress: string;
+  timezone: string;
   startAt: Date;
   endAt: Date;
   createdAt: Date;

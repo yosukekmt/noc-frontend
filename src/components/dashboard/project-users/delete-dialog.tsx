@@ -1,7 +1,7 @@
 import { useApiClient } from "@/hooks/useApiClient";
 import { useFirebase } from "@/hooks/useFirebase";
-import { useInvitationsApi } from "@/hooks/useInvitationsApi";
-import { Invitation } from "@/models";
+import { useProjectUsersApi } from "@/hooks/useProjectUsersApi";
+import { User } from "@/models";
 import {
   Button,
   Divider,
@@ -16,9 +16,9 @@ import {
 } from "@chakra-ui/react";
 import { FormEvent, useCallback, useState } from "react";
 
-export default function DeleteDialog(props: {
+export default function ProjectUsersDeleteDialog(props: {
   projectId: string;
-  item: Invitation;
+  item: User;
   isOpen: boolean;
   onClose(): void;
   onOpen(): void;
@@ -26,17 +26,17 @@ export default function DeleteDialog(props: {
 }) {
   const { isOpen, onClose, onOpen, onDeleted } = props;
   const { authToken } = useFirebase();
-  const { callDeleteInvitation } = useInvitationsApi();
+  const { callDeleteProjectUser } = useProjectUsersApi();
   const { getErrorMessage } = useApiClient();
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const deleteInvitation = useCallback(
-    async (authToken: string, projectId: string, id: string) => {
+  const deleteProjectUser = useCallback(
+    async (authToken: string, projectId: string, userId: string) => {
       setIsLoading(true);
       try {
-        await callDeleteInvitation(authToken, projectId, id);
-        onDeleted(id);
+        await callDeleteProjectUser(authToken, projectId, userId);
+        onDeleted(userId);
         onClose();
       } catch (err: unknown) {
         console.error(err);
@@ -47,7 +47,7 @@ export default function DeleteDialog(props: {
       }
       setIsLoading(false);
     },
-    [callDeleteInvitation, getErrorMessage, onClose, onDeleted]
+    [callDeleteProjectUser, getErrorMessage, onClose, onDeleted]
   );
 
   const clickSubmit = (evt: FormEvent) => {
@@ -55,7 +55,7 @@ export default function DeleteDialog(props: {
     if (!authToken) {
       return;
     }
-    deleteInvitation(authToken, props.projectId, props.item.id);
+    deleteProjectUser(authToken, props.projectId, props.item.id);
   };
 
   return (
@@ -63,7 +63,7 @@ export default function DeleteDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>Invalidate an invitation</ModalHeader>
+          <ModalHeader>Remove user from team</ModalHeader>
           <ModalCloseButton />
           <Divider />
           <ModalBody bg="gray.100">
@@ -71,7 +71,7 @@ export default function DeleteDialog(props: {
               <Text as="span" fontWeight="bold">
                 {props.item.email}
               </Text>{" "}
-              will no longer be available.
+              will no longer be able to access this project.
             </Text>
           </ModalBody>
           <Divider />
@@ -80,7 +80,7 @@ export default function DeleteDialog(props: {
               Cancel
             </Button>
             <Button type="submit" size="sm" isLoading={isLoading} ml={2}>
-              Invalidate
+              Remove user
             </Button>
           </ModalFooter>
         </ModalContent>

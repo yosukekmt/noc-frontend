@@ -24,6 +24,7 @@ import { Warning } from "phosphor-react";
 import { FormEvent, useCallback, useMemo, useState } from "react";
 
 export default function NewDialog(props: {
+  projectId: string;
   isOpen: boolean;
   onClose(): void;
   onOpen(): void;
@@ -44,10 +45,13 @@ export default function NewDialog(props: {
   }, [validateEmail, email]);
 
   const createInvitation = useCallback(
-    async (authToken: string, email: string) => {
+    async (authToken: string, projectId: string, email: string) => {
       setIsLoading(true);
       try {
-        const item = await callCreateInvitation(authToken, email);
+        const item = await callCreateInvitation(authToken, {
+          projectId,
+          email,
+        });
         console.log(item);
         onCreated(item);
         onClose();
@@ -82,7 +86,7 @@ export default function NewDialog(props: {
     if (!isValidEmail) {
       return;
     }
-    createInvitation(authToken, email);
+    createInvitation(authToken, props.projectId, email);
   };
 
   return (
@@ -90,7 +94,7 @@ export default function NewDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>Invite project new member</ModalHeader>
+          <ModalHeader>Invite new project member</ModalHeader>
           <ModalCloseButton />
           <Divider />
           <ModalBody bg="gray.100">

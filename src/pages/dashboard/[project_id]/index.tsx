@@ -58,19 +58,12 @@ const LoadingTBody = () => {
   );
 };
 
-const LoadedTbodyRow = (props: { item: Coupon }) => {
-  const { onCopy, value, setValue, hasCopied } = useClipboard("");
-  const { authToken } = useFirebase();
-
-  const clickCopy = () => {
-    onCopy();
-  };
-
+const LoadedTbodyRow = (props: { projectId: string; item: Coupon }) => {
   return (
     <Tr key={`coupon_${props.item.id}`} h={8}>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink
-          href={`/dashboard/coupons/${props.item.id}`}
+          href={`/dashboard/${props.projectId}/coupons/${props.item.id}`}
           style={{ width: "100%", display: "block" }}
         >
           <Text>{props.item.name}</Text>
@@ -78,7 +71,7 @@ const LoadedTbodyRow = (props: { item: Coupon }) => {
       </Td>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink
-          href={`/dashboard/coupons/${props.item.id}`}
+          href={`/dashboard/${props.projectId}/coupons/${props.item.id}`}
           style={{ width: "100%", display: "block" }}
         >
           Gas fee cashback
@@ -86,15 +79,15 @@ const LoadedTbodyRow = (props: { item: Coupon }) => {
       </Td>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink
-          href={`/dashboard/coupons/${props.item.id}`}
+          href={`/dashboard/${props.projectId}/coupons/${props.item.id}`}
           style={{ width: "100%", display: "block" }}
         >
-          {props.item.startAt.toLocaleString()}
+          {props.item.timezone}
         </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink
-          href="/dashboard/coupons/uuid"
+          href={`/dashboard/${props.projectId}/coupons/${props.item.id}`}
           style={{ width: "100%", display: "block" }}
         >
           {props.item.endAt.toLocaleString()}
@@ -104,7 +97,7 @@ const LoadedTbodyRow = (props: { item: Coupon }) => {
   );
 };
 
-const LoadedTbody = (props: { items: Coupon[] }) => {
+const LoadedTbody = (props: { projectId: string; items: Coupon[] }) => {
   return (
     <Tbody>
       {0 === props.items.length && (
@@ -116,7 +109,7 @@ const LoadedTbody = (props: { items: Coupon[] }) => {
       )}
       {0 < props.items.length &&
         props.items.flatMap((item) => {
-          return <LoadedTbodyRow item={item} />;
+          return <LoadedTbodyRow projectId={props.projectId} item={item} />;
         })}
     </Tbody>
   );
@@ -187,7 +180,7 @@ export default function Project() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
-      <DashboardLayout>
+      <DashboardLayout projectId={projectId as string}>
         <Card variant="outline">
           <CardHeader>
             <Grid templateColumns="repeat(12, 1fr)" gap={4}>
@@ -219,11 +212,15 @@ export default function Project() {
                 <Tr>
                   <Th>NAME</Th>
                   <Th>REWARD TYPE</Th>
-                  <Th>START</Th>
+                  <Th>TIME ZONE</Th>
                   <Th>DURATION</Th>
                 </Tr>
               </Thead>
-              {isInitialized ? <LoadedTbody items={items} /> : <LoadingTBody />}
+              {isInitialized ? (
+                <LoadedTbody projectId={projectId as string} items={items} />
+              ) : (
+                <LoadingTBody />
+              )}
             </Table>
           </TableContainer>
         </Card>

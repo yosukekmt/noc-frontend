@@ -19,6 +19,7 @@ export const useCouponsApi = () => {
           description: d.description,
           contractAddress: d.contractAddress,
           treasuryAddress: d.treasuryAddress,
+          timezone: d.timezone,
           startAt: new Date(d.startAt),
           endAt: new Date(d.endAt),
           createdAt: new Date(d.createdAt),
@@ -38,11 +39,11 @@ export const useCouponsApi = () => {
         rewardType: "gas_fee_cashback";
         name: string;
         description: string;
+        timezone: string;
         startAt: Date;
         endAt: Date;
       }
     ): Promise<Coupon> => {
-      console.log(data);
       const resp = await apiClient.post("/coupons", data, {
         headers: {
           Authorization: authToken,
@@ -55,6 +56,7 @@ export const useCouponsApi = () => {
         description: resp.data.description,
         contractAddress: resp.data.contractAddress,
         treasuryAddress: resp.data.treasuryAddress,
+        timezone: resp.data.timezone,
         startAt: new Date(resp.data.startAt),
         endAt: new Date(resp.data.endAt),
         createdAt: new Date(resp.data.createdAt),
@@ -82,6 +84,7 @@ export const useCouponsApi = () => {
         description: resp.data.description,
         contractAddress: resp.data.contractAddress,
         treasuryAddress: resp.data.treasuryAddress,
+        timezone: resp.data.timezone,
         startAt: new Date(resp.data.startAt),
         endAt: new Date(resp.data.endAt),
         createdAt: new Date(resp.data.createdAt),

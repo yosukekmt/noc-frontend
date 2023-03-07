@@ -7,12 +7,8 @@ export const useProjectsApi = () => {
 
   const callGetProjects = useCallback(
     async (authToken: string): Promise<Project[]> => {
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-
       const resp = await apiClient.get("/projects", {
-        headers: {
-          Authorization: authToken,
-        },
+        headers: { Authorization: authToken },
       });
       const items = resp.data.map((d: any) => {
         return {
@@ -30,9 +26,7 @@ export const useProjectsApi = () => {
   const callCreateProject = useCallback(
     async (authToken: string, data: { name: string }): Promise<Project> => {
       const resp = await apiClient.post("/projects", data, {
-        headers: {
-          Authorization: authToken,
-        },
+        headers: { Authorization: authToken },
       });
       const item = {
         id: resp.data.id,
@@ -52,9 +46,7 @@ export const useProjectsApi = () => {
       data: { name: string }
     ): Promise<Project> => {
       const resp = await apiClient.patch(`/projects/${id}/`, data, {
-        headers: {
-          Authorization: authToken,
-        },
+        headers: { Authorization: authToken },
       });
       const item = {
         id: resp.data.id,
@@ -68,11 +60,9 @@ export const useProjectsApi = () => {
   );
 
   const callDeleteProject = useCallback(
-    async (authToken: string, email: string): Promise<void> => {
-      await apiClient.delete(`/projects/${email}`, {
-        headers: {
-          Authorization: authToken,
-        },
+    async (authToken: string, id: string): Promise<void> => {
+      await apiClient.delete(`/projects/${id}`, {
+        headers: { Authorization: authToken },
       });
       return;
     },

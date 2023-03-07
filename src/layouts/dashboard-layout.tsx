@@ -7,8 +7,10 @@ import { useEffect } from "react";
 
 export default function DashboardLayout({
   children,
+  projectId = null,
 }: {
   children: JSX.Element;
+  projectId?: string | null;
 }) {
   const router = useRouter();
   const { firebaseSignOut } = useFirebase();
@@ -36,7 +38,7 @@ export default function DashboardLayout({
   return (
     <Box>
       <Box as="header">
-        <Header />
+        <Header projectId={projectId} />
       </Box>
       <Box as="main">
         <Container maxWidth="6xl" py={8}>

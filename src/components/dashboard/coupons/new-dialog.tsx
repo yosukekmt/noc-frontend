@@ -46,7 +46,6 @@ export default function NewDialog(props: {
     getDefaultEndDate,
     getDefaultEndTime,
     parseDateInput,
-    getTimezones,
     getTimezoneOffsets,
   } = useDatetime();
   const { callCreateCoupons } = useCouponsApi();
@@ -82,6 +81,7 @@ export default function NewDialog(props: {
       rewardType: "gas_fee_cashback",
       name: string,
       description: string,
+      timezone: string,
       startAt: Date,
       endAt: Date
     ) => {
@@ -92,6 +92,7 @@ export default function NewDialog(props: {
           rewardType,
           name,
           description,
+          timezone,
           startAt,
           endAt,
         });
@@ -124,6 +125,7 @@ export default function NewDialog(props: {
       "gas_fee_cashback",
       name,
       description,
+      timezone,
       startAt,
       endtAt
     );
