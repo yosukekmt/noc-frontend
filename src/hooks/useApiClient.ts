@@ -1,4 +1,4 @@
-//import Axios from "axios";
+import Axios from "axios";
 import { useCallback } from "react";
 
 const ERROR_MESSAGES = [
@@ -34,13 +34,9 @@ const ERROR_MESSAGES = [
   { code: 510, message: "Server Error(510): :not_extended" },
 ];
 
-/*
 const apiClient = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
 });
-*/
-
-const apiClient: any = [];
 
 export const useApiClient = () => {
   const getErrorMessage = useCallback((err: unknown): string | null => {

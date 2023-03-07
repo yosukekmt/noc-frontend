@@ -1,6 +1,6 @@
-//import * as Firebase from "firebase/app";
-//import * as FirebaseAuth from "firebase/auth";
 import { faker } from "@faker-js/faker";
+import * as Firebase from "firebase/app";
+import * as FirebaseAuth from "firebase/auth";
 import { atom, useAtom } from "jotai";
 import { useCallback } from "react";
 const ERROR_MESSAGES = [
@@ -21,13 +21,13 @@ const ERROR_MESSAGES = [
     message: "The password is incorrect.",
   },
 ];
-/*
+
 const firebase = Firebase.initializeApp(
   JSON.parse(process.env.NEXT_PUBLIC_FIREBASE_CONFIG as string)
 );
 const firebaseAuth = FirebaseAuth.getAuth(firebase);
 firebaseAuth.languageCode = "ja";
-*/
+
 const authTokenAtom = atom<string | null>(null);
 const isInitializedAtom = atom<boolean>(false);
 
@@ -37,13 +37,8 @@ export const useFirebase = () => {
   const [authToken, setAuthToken] = useAtom(authTokenAtom);
   const [isInitialized, setIsInitialized] = useAtom(isInitializedAtom);
 
-  setTimeout(() => {
-    setIsInitialized(true);
-    setAuthToken(item);
-  }, 300);
-
-  /*
   firebaseAuth.onAuthStateChanged((firebaseUser) => {
+    console.log("firebaseUser:" + firebaseUser);
     setIsInitialized(true);
     if (!firebaseUser) {
       setAuthToken(null);
@@ -60,13 +55,30 @@ export const useFirebase = () => {
       })
       .finally(() => {});
   });
-*/
+
+  const signUp = useCallback(
+    async (email: string, password: string): Promise<string> => {
+      if (authToken && 0 < authToken.length) {
+        return authToken;
+      }
+      const credential = await FirebaseAuth.createUserWithEmailAndPassword(
+        firebaseAuth,
+        email,
+        password
+      );
+      const idToken = await credential.user.getIdToken();
+      const item = `Bearer ${idToken}`;
+      setAuthToken(item);
+      return item;
+    },
+    [authToken, setAuthToken]
+  );
 
   const signIn = useCallback(
     async (email: string, password: string): Promise<string> => {
       if (authToken && 0 < authToken.length) {
         return authToken;
-      } /*
+      }
       const credential = await FirebaseAuth.signInWithEmailAndPassword(
         firebaseAuth,
         email,
@@ -74,7 +86,6 @@ export const useFirebase = () => {
       );
       const idToken = await credential.user.getIdToken();
       const item = `Bearer ${idToken}`;
-      */
       setAuthToken(item);
       return item;
     },
@@ -82,13 +93,13 @@ export const useFirebase = () => {
   );
 
   const signOut = useCallback(async (): Promise<void> => {
-    //await FirebaseAuth.signOut(firebaseAuth);
+    await FirebaseAuth.signOut(firebaseAuth);
     setAuthToken(null);
   }, [setAuthToken]);
 
   const updatePassword = useCallback(
     async (password: string, newPassword: string): Promise<void> => {
-      /*      const user = firebaseAuth.currentUser;
+      const user = firebaseAuth.currentUser;
       if (!user) return;
       const email = user.email;
       if (!email) return;
@@ -98,20 +109,19 @@ export const useFirebase = () => {
         password
       );
       await FirebaseAuth.reauthenticateWithCredential(user, credential);
-      await FirebaseAuth.updatePassword(user, newPassword);*/
+      await FirebaseAuth.updatePassword(user, newPassword);
     },
     []
   );
 
   const resetPassword = useCallback(
     async (email: string, url: string): Promise<void> => {
-      /*
       const config = { url: url, handleCodeInApp: false };
       return await FirebaseAuth.sendPasswordResetEmail(
         firebaseAuth,
         email,
         config
-      );*/
+      );
     },
     []
   );
@@ -126,10 +136,11 @@ export const useFirebase = () => {
   return {
     isFirebaseInitialized: isInitialized,
     authToken,
+    firebaseSignUp: signUp,
     firebaseSignIn: signIn,
     firebaseSignOut: signOut,
+    getFirebaseErrorMessage: getErrorMessage,
     updatePassword,
     resetPassword,
-    getErrorMessage,
   };
 };

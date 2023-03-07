@@ -28,7 +28,7 @@ export default function EditDialog(props: {
   onUpdated(): void;
 }) {
   const { isOpen, onClose, onOpen, onUpdated } = props;
-  const { authToken, updatePassword, getErrorMessage } = useFirebase();
+  const { authToken, updatePassword, getFirebaseErrorMessage } = useFirebase();
   const { validatePassword } = useValidator();
 
   const [password, setPassword] = useState("");
@@ -62,14 +62,14 @@ export default function EditDialog(props: {
         onClose();
       } catch (err: unknown) {
         console.error(err);
-        const errorMessage = getErrorMessage(err);
+        const errorMessage = getFirebaseErrorMessage(err);
         if (errorMessage) {
           setErrorMessage(errorMessage);
         }
       }
       setIsLoading(false);
     },
-    [getErrorMessage, onClose, onUpdated, updatePassword]
+    [updatePassword, getFirebaseErrorMessage, onUpdated, onClose]
   );
 
   const clickSubmit = (evt: FormEvent) => {
@@ -95,12 +95,12 @@ export default function EditDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>Change password</ModalHeader>
+          <ModalHeader>パスワードの変更</ModalHeader>
           <ModalCloseButton />
           <Divider />
           <ModalBody bg="gray.100">
             <FormControl mt={8}>
-              <FormLabel fontSize="sm">Current password</FormLabel>
+              <FormLabel fontSize="sm">現在のパスワード</FormLabel>
               <InputGroup size="lg">
                 <Input
                   type="password"
@@ -114,14 +114,14 @@ export default function EditDialog(props: {
                   <Flex align="center">
                     <WarningTwoIcon color="red" />
                     <Text fontSize="sm" fontWeight="normal" color="red" ml={2}>
-                      Provide current password
+                      現在のパスワードを入力してください。
                     </Text>
                   </Flex>
                 )}
               </Box>
             </FormControl>
             <FormControl mt={8}>
-              <FormLabel fontSize="sm">New password</FormLabel>
+              <FormLabel fontSize="sm">新しいパスワード</FormLabel>
               <InputGroup size="lg">
                 <Input
                   type="password"
@@ -135,14 +135,14 @@ export default function EditDialog(props: {
                   <Flex align="center">
                     <WarningTwoIcon color="red" />
                     <Text fontSize="sm" fontWeight="normal" color="red" ml={2}>
-                      Provide new password
+                      新しいパスワードを入力してください。
                     </Text>
                   </Flex>
                 )}
               </Box>
             </FormControl>
             <FormControl mt={8}>
-              <FormLabel fontSize="sm">New password (confirmation)</FormLabel>
+              <FormLabel fontSize="sm">新しいパスワード（確認）</FormLabel>
               <InputGroup size="lg">
                 <Input
                   type="password"
@@ -165,7 +165,7 @@ export default function EditDialog(props: {
                           color="red"
                           ml={2}
                         >
-                          Provide new password
+                          新しいパスワード（確認）を入力してください。
                         </Text>
                       </Flex>
                     );
@@ -193,10 +193,10 @@ export default function EditDialog(props: {
           <Divider />
           <ModalFooter>
             <Button size="sm" onClick={onClose}>
-              Cancel
+              キャンセル
             </Button>
             <Button type="submit" size="sm" isLoading={isLoading} ml={2}>
-              Change password
+              パスワードの変更
             </Button>
           </ModalFooter>
         </ModalContent>

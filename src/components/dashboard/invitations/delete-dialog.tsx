@@ -1,7 +1,7 @@
 import { useApiClient } from "@/hooks/useApiClient";
-import { useCouponsApi } from "@/hooks/useCouponsApi";
 import { useFirebase } from "@/hooks/useFirebase";
-import { Coupon } from "@/models";
+import { useInvitationsApi } from "@/hooks/useInvitationsApi";
+import { Invitation } from "@/models";
 import {
   Button,
   Divider,
@@ -17,8 +17,7 @@ import {
 import { FormEvent, useCallback, useState } from "react";
 
 export default function DeleteDialog(props: {
-  projectId: string;
-  item: Coupon;
+  item: Invitation;
   isOpen: boolean;
   onClose(): void;
   onOpen(): void;
@@ -26,16 +25,16 @@ export default function DeleteDialog(props: {
 }) {
   const { isOpen, onClose, onOpen, onDeleted } = props;
   const { authToken } = useFirebase();
-  const { callDeleteCoupon } = useCouponsApi();
+  const { callDeleteInvitation } = useInvitationsApi();
   const { getErrorMessage } = useApiClient();
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const deleteToken = useCallback(
-    async (authToken: string, projectId: string, id: string) => {
+  const deleteInvitation = useCallback(
+    async (authToken: string, id: string) => {
       setIsLoading(true);
       try {
-        await callDeleteCoupon(authToken, projectId, id);
+        await callDeleteInvitation(authToken, id);
         onDeleted();
         onClose();
       } catch (err: unknown) {
@@ -47,7 +46,7 @@ export default function DeleteDialog(props: {
       }
       setIsLoading(false);
     },
-    [callDeleteCoupon, getErrorMessage, onClose, onDeleted]
+    [callDeleteInvitation, getErrorMessage, onClose, onDeleted]
   );
 
   const clickSubmit = (evt: FormEvent) => {
@@ -55,7 +54,7 @@ export default function DeleteDialog(props: {
     if (!authToken) {
       return;
     }
-    deleteToken(authToken, props.projectId, props.item.id);
+    deleteInvitation(authToken, props.item.id);
   };
 
   return (
@@ -63,11 +62,16 @@ export default function DeleteDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>Invalidate Coupon</ModalHeader>
+          <ModalHeader>Remove user from team</ModalHeader>
           <ModalCloseButton />
           <Divider />
           <ModalBody bg="gray.100">
-            <Text fontSize="md">This coupon will be unabled.</Text>
+            <Text fontSize="md">
+              <Text as="span" fontWeight="bold">
+                {props.item.email}
+              </Text>{" "}
+              will no longer be able to access this project.
+            </Text>
           </ModalBody>
           <Divider />
           <ModalFooter>
@@ -75,7 +79,7 @@ export default function DeleteDialog(props: {
               Cancel
             </Button>
             <Button type="submit" size="sm" isLoading={isLoading} ml={2}>
-              Delete coupon
+              Remove user
             </Button>
           </ModalFooter>
         </ModalContent>

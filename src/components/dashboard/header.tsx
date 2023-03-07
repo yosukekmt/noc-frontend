@@ -1,8 +1,7 @@
 import Logo from "@/components/logo";
-import { Team, useCurrentTeam } from "@/hooks/useCurrentTeam";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useCurrentUserApi } from "@/hooks/useCurrentUserApi";
 import { useFirebase } from "@/hooks/useFirebase";
-import { User } from "@/hooks/useUsersApi";
+import { User } from "@/models";
 import { EditIcon, HamburgerIcon, RepeatIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -77,10 +76,8 @@ const NavigationBar = () => {
 export default function Header() {
   const router = useRouter();
   const { authToken, firebaseSignOut } = useFirebase();
-  const { getCurrentUser, clearCurrentUser } = useCurrentUser();
-  const { getCurrentTeam, clearCurrentTeam } = useCurrentTeam();
+  const { getCurrentUser, clearCurrentUser } = useCurrentUserApi();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [currentTeam, setCurrentTeam] = useState<Team | null>(null);
 
   useEffect(() => {
     if (!authToken) {
@@ -93,18 +90,11 @@ export default function Header() {
         setCurrentUser(item);
       })();
     }
-    {
-      (async () => {
-        const item = await getCurrentTeam(authToken);
-        setCurrentTeam(item);
-      })();
-    }
-  }, [authToken, getCurrentTeam, getCurrentUser]);
+  }, [authToken, getCurrentUser]);
 
   const clickSignOut = () => {
     firebaseSignOut();
     clearCurrentUser();
-    clearCurrentTeam();
     router.push("/");
   };
 
@@ -118,7 +108,7 @@ export default function Header() {
             </NextLink>
             <Spacer />
             <Text fontSize="md" mx={4}>
-              {currentTeam && currentTeam.name}
+              team
             </Text>
             <Menu>
               <MenuButton
@@ -130,7 +120,7 @@ export default function Header() {
               <MenuList>
                 <Box px={4} pt={2}>
                   <Heading as="h3" fontSize="md" fontWeight="bold">
-                    {currentTeam && currentTeam.name}
+                    team
                   </Heading>
                   <Heading as="h4" fontSize="sm" fontWeight="light" mt={1}>
                     {currentUser && currentUser.email}

@@ -1,176 +1,48 @@
-import NewDialog from "@/components/dashboard/coupons/new-dialog";
-import { Coupon, useCouponsApi } from "@/hooks/useCouponsApi";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
+import NewDialog from "@/components/dashboard/projects/new-dialog";
 import { useFirebase } from "@/hooks/useFirebase";
+import { useProjectsApi } from "@/hooks/useProjectsApi";
 import DashboardLayout from "@/layouts/dashboard-layout";
-import {
-  Box,
-  Button,
-  Card,
-  CardHeader,
-  Center,
-  Divider,
-  Flex,
-  Grid,
-  GridItem,
-  Heading,
-  Skeleton,
-  Spacer,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-  useClipboard,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Project } from "@/models";
+import { Center, Flex, useDisclosure } from "@chakra-ui/react";
 import Head from "next/head";
-import NextLink from "next/link";
 import { useRouter } from "next/router";
+import { Spinner } from "phosphor-react";
 import { useCallback, useEffect, useState } from "react";
-
-const LoadingTBody = () => {
-  return (
-    <Tbody>
-      {[...Array(3)].flatMap((x, idx) => {
-        return (
-          <Tr key={`coupon_${idx}`} h={16}>
-            <Td>
-              <Skeleton h={4} />
-            </Td>
-            <Td>
-              <Skeleton h={4} />
-            </Td>
-            <Td>
-              <Skeleton h={4} />
-            </Td>
-            <Td>
-              <Skeleton h={4} />
-            </Td>
-          </Tr>
-        );
-      })}
-    </Tbody>
-  );
-};
-
-const LoadedTbodyRow = (props: { item: Coupon }) => {
-  const { onCopy, value, setValue, hasCopied } = useClipboard("");
-  const { authToken } = useFirebase();
-
-  const clickCopy = () => {
-    onCopy();
-  };
-
-  return (
-    <Tr key={`coupon_${props.item.uuid}`} h={8}>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href="/dashboard/coupons/uuid"
-          style={{ width: "100%", display: "block" }}
-        >
-          <Text>{props.item.name}</Text>
-        </NextLink>
-      </Td>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href="/dashboard/coupons/uuid"
-          style={{ width: "100%", display: "block" }}
-        >
-          Gas fee cashback
-        </NextLink>
-      </Td>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href="/dashboard/coupons/uuid"
-          style={{ width: "100%", display: "block" }}
-        >
-          {props.item.startAt.toLocaleString()}
-        </NextLink>
-      </Td>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href="/dashboard/coupons/uuid"
-          style={{ width: "100%", display: "block" }}
-        >
-          {props.item.duration}
-        </NextLink>
-      </Td>
-    </Tr>
-  );
-};
-
-const LoadedTbody = (props: { items: Coupon[] }) => {
-  return (
-    <Tbody>
-      {0 === props.items.length && (
-        <Tr key={"coupons_empty"} h={16}>
-          <Td colSpan={5}>
-            <Center>There is not any coupons.</Center>
-          </Td>
-        </Tr>
-      )}
-      {0 < props.items.length &&
-        props.items.flatMap((item) => {
-          return <LoadedTbodyRow item={item} />;
-        })}
-    </Tbody>
-  );
-};
 
 export default function Dashboard() {
   const router = useRouter();
-  const { firebaseSignOut } = useFirebase();
-  const { clearCurrentUser } = useCurrentUser();
-  const { callGetCoupons } = useCouponsApi();
-  const [items, setItems] = useState<Coupon[]>([]);
   const { authToken, isFirebaseInitialized } = useFirebase();
+  const { callGetProjects } = useProjectsApi();
   const [isInitialized, setIsInitialized] = useState(false);
   const newDialog = useDisclosure();
-  const getCoupons = useCallback(
+
+  const getProjects = useCallback(
     async (authToken: string): Promise<void> => {
-      const items = await callGetCoupons(authToken);
-      setItems(items);
+      const items = await callGetProjects(authToken);
+      if (items.length === 0) {
+        newDialog.onOpen();
+      } else {
+        router.push(`/dashboard/${items[0].id}`);
+      }
     },
-    [callGetCoupons]
+    [callGetProjects, newDialog, router]
   );
 
   useEffect(() => {
-    if (!isFirebaseInitialized) {
-      return;
-    }
-    if (!authToken) {
-      firebaseSignOut();
-      clearCurrentUser();
-      router.push("/");
-      return;
-    }
+    if (!isFirebaseInitialized) return;
+    if (!authToken) return;
 
     (async () => {
-      await getCoupons(authToken);
+      await getProjects(authToken);
       setIsInitialized(true);
     })();
-  }, [
-    isFirebaseInitialized,
-    authToken,
-    firebaseSignOut,
-    clearCurrentUser,
-    router,
-    getCoupons,
-  ]);
+  }, [authToken, getProjects, isFirebaseInitialized]);
 
-  const clickNew = () => {
-    newDialog.onOpen();
-  };
-
-  const onCreated = (item: Coupon) => {
+  const onCreated = (item: Project) => {
     if (!authToken) {
       return;
     }
-    getCoupons(authToken);
+    router.push(`/dashboard/${item.id}`);
   };
 
   return (
@@ -185,47 +57,24 @@ export default function Dashboard() {
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
       <DashboardLayout>
-        <Card variant="outline">
-          <CardHeader>
-            <Grid templateColumns="repeat(12, 1fr)" gap={4}>
-              <GridItem colSpan={{ base: 12, sm: 6 }}>
-                <Box>
-                  <Heading as="h3" fontSize="2xl" fontWeight="bold">
-                    Gasback NFTs
-                  </Heading>
-                </Box>
-              </GridItem>
-              <GridItem colSpan={{ base: 12, sm: 6 }}>
-                <Flex align="center" h="100%">
-                  <Spacer />
-                  <Button
-                    size="sm"
-                    w={{ base: "100%", sm: "inherit" }}
-                    onClick={clickNew}
-                  >
-                    New Gasback NFT
-                  </Button>
-                </Flex>
-              </GridItem>
-            </Grid>
-          </CardHeader>
-          <Divider />
-          <TableContainer>
-            <Table size="sm">
-              <Thead>
-                <Tr>
-                  <Th>NAME</Th>
-                  <Th>REWARD TYPE</Th>
-                  <Th>START</Th>
-                  <Th>DURATION</Th>
-                </Tr>
-              </Thead>
-              {isInitialized ? <LoadedTbody items={items} /> : <LoadingTBody />}
-            </Table>
-          </TableContainer>
-        </Card>
+        <Flex h={320} align="center" justify="center">
+          <Center>
+            <Spinner size={24}>
+              <animateTransform
+                attributeName="transform"
+                attributeType="XML"
+                type="rotate"
+                dur="1.8s"
+                from="0 0 0"
+                to="360 0 0"
+                repeatCount="indefinite"
+              ></animateTransform>
+            </Spinner>
+          </Center>
+        </Flex>
       </DashboardLayout>
       <NewDialog
+        closable={false}
         isOpen={newDialog.isOpen}
         onClose={newDialog.onClose}
         onOpen={newDialog.onOpen}

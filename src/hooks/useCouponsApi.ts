@@ -1,109 +1,64 @@
-import { faker } from "@faker-js/faker";
+import { Coupon } from "@/models";
 import { useCallback } from "react";
 import { useApiClient } from "./useApiClient";
-
-export type Coupon = {
-  uuid: string;
-  name: string;
-  address: string;
-  targetAddress: string;
-  startAt: Date;
-  duration: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
 
 export const useCouponsApi = () => {
   const { apiClient } = useApiClient();
 
   const callGetCoupons = useCallback(
-    async (authToken: string): Promise<Coupon[]> => {
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-
-      /*
+    async (authToken: string, projectId: string): Promise<Coupon[]> => {
       const resp = await apiClient.get("/coupons", {
-        headers: {
-          Authorization: authToken,
-        },
+        params: { project_id: projectId },
+        headers: { Authorization: authToken },
       });
       const items = resp.data.map((d: any) => {
         return {
-          uuid: d.uuid,
+          id: d.id,
+          rewardType: d.rewardType,
           name: d.name,
-          secretKey: null,
+          description: d.description,
+          contractAddress: d.contractAddress,
+          treasuryAddress: d.treasuryAddress,
+          startAt: new Date(d.startAt),
+          endAt: new Date(d.endAt),
           createdAt: new Date(d.createdAt),
           updatedAt: new Date(d.updatedAt),
-        };
-      });*/
-      const items = [null, null, null].flatMap((n): Coupon => {
-        return {
-          uuid: faker.datatype.uuid(),
-          name: faker.git.branch(),
-          address: faker.finance.ethereumAddress(),
-          targetAddress: faker.finance.ethereumAddress(),
-          startAt: faker.date.soon(),
-          duration: [
-            "1d",
-            "2d",
-            "3d",
-            "1w",
-            "2w",
-            "3w",
-            "1m",
-            "2m",
-            "3m",
-            "6m",
-            "1y",
-          ][Math.floor(Math.random() * 11)],
-          createdAt: faker.date.recent(),
-          updatedAt: faker.date.recent(),
         };
       });
       return items;
     },
-    []
+    [apiClient]
   );
 
   const callCreateCoupons = useCallback(
-    async (authToken: string, name: string): Promise<Coupon> => {
-      /*
-      const resp = await apiClient.post(
-        "/coupons",
-        { name },
-        {
-          headers: {
-            Authorization: authToken,
-          },
-        }
-      );
+    async (
+      authToken: string,
+      data: {
+        projectId: string;
+        rewardType: "gas_fee_cashback";
+        name: string;
+        description: string;
+        startAt: Date;
+        endAt: Date;
+      }
+    ): Promise<Coupon> => {
+      console.log(data);
+      const resp = await apiClient.post("/coupons", data, {
+        headers: {
+          Authorization: authToken,
+        },
+      });
       const item = {
-        uuid: resp.data.uuid,
+        id: resp.data.id,
+        rewardType: resp.data.rewardType,
         name: resp.data.name,
-        secretKey: null,
+        description: resp.data.description,
+        contractAddress: resp.data.contractAddress,
+        treasuryAddress: resp.data.treasuryAddress,
+        startAt: new Date(resp.data.startAt),
+        endAt: new Date(resp.data.endAt),
         createdAt: new Date(resp.data.createdAt),
         updatedAt: new Date(resp.data.updatedAt),
-      };*/
-      const item = {
-        uuid: faker.datatype.uuid(),
-        name: faker.git.branch(),
-        address: faker.finance.ethereumAddress(),
-        targetAddress: faker.finance.ethereumAddress(),
-        startAt: faker.date.soon(),
-        duration: [
-          "1d",
-          "2d",
-          "3d",
-          "1w",
-          "2w",
-          "3w",
-          "1m",
-          "2m",
-          "3m",
-          "6m",
-          "1y",
-        ][Math.floor(Math.random() * 11)],
-        createdAt: faker.date.recent(),
-        updatedAt: faker.date.recent(),
       };
       return item;
     },
@@ -111,41 +66,26 @@ export const useCouponsApi = () => {
   );
 
   const callGetCoupon = useCallback(
-    async (authToken: string, uuid: string): Promise<Coupon> => {
-      /*
-      const resp = await apiClient.get(`/coupons/${uuid}`, {
-        headers: {
-          Authorization: authToken,
-        },
+    async (
+      authToken: string,
+      projectId: string,
+      id: string
+    ): Promise<Coupon> => {
+      const resp = await apiClient.get(`/coupons/${id}`, {
+        params: { project_id: projectId },
+        headers: { Authorization: authToken },
       });
       const item = {
-        uuid: resp.data.uuid,
+        id: resp.data.id,
+        rewardType: resp.data.rewardType,
         name: resp.data.name,
-        secretKey: resp.data.secretKey,
+        description: resp.data.description,
+        contractAddress: resp.data.contractAddress,
+        treasuryAddress: resp.data.treasuryAddress,
+        startAt: new Date(resp.data.startAt),
+        endAt: new Date(resp.data.endAt),
         createdAt: new Date(resp.data.createdAt),
         updatedAt: new Date(resp.data.updatedAt),
-      };*/
-      const item = {
-        uuid: faker.datatype.uuid(),
-        name: faker.git.branch(),
-        address: faker.finance.ethereumAddress(),
-        targetAddress: faker.finance.ethereumAddress(),
-        startAt: faker.date.soon(),
-        duration: [
-          "1d",
-          "2d",
-          "3d",
-          "1w",
-          "2w",
-          "3w",
-          "1m",
-          "2m",
-          "3m",
-          "6m",
-          "1y",
-        ][Math.floor(Math.random() * 11)],
-        createdAt: faker.date.recent(),
-        updatedAt: faker.date.recent(),
       };
       return item;
     },
@@ -153,15 +93,12 @@ export const useCouponsApi = () => {
   );
 
   const callDeleteCoupon = useCallback(
-    async (authToken: string, uuid: string): Promise<void> => {
-      /*
-      await apiClient.delete(`/coupons/${uuid}`, {
-        headers: {
-          Authorization: authToken,
-        },
+    async (authToken: string, projectId: string, id: string): Promise<void> => {
+      await apiClient.delete(`/coupons/${id}`, {
+        params: { project_id: projectId },
+        headers: { Authorization: authToken },
       });
       return;
-      */
     },
     [apiClient]
   );

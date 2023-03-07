@@ -1,6 +1,7 @@
 import { useApiClient } from "@/hooks/useApiClient";
 import { useFirebase } from "@/hooks/useFirebase";
-import { User, useUsersApi } from "@/hooks/useUsersApi";
+import { useProjectsApi } from "@/hooks/useProjectsApi";
+import { Project } from "@/models";
 import {
   Button,
   Divider,
@@ -16,7 +17,7 @@ import {
 import { FormEvent, useCallback, useState } from "react";
 
 export default function DeleteDialog(props: {
-  user: User;
+  item: Project;
   isOpen: boolean;
   onClose(): void;
   onOpen(): void;
@@ -24,16 +25,16 @@ export default function DeleteDialog(props: {
 }) {
   const { isOpen, onClose, onOpen, onDeleted } = props;
   const { authToken } = useFirebase();
-  const { callDeleteUser } = useUsersApi();
+  const { callDeleteProject } = useProjectsApi();
   const { getErrorMessage } = useApiClient();
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const deleteUser = useCallback(
-    async (authToken: string, email: string) => {
+  const deleteProject = useCallback(
+    async (authToken: string, id: string) => {
       setIsLoading(true);
       try {
-        await callDeleteUser(authToken, email);
+        await callDeleteProject(authToken, id);
         onDeleted();
         onClose();
       } catch (err: unknown) {
@@ -45,7 +46,7 @@ export default function DeleteDialog(props: {
       }
       setIsLoading(false);
     },
-    [callDeleteUser, getErrorMessage, onClose, onDeleted]
+    [callDeleteProject, getErrorMessage, onClose, onDeleted]
   );
 
   const clickSubmit = (evt: FormEvent) => {
@@ -53,7 +54,7 @@ export default function DeleteDialog(props: {
     if (!authToken) {
       return;
     }
-    deleteUser(authToken, props.user.email);
+    deleteProject(authToken, props.item.id);
   };
 
   return (
@@ -61,15 +62,12 @@ export default function DeleteDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>Remove user from team</ModalHeader>
+          <ModalHeader>Remove project</ModalHeader>
           <ModalCloseButton />
           <Divider />
           <ModalBody bg="gray.100">
             <Text fontSize="md">
-              <Text as="span" fontWeight="bold">
-                {props.user.email}
-              </Text>{" "}
-              will no longer be able to access this account.
+              All members belong to this project will also lose the access.
             </Text>
           </ModalBody>
           <Divider />
@@ -78,7 +76,7 @@ export default function DeleteDialog(props: {
               Cancel
             </Button>
             <Button type="submit" size="sm" isLoading={isLoading} ml={2}>
-              Remove user
+              Delete project
             </Button>
           </ModalFooter>
         </ModalContent>

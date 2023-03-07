@@ -14,8 +14,8 @@ import {
   Flex,
   Grid,
   GridItem,
-  HStack,
   Heading,
+  HStack,
   Spacer,
   Text,
 } from "@chakra-ui/react";
@@ -50,7 +50,7 @@ const Header = () => {
                   Sign in
                 </Button>
               </NextLink>
-              <NextLink href="/session/register">
+              <NextLink href="/session/signup">
                 <Button size="sm" variant="outline">
                   Register
                 </Button>

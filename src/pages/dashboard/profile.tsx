@@ -1,8 +1,8 @@
-import EditDialog from "@/components/dashboard/users/edit-dialog";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
+import EditDialog from "@/components/dashboard/current-user/edit-dialog";
+import { useCurrentUserApi } from "@/hooks/useCurrentUserApi";
 import { useFirebase } from "@/hooks/useFirebase";
-import { User } from "@/hooks/useUsersApi";
 import DashboardLayout from "@/layouts/dashboard-layout";
+import { User } from "@/models";
 import { EditIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -20,7 +20,7 @@ import { useEffect, useState } from "react";
 
 export default function Profile() {
   const { authToken } = useFirebase();
-  const { getCurrentUser } = useCurrentUser();
+  const { getCurrentUser } = useCurrentUserApi();
   const [currentUser, setcurrentUser] = useState<User | null>(null);
 
   const editUserDialog = useDisclosure();

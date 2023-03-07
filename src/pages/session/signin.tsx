@@ -1,11 +1,10 @@
 import Footer from "@/components/session/footer";
 import Header from "@/components/session/header";
 import { useApiClient } from "@/hooks/useApiClient";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useCurrentUserApi } from "@/hooks/useCurrentUserApi";
 import { useFirebase } from "@/hooks/useFirebase";
-import { User } from "@/hooks/useUsersApi";
 import { useValidator } from "@/hooks/useValidator";
-import { ViewIcon, ViewOffIcon, WarningTwoIcon } from "@chakra-ui/icons";
+import { User } from "@/models";
 import {
   Box,
   Button,
@@ -16,6 +15,7 @@ import {
   FormControl,
   FormLabel,
   Heading,
+  Icon,
   IconButton,
   Input,
   InputGroup,
@@ -26,6 +26,7 @@ import {
 import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
+import { Eye, EyeSlash, Warning } from "phosphor-react";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 export default function Login() {
@@ -34,11 +35,11 @@ export default function Login() {
     authToken,
     firebaseSignIn,
     firebaseSignOut,
-    getErrorMessage: getFirebaseErrorMessage,
+    getFirebaseErrorMessage,
   } = useFirebase();
   const { getErrorMessage: getApiErrorMessage, isUnauthorizedError } =
     useApiClient();
-  const { getCurrentUser, clearCurrentUser } = useCurrentUser();
+  const { getCurrentUser, clearCurrentUser } = useCurrentUserApi();
   const { validateEmail, validatePassword } = useValidator();
 
   const [email, setEmail] = useState("");
@@ -122,9 +123,6 @@ export default function Login() {
   }, [currentUser, router]);
 
   const clickSubmit = (evt: FormEvent) => {
-    setTimeout(() => {
-      router.push("/dashboard");
-    }, 300);
     evt.preventDefault();
     setIsAttempted(true);
     if (!isValidEmail) return;
@@ -169,7 +167,7 @@ export default function Login() {
                       <Box h={2} mt={2}>
                         {isAttempted && !isValidEmail && (
                           <Flex align="center">
-                            <WarningTwoIcon color="red" />
+                            <Icon as={Warning} color="red" />
                             <Text
                               fontSize="sm"
                               fontWeight="normal"
@@ -202,7 +200,11 @@ export default function Login() {
                             variant="ghost"
                             aria-label="Toggle Password"
                             icon={
-                              passwordVisible ? <ViewOffIcon /> : <ViewIcon />
+                              passwordVisible ? (
+                                <Icon as={EyeSlash} />
+                              ) : (
+                                <Icon as={Eye} />
+                              )
                             }
                             onClick={() => setPasswordVisible(!passwordVisible)}
                           />
@@ -213,7 +215,7 @@ export default function Login() {
                           if (isAttempted && !isValidPassword) {
                             return (
                               <Flex align="center">
-                                <WarningTwoIcon color="red" />
+                                <Icon as={Warning} color="red" />
                                 <Text
                                   fontSize="sm"
                                   fontWeight="normal"
@@ -227,7 +229,7 @@ export default function Login() {
                           } else if (isAttempted && errorMessage) {
                             return (
                               <Flex align="center">
-                                <WarningTwoIcon color="red" />
+                                <Icon as={Warning} color="red" />
                                 <Text
                                   fontSize="sm"
                                   fontWeight="normal"

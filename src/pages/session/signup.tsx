@@ -1,11 +1,10 @@
 import Footer from "@/components/session/footer";
 import Header from "@/components/session/header";
 import { useApiClient } from "@/hooks/useApiClient";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useCurrentUserApi } from "@/hooks/useCurrentUserApi";
 import { useFirebase } from "@/hooks/useFirebase";
-import { User } from "@/hooks/useUsersApi";
 import { useValidator } from "@/hooks/useValidator";
-import { ViewIcon, ViewOffIcon, WarningTwoIcon } from "@chakra-ui/icons";
+import { User } from "@/models";
 import {
   Box,
   Button,
@@ -16,29 +15,30 @@ import {
   FormControl,
   FormLabel,
   Heading,
+  Icon,
   IconButton,
   Input,
   InputGroup,
   InputRightElement,
-  Spacer,
   Text,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
+import { Eye, EyeSlash, Warning } from "phosphor-react";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 export default function Login() {
   const router = useRouter();
   const {
     authToken,
-    firebaseSignIn,
+    firebaseSignUp,
     firebaseSignOut,
-    getErrorMessage: getFirebaseErrorMessage,
+    getFirebaseErrorMessage,
   } = useFirebase();
   const { getErrorMessage: getApiErrorMessage, isUnauthorizedError } =
     useApiClient();
-  const { getCurrentUser, clearCurrentUser } = useCurrentUser();
+  const { getCurrentUser, clearCurrentUser } = useCurrentUserApi();
   const { validateEmail, validatePassword } = useValidator();
 
   const [email, setEmail] = useState("");
@@ -58,17 +58,16 @@ export default function Login() {
   }, [validatePassword, password]);
 
   const callSignOut = useCallback(async () => {
-    console.log("callSignOut");
     setIsLoading(true);
     await firebaseSignOut();
     clearCurrentUser();
     setIsLoading(false);
   }, [clearCurrentUser, firebaseSignOut]);
 
-  const callSignIn = useCallback(async () => {
+  const callSignUp = useCallback(async () => {
     setIsLoading(true);
     try {
-      const authToken = await firebaseSignIn(email, password);
+      const authToken = await firebaseSignUp(email, password);
       console.log(authToken);
     } catch (err: unknown) {
       console.error(err);
@@ -78,7 +77,7 @@ export default function Login() {
       }
     }
     setIsLoading(false);
-  }, [email, getFirebaseErrorMessage, password, firebaseSignIn]);
+  }, [email, firebaseSignUp, getFirebaseErrorMessage, password]);
 
   const callApiGetCurrentUser = useCallback(
     async (authToken: string) => {
@@ -106,8 +105,6 @@ export default function Login() {
   }, [email, password, setErrorMessage]);
 
   useEffect(() => {
-    console.log("authToken");
-    console.log(authToken);
     if (!authToken) {
       return;
     }
@@ -126,7 +123,7 @@ export default function Login() {
     setIsAttempted(true);
     if (!isValidEmail) return;
     if (!isValidPassword) return;
-    callSignIn();
+    callSignUp();
   };
 
   return (
@@ -151,7 +148,7 @@ export default function Login() {
                 <Card overflow="hidden" boxShadow="2xl" mt={8}>
                   <CardBody p={12}>
                     <Heading as="h2" size="md">
-                      Create your Stripe account
+                      Create your account
                     </Heading>
                     <FormControl mt={8}>
                       <FormLabel fontSize="sm">Email</FormLabel>
@@ -166,7 +163,7 @@ export default function Login() {
                       <Box h={2} mt={2}>
                         {isAttempted && !isValidEmail && (
                           <Flex align="center">
-                            <WarningTwoIcon color="red" />
+                            <Icon as={Warning} color="red" />
                             <Text
                               fontSize="sm"
                               fontWeight="normal"
@@ -193,44 +190,22 @@ export default function Login() {
                             variant="ghost"
                             aria-label="Toggle Password"
                             icon={
-                              passwordVisible ? <ViewOffIcon /> : <ViewIcon />
+                              passwordVisible ? (
+                                <Icon as={EyeSlash} />
+                              ) : (
+                                <Icon as={Eye} />
+                              )
                             }
                             onClick={() => setPasswordVisible(!passwordVisible)}
                           />
                         </InputRightElement>
                       </InputGroup>
                       <Box h={2} mt={2}>
-                        {isAttempted && !isValidPassword && (
-                          <Flex align="center">
-                            <WarningTwoIcon color="red" />
-                            <Text
-                              fontSize="sm"
-                              fontWeight="normal"
-                              color="red"
-                              ml={2}
-                            >
-                              Please enter your password.
-                            </Text>
-                          </Flex>
-                        )}
-                      </Box>
-                    </FormControl>
-                    <FormControl mt={8}>
-                      <FormLabel fontSize="sm">Project Name</FormLabel>
-                      <InputGroup size="lg">
-                        <Input
-                          type="text"
-                          name="project_name"
-                          value={password}
-                          onChange={(evt) => setPassword(evt.target.value)}
-                        />
-                      </InputGroup>
-                      <Box h={2} mt={2}>
                         {(() => {
                           if (isAttempted && !isValidPassword) {
                             return (
                               <Flex align="center">
-                                <WarningTwoIcon color="red" />
+                                <Icon as={Warning} color="red" />
                                 <Text
                                   fontSize="sm"
                                   fontWeight="normal"
@@ -244,7 +219,7 @@ export default function Login() {
                           } else if (isAttempted && errorMessage) {
                             return (
                               <Flex align="center">
-                                <WarningTwoIcon color="red" />
+                                <Icon as={Warning} color="red" />
                                 <Text
                                   fontSize="sm"
                                   fontWeight="normal"

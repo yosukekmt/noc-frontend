@@ -1,9 +1,10 @@
-import DeleteDialog from "@/components/dashboard/users/delete-dialog";
-import NewDialog from "@/components/dashboard/users/new-dialog";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
+import DeleteDialog from "@/components/dashboard/invitations/delete-dialog";
+import NewDialog from "@/components/dashboard/invitations/new-dialog";
+import { useCurrentUserApi } from "@/hooks/useCurrentUserApi";
 import { useFirebase } from "@/hooks/useFirebase";
-import { User, useUsersApi } from "@/hooks/useUsersApi";
+import { useInvitationsApi } from "@/hooks/useInvitationsApi";
 import DashboardLayout from "@/layouts/dashboard-layout";
+import { Invitation, User } from "@/models";
 import { DeleteIcon, HamburgerIcon } from "@chakra-ui/icons";
 import {
   Button,
@@ -31,7 +32,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import Head from "next/head";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const LoadingTBody = () => {
   return (
@@ -54,11 +55,11 @@ const LoadingTBody = () => {
 };
 
 const LoadedTbody = (props: {
-  clickDelete: (item: User) => void;
-  items: User[];
+  clickDelete: (item: Invitation) => void;
+  items: Invitation[];
 }) => {
   const { authToken } = useFirebase();
-  const { getCurrentUser } = useCurrentUser();
+  const { getCurrentUser } = useCurrentUserApi();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   useEffect(() => {
     if (!authToken) {
@@ -116,19 +117,21 @@ const LoadedTbody = (props: {
 
 export default function Members() {
   const { authToken } = useFirebase();
-  const { callGetUsers } = useUsersApi();
-  const [items, setItems] = useState<User[]>([]);
+  const { callGetInvitations } = useInvitationsApi();
+  const [items, setItems] = useState<Invitation[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [targetUser, setTargetUser] = useState<User | null>(null);
+  const [targetInvitation, setTargetInvitation] = useState<Invitation | null>(
+    null
+  );
   const newUserDialog = useDisclosure();
   const deleteUserDialog = useDisclosure();
 
-  const getUsers = useCallback(
+  const getInvitations = useCallback(
     async (authToken: string): Promise<void> => {
-      const items = await callGetUsers(authToken);
+      const items = await callGetInvitations(authToken);
       setItems(items);
     },
-    [callGetUsers]
+    [callGetInvitations]
   );
 
   useEffect(() => {
@@ -137,33 +140,33 @@ export default function Members() {
     }
     {
       (async () => {
-        await getUsers(authToken);
+        await getInvitations(authToken);
         setIsInitialized(true);
       })();
     }
-  }, [authToken, getUsers]);
+  }, [authToken, getInvitations]);
 
   const clickNew = () => {
     newUserDialog.onOpen();
   };
 
-  const clickDelete = (item: User) => {
-    setTargetUser(item);
+  const clickDelete = (item: Invitation) => {
+    setTargetInvitation(item);
     deleteUserDialog.onOpen();
   };
 
-  const onCreated = (item: User) => {
+  const onCreated = (item: Invitation) => {
     if (!authToken) {
       return;
     }
-    getUsers(authToken);
+    getInvitations(authToken);
   };
 
   const onDeleted = () => {
     if (!authToken) {
       return;
     }
-    getUsers(authToken);
+    getInvitations(authToken);
   };
 
   return (
@@ -225,9 +228,9 @@ export default function Members() {
         onOpen={newUserDialog.onOpen}
         onCreated={onCreated}
       />
-      {targetUser && (
+      {targetInvitation && (
         <DeleteDialog
-          user={targetUser}
+          item={targetInvitation}
           isOpen={deleteUserDialog.isOpen}
           onClose={deleteUserDialog.onClose}
           onOpen={deleteUserDialog.onOpen}

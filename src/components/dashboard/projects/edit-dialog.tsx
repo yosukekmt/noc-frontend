@@ -1,6 +1,6 @@
 import { useApiClient } from "@/hooks/useApiClient";
 import { useFirebase } from "@/hooks/useFirebase";
-import { User, useUsersApi } from "@/hooks/useUsersApi";
+import { useProjectsApi } from "@/hooks/useProjectsApi";
 import { useValidator } from "@/hooks/useValidator";
 import { WarningTwoIcon } from "@chakra-ui/icons";
 import {
@@ -21,49 +21,47 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { FormEvent, useCallback, useMemo, useState } from "react";
+import { Project } from "@/models";
 
-export default function NewDialog(props: {
+export default function EditDialog(props: {
+  item: Project;
   isOpen: boolean;
   onClose(): void;
   onOpen(): void;
-  onCreated(item: User): void;
+  onUpdated(item: Project): void;
 }) {
-  const { isOpen, onClose, onOpen, onCreated } = props;
+  const { isOpen, onClose, onOpen, onUpdated } = props;
   const { authToken } = useFirebase();
-  const { validateEmail } = useValidator();
-  const { callCreateUser } = useUsersApi();
-  const { getErrorMessage, isBadRequestError } = useApiClient();
-  const [email, setEmail] = useState("");
+  const { validateCouponsName } = useValidator();
+  const { callUpdateProject } = useProjectsApi();
+  const { getErrorMessage } = useApiClient();
+  const [name, setName] = useState("");
   const [isAttempted, setIsAttempted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const isValidEmail = useMemo(() => {
-    return validateEmail(email);
-  }, [validateEmail, email]);
+  const isValidName = useMemo(() => {
+    return validateCouponsName(name);
+  }, [validateCouponsName, name]);
 
-  const createUser = useCallback(
-    async (authToken: string, email: string) => {
+  const updateProject = useCallback(
+    async (authToken: string, id: string, data: { name: string }) => {
       setIsLoading(true);
       try {
-        const item = await callCreateUser(authToken, email);
-        console.log(item);
-        onCreated(item);
+        const item = await callUpdateProject(authToken, id, data);
+        onUpdated(item);
         onClose();
       } catch (err: unknown) {
         console.error(err);
-        if (isBadRequestError(err)) {
-          setErrorMessage("すでに登録済みのメールアドレスです。");
-        } else {
-          const errorMessage = getErrorMessage(err);
-          if (errorMessage) {
-            setErrorMessage(errorMessage);
-          }
+
+        const errorMessage = getErrorMessage(err);
+        if (errorMessage) {
+          setErrorMessage(errorMessage);
         }
       }
       setIsLoading(false);
     },
-    [callCreateUser, getErrorMessage, onClose, onCreated, isBadRequestError]
+    [callUpdateProject, getErrorMessage, onUpdated, onClose]
   );
 
   const clickSubmit = (evt: FormEvent) => {
@@ -72,10 +70,10 @@ export default function NewDialog(props: {
       return;
     }
     setIsAttempted(true);
-    if (!isValidEmail) {
+    if (!isValidName) {
       return;
     }
-    createUser(authToken, email);
+    updateProject(authToken, props.item.id, { name });
   };
 
   return (
@@ -83,23 +81,23 @@ export default function NewDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>Invite team members</ModalHeader>
+          <ModalHeader>Change project name</ModalHeader>
           <ModalCloseButton />
           <Divider />
           <ModalBody bg="gray.100">
             <FormControl>
-              <FormLabel fontSize="sm">Email</FormLabel>
+              <FormLabel fontSize="sm">Project name</FormLabel>
               <Input
                 size="sm"
                 bg="white"
                 type="text"
-                name="email"
-                value={email}
-                onChange={(evt) => setEmail(evt.target.value)}
+                name="name"
+                value={name}
+                onChange={(evt) => setName(evt.target.value)}
               />
               <Box h={8} mt={2}>
                 {(() => {
-                  if (isAttempted && !isValidEmail) {
+                  if (isAttempted && !isValidName) {
                     return (
                       <Flex align="center">
                         <WarningTwoIcon color="red" />
@@ -109,7 +107,7 @@ export default function NewDialog(props: {
                           color="red"
                           ml={2}
                         >
-                          Provided email is invalid.
+                          Please enter a project name.
                         </Text>
                       </Flex>
                     );
@@ -140,7 +138,7 @@ export default function NewDialog(props: {
               Cancel
             </Button>
             <Button type="submit" size="sm" isLoading={isLoading} ml={2}>
-              Invite
+              Update
             </Button>
           </ModalFooter>
         </ModalContent>

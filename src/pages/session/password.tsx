@@ -24,7 +24,7 @@ import { FormEvent, useCallback, useMemo, useState } from "react";
 
 export default function Password() {
   const router = useRouter();
-  const { resetPassword, getErrorMessage } = useFirebase();
+  const { resetPassword, getFirebaseErrorMessage } = useFirebase();
   const [email, setEmail] = useState("");
   const [isAttempted, setIsAttempted] = useState(false);
   const { validateEmail } = useValidator();
@@ -39,14 +39,14 @@ export default function Password() {
         router.push("/session/sent");
       } catch (err: unknown) {
         console.error(err);
-        const errorMessage = getErrorMessage(err);
+        const errorMessage = getFirebaseErrorMessage(err);
         if (errorMessage) {
           setErrorMessage(errorMessage);
         }
       }
       setIsLoading(false);
     },
-    [getErrorMessage, resetPassword, router]
+    [getFirebaseErrorMessage, resetPassword, router]
   );
 
   const isValidEmail = useMemo(() => {

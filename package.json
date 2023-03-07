@@ -1,5 +1,5 @@
 {
-  "name": "nudge-on-chain",
+  "name": "nudge-onchain",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -18,16 +18,23 @@
     "@types/node": "18.11.18",
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
+    "axios": "^1.3.4",
     "chart.js": "^4.2.1",
     "eslint": "8.32.0",
     "eslint-config-next": "13.1.5",
+    "firebase": "^9.17.1",
     "framer-motion": "^9.0.4",
     "jotai": "^1.13.1",
+    "luxon": "^3.3.0",
     "next": "13.1.5",
     "phosphor-react": "^1.4.1",
     "react": "18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "18.2.0",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "tzdata": "^1.0.36"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.2.0"
   }
 }

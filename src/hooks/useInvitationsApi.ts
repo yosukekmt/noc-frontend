@@ -1,38 +1,27 @@
+import { Invitation } from "@/models";
 import { useCallback } from "react";
 import { useApiClient } from "./useApiClient";
-import { faker } from "@faker-js/faker";
 
-export type User = {
-  email: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-export const useUsersApi = () => {
+export const useInvitationsApi = () => {
   const { apiClient } = useApiClient();
 
-  const callGetUsers = useCallback(
-    async (authToken: string): Promise<User[]> => {
+  const callGetInvitations = useCallback(
+    async (authToken: string): Promise<Invitation[]> => {
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      /*
-      const resp = await apiClient.get("/users", {
+      const resp = await apiClient.get("/invitations", {
         headers: {
           Authorization: authToken,
         },
       });
       const items = resp.data.map((d: any) => {
         return {
+          id: d.id,
           email: d.email,
+          sentAt: d.sentAt && new Date(d.sentAt),
+          acceptedAt: d.acceptedAt && new Date(d.acceptedAt),
           createdAt: new Date(d.createdAt),
           updatedAt: new Date(d.updatedAt),
-        };
-      });*/
-      const items = [null, null, null].flatMap((n) => {
-        return {
-          email: faker.internet.email(),
-          createdAt: faker.date.recent(),
-          updatedAt: faker.date.recent(),
         };
       });
       return items;
@@ -40,11 +29,10 @@ export const useUsersApi = () => {
     [apiClient]
   );
 
-  const callCreateUser = useCallback(
-    async (authToken: string, email: string): Promise<User> => {
-      /*
+  const callCreateInvitation = useCallback(
+    async (authToken: string, email: string): Promise<Invitation> => {
       const resp = await apiClient.post(
-        "/users",
+        "/invitations",
         { email },
         {
           headers: {
@@ -53,36 +41,33 @@ export const useUsersApi = () => {
         }
       );
       const item = {
+        id: resp.data.id,
         email: resp.data.email,
+        sentAt: resp.data.sentAt && new Date(resp.data.sentAt),
+        acceptedAt: resp.data.acceptedAt && new Date(resp.data.acceptedAt),
         createdAt: new Date(resp.data.createdAt),
         updatedAt: new Date(resp.data.updatedAt),
-      };*/
-      const item = {
-        email: faker.internet.email(),
-        createdAt: faker.date.recent(),
-        updatedAt: faker.date.recent(),
       };
       return item;
     },
     [apiClient]
   );
 
-  const callDeleteUser = useCallback(
+  const callDeleteInvitation = useCallback(
     async (authToken: string, email: string): Promise<void> => {
-      /*
-      await apiClient.delete(`/users/${email}`, {
+      await apiClient.delete(`/invitations/${email}`, {
         headers: {
           Authorization: authToken,
         },
-      });*/
+      });
       return;
     },
     [apiClient]
   );
 
   return {
-    callGetUsers,
-    callCreateUser,
-    callDeleteUser,
+    callGetInvitations,
+    callCreateInvitation,
+    callDeleteInvitation,
   };
 };

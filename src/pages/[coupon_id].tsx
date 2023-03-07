@@ -1,25 +1,23 @@
 import Footer from "@/components/session/footer";
 import Header from "@/components/session/header";
 import { useApiClient } from "@/hooks/useApiClient";
-import { Coupon, useCouponsApi } from "@/hooks/useCouponsApi";
+import { useCouponsApi } from "@/hooks/useCouponsApi";
 import { useFirebase } from "@/hooks/useFirebase";
+import { Coupon } from "@/models";
 import { WarningTwoIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
   Card,
-  VStack,
   CardBody,
   Container,
   Flex,
-  FormControl,
-  FormLabel,
   Heading,
   Spacer,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 import Head from "next/head";
-import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 
@@ -29,7 +27,7 @@ export default function Mint() {
     authToken,
     firebaseSignIn,
     firebaseSignOut,
-    getErrorMessage: getFirebaseErrorMessage,
+    getFirebaseErrorMessage,
   } = useFirebase();
   const { getErrorMessage: getApiErrorMessage, isUnauthorizedError } =
     useApiClient();
@@ -52,7 +50,7 @@ export default function Mint() {
   useEffect(() => {
     setErrorMessage("");
     getCoupon("");
-  }, []);
+  }, [getCoupon]);
 
   const clickSubmit = (evt: FormEvent) => {};
 
@@ -100,22 +98,30 @@ export default function Mint() {
                       <Flex align="center" w="100%">
                         <Text>Start</Text>
                         <Spacer />
-                        <Text>{item && item.startAt.toLocaleString()}</Text>
+                        <Text>
+                          {item &&
+                            item.startAt &&
+                            item.startAt.toLocaleString()}
+                        </Text>
                       </Flex>
                       <Flex align="center" w="100%">
                         <Text>End</Text>
                         <Spacer />
-                        <Text>{item && item.startAt.toLocaleString()}</Text>
+                        <Text>
+                          {item &&
+                            item.startAt &&
+                            item.startAt.toLocaleString()}
+                        </Text>
                       </Flex>
                     </VStack>
                     <VStack mt={8} align="start" w="100%">
                       <Heading as="h4" size="sm" color="gray">
                         Applicable NFTs
                       </Heading>
-                      <Text fontsize="sm">0x382318481938ab902832</Text>
-                      <Text fontsize="sm">0x382318481938ab902832</Text>
-                      <Text fontsize="sm">0x382318481938ab902832</Text>
-                      <Text fontsize="sm">0x382318481938ab902832</Text>
+                      <Text fontSize="sm">0x382318481938ab902832</Text>
+                      <Text fontSize="sm">0x382318481938ab902832</Text>
+                      <Text fontSize="sm">0x382318481938ab902832</Text>
+                      <Text fontSize="sm">0x382318481938ab902832</Text>
                     </VStack>
                     <Box mt={8}>
                       {isAttempted && errorMessage && (

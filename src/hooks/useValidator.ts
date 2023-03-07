@@ -1,6 +1,10 @@
 import { useCallback } from "react";
 
 export const useValidator = () => {
+  const validateProjectName = useCallback((arg: string) => {
+    return /^.{1,}$/.test(arg);
+  }, []);
+
   const validateEmail = useCallback((arg: string) => {
     return /^\w+([+.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,5})+$/.test(arg);
   }, []);
@@ -13,14 +17,15 @@ export const useValidator = () => {
     return /^.{1,}$/.test(arg);
   }, []);
 
-  const validateTreasuryName = useCallback((arg: string) => {
+  const validateCouponsDescription = useCallback((arg: string) => {
     return /^.{1,}$/.test(arg);
   }, []);
 
   return {
+    validateProjectName,
     validateEmail,
     validatePassword,
     validateCouponsName,
-    validateTreasuryName,
+    validateCouponsDescription,
   };
 };
