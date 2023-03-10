@@ -21,11 +21,16 @@ export const useValidator = () => {
     return /^.{1,}$/.test(arg);
   }, []);
 
+  const validateContractAddress = useCallback((arg: string) => {
+    return /^0x[a-fA-F0-9]{40}$/.test(arg);
+  }, []);
+
   return {
     validateProjectName,
     validateEmail,
     validatePassword,
     validateCouponsName,
     validateCouponsDescription,
+    validateContractAddress,
   };
 };

@@ -34,3 +34,11 @@ export type User = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type Nft = {
+  id: string;
+  contractAddress: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+};

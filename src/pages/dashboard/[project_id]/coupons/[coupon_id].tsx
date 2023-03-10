@@ -123,7 +123,7 @@ export default function CouponDetail() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
-      <DashboardLayout>
+      <DashboardLayout projectId={projectId as string}>
         <Box>
           <Grid templateColumns="repeat(12, 1fr)" gap={4} my={4}>
             <GridItem colSpan={{ base: 12 }}>
@@ -176,7 +176,7 @@ export default function CouponDetail() {
                   Start
                 </Text>
                 <Text fontSize="sm">
-                  {item && item.startAt.toLocaleString()}
+                  {item && item.startAt && item.startAt.toLocaleString()}
                 </Text>
               </Box>
             </GridItem>
@@ -320,9 +320,9 @@ export default function CouponDetail() {
           </Grid>
         </Box>
       </DashboardLayout>
-
       {item && (
         <DeleteDialog
+          projectId={projectId as string}
           item={item}
           isOpen={deleteDialog.isOpen}
           onClose={deleteDialog.onClose}

@@ -42,6 +42,7 @@ export const useCouponsApi = () => {
         timezone: string;
         startAt: Date;
         endAt: Date;
+        nftIds: string[];
       }
     ): Promise<Coupon> => {
       const resp = await apiClient.post("/coupons", data, {

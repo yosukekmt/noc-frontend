@@ -1,8 +1,7 @@
 import Footer from "@/components/session/footer";
 import Header from "@/components/session/header";
 import { useApiClient } from "@/hooks/useApiClient";
-import { useCouponsApi } from "@/hooks/useCouponsApi";
-import { useFirebase } from "@/hooks/useFirebase";
+import { usePublicApi } from "@/hooks/usePublicApi";
 import { Coupon } from "@/models";
 import { WarningTwoIcon } from "@chakra-ui/icons";
 import {
@@ -22,16 +21,11 @@ import { useRouter } from "next/router";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 
 export default function Mint() {
-  const router = useRouter();
-  const {
-    authToken,
-    firebaseSignIn,
-    firebaseSignOut,
-    getFirebaseErrorMessage,
-  } = useFirebase();
+  const { coupon_id: couponId } = useRouter().query;
+
   const { getErrorMessage: getApiErrorMessage, isUnauthorizedError } =
     useApiClient();
-  const { callGetCoupon } = useCouponsApi();
+  const { callGetCoupon } = usePublicApi();
   const [item, setItem] = useState<Coupon | null>(null);
   const [isAttempted, setIsAttempted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -41,10 +35,10 @@ export default function Mint() {
 
   const getCoupon = useCallback(
     async (authToken: string): Promise<void> => {
-      const item = await callGetCoupon(authToken, "dummy");
+      const item = await callGetCoupon(authToken, couponId as string);
       setItem(item);
     },
-    [callGetCoupon]
+    [callGetCoupon, couponId]
   );
 
   useEffect(() => {

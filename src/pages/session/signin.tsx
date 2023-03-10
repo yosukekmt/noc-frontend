@@ -107,8 +107,6 @@ export default function Login() {
   }, [email, password, setErrorMessage]);
 
   useEffect(() => {
-    console.log("authToken");
-    console.log(authToken);
     if (!authToken) {
       return;
     }

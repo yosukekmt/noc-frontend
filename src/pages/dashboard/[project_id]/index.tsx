@@ -1,4 +1,3 @@
-import NewDialog from "@/components/dashboard/coupons/new-dialog";
 import { useCouponsApi } from "@/hooks/useCouponsApi";
 import { useCurrentUserApi } from "@/hooks/useCurrentUserApi";
 import { useFirebase } from "@/hooks/useFirebase";
@@ -25,8 +24,6 @@ import {
   Th,
   Thead,
   Tr,
-  useClipboard,
-  useDisclosure,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import NextLink from "next/link";
@@ -116,15 +113,14 @@ const LoadedTbody = (props: { projectId: string; items: Coupon[] }) => {
 };
 
 export default function Project() {
-  const { project_id: projectId } = useRouter().query;
   const router = useRouter();
+  const { project_id: projectId } = router.query;
   const { firebaseSignOut } = useFirebase();
   const { clearCurrentUser } = useCurrentUserApi();
   const { callGetCoupons } = useCouponsApi();
   const [items, setItems] = useState<Coupon[]>([]);
   const { authToken, isFirebaseInitialized } = useFirebase();
   const [isInitialized, setIsInitialized] = useState(false);
-  const newDialog = useDisclosure();
 
   const getCoupons = useCallback(
     async (authToken: string): Promise<void> => {
@@ -159,14 +155,7 @@ export default function Project() {
   ]);
 
   const clickNew = () => {
-    newDialog.onOpen();
-  };
-
-  const onCreated = (item: Coupon) => {
-    if (!authToken) {
-      return;
-    }
-    getCoupons(authToken);
+    router.push(`/dashboard/${projectId}/coupons/new`);
   };
 
   return (
@@ -225,15 +214,6 @@ export default function Project() {
           </TableContainer>
         </Card>
       </DashboardLayout>
-      {projectId && (
-        <NewDialog
-          projectId={projectId as string}
-          isOpen={newDialog.isOpen}
-          onClose={newDialog.onClose}
-          onOpen={newDialog.onOpen}
-          onCreated={onCreated}
-        />
-      )}
     </>
   );
 }

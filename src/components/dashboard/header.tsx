@@ -37,12 +37,9 @@ const NavigationBar = ({ projectId = null }: { projectId?: string | null }) => {
   const { pathname } = useRouter();
   const [_menuItemType, _setMenuItemType] = useState<MenuItemType>("");
   useEffect(() => {
-    if (pathname === "/dashboard/members") {
+    if (pathname.includes("/members")) {
       _setMenuItemType("members");
-    } else if (
-      pathname === "/dashboard" ||
-      pathname.startsWith("/dashboard/coupons/")
-    ) {
+    } else {
       _setMenuItemType("gasback_nfts");
     }
   }, [pathname]);
@@ -211,7 +208,7 @@ export default function Header({
           </Container>
           <Divider color="gray" />
         </Box>
-        <NavigationBar projectId={projectId} />
+        {projectId && <NavigationBar projectId={projectId} />}
         <Divider />
       </Box>
       <NewDialog
