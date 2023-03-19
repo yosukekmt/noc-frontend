@@ -15,6 +15,7 @@ export default function Sent() {
   const clickResend = () => {
     console.log("resend");
   };
+
   return (
     <>
       <Head>

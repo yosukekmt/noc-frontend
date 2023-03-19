@@ -1,4 +1,4 @@
-import { Coupon } from "@/models";
+import { Coupon, Nft } from "@/models";
 import { useCallback } from "react";
 import { useApiClient } from "./useApiClient";
 
@@ -6,10 +6,8 @@ export const usePublicApi = () => {
   const { apiClient } = useApiClient();
 
   const callGetCoupon = useCallback(
-    async (authToken: string, id: string): Promise<Coupon> => {
-      const resp = await apiClient.get(`/public/coupons/${id}`, {
-        headers: { Authorization: authToken },
-      });
+    async (id: string): Promise<Coupon> => {
+      const resp = await apiClient.get(`/public/coupons/${id}`);
       const item = {
         id: resp.data.id,
         rewardType: resp.data.rewardType,
@@ -27,6 +25,23 @@ export const usePublicApi = () => {
     },
     [apiClient]
   );
-
-  return { callGetCoupon };
+  const callGetNfts = useCallback(
+    async (couponId: string): Promise<Nft[]> => {
+      const resp = await apiClient.get("/public/nfts", {
+        params: { coupon_id: couponId },
+      });
+      const items = resp.data.map((d: any) => {
+        return {
+          id: d.id,
+          name: d.name,
+          contractAddress: d.contractAddress,
+          createdAt: new Date(d.createdAt),
+          updatedAt: new Date(d.updatedAt),
+        };
+      });
+      return items;
+    },
+    [apiClient]
+  );
+  return { callGetCoupon, callGetNfts };
 };

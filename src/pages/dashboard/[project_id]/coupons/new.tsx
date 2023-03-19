@@ -6,7 +6,7 @@ import { useFirebase } from "@/hooks/useFirebase";
 import { useUtil } from "@/hooks/useUtil";
 import { useValidator } from "@/hooks/useValidator";
 import DashboardLayout from "@/layouts/dashboard-layout";
-import { Coupon, Nft } from "@/models";
+import { Nft } from "@/models";
 import {
   Box,
   Button,
