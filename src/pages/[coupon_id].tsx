@@ -1,5 +1,6 @@
 import Footer from "@/components/session/footer";
 import Header from "@/components/session/header";
+import { useDatetime } from "@/hooks/useDatetime";
 import { usePublicApi } from "@/hooks/usePublicApi";
 import { Coupon, Nft } from "@/models";
 import {
@@ -23,14 +24,29 @@ import {
 } from "@thirdweb-dev/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 const BLOCKCHAIN_NETWORK = process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK;
 
 const MintBody = (props: { coupon: Coupon; nfts: Nft[] }) => {
   const address = useAddress();
+  const { formatWithTimezone } = useDatetime();
 
   useContract(props.coupon.contractAddress, "edition-drop");
+
+  const startAtStr = useMemo(() => {
+    if (!props.coupon.startAt) return;
+    if (!props.coupon.timezone) return;
+
+    return formatWithTimezone(props.coupon.startAt, props.coupon.timezone);
+  }, [formatWithTimezone, props.coupon.startAt, props.coupon.timezone]);
+
+  const endAtStr = useMemo(() => {
+    if (!props.coupon.endAt) return;
+    if (!props.coupon.timezone) return;
+
+    return formatWithTimezone(props.coupon.endAt, props.coupon.timezone);
+  }, [formatWithTimezone, props.coupon.endAt, props.coupon.timezone]);
 
   const clickSubmit = (evt: FormEvent) => {};
 
@@ -58,14 +74,15 @@ const MintBody = (props: { coupon: Coupon; nfts: Nft[] }) => {
                     Gasback NFT Details
                   </Heading>
                   <Flex align="center" w="100%">
-                    <Text>Start</Text>
+                    <Text>Stat</Text>
                     <Spacer />
                     <Text>{props.coupon.startAt.toLocaleString()}</Text>
+                    <Text>{startAtStr}</Text>
                   </Flex>
                   <Flex align="center" w="100%">
                     <Text>End</Text>
                     <Spacer />
-                    <Text>{props.coupon.endAt.toLocaleString()}</Text>
+                    <Text>{endAtStr}</Text>
                   </Flex>
                 </VStack>
                 <VStack mt={8} align="start" w="100%">
@@ -80,7 +97,6 @@ const MintBody = (props: { coupon: Coupon; nfts: Nft[] }) => {
                     );
                   })}
                 </VStack>
-
                 <Button
                   type="submit"
                   w="100%"
@@ -92,7 +108,9 @@ const MintBody = (props: { coupon: Coupon; nfts: Nft[] }) => {
                 </Button>
                 <Web3Button
                   contractAddress={props.coupon.contractAddress}
-                  action={(contract) => contract.erc1155.claim(0, 1)}
+                  action={(contract) =>
+                    contract.erc1155.claim(props.coupon.nftTokenId, 2)
+                  }
                 />
                 <Text fontSize="sm" mt={2}>
                   Not sure how to use it?

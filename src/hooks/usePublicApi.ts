@@ -14,6 +14,7 @@ export const usePublicApi = () => {
         name: resp.data.name,
         description: resp.data.description,
         contractAddress: resp.data.contractAddress,
+        nftTokenId: resp.data.nftTokenId,
         treasuryAddress: resp.data.treasuryAddress,
         timezone: resp.data.timezone,
         startAt: new Date(resp.data.startAt),

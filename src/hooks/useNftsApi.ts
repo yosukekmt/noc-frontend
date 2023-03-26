@@ -22,7 +22,32 @@ export const useNftsApi = () => {
     [apiClient]
   );
 
+  const callGetNfts = useCallback(
+    async (
+      authToken: string,
+      projectId: string,
+      couponId: string
+    ): Promise<Nft[]> => {
+      const resp = await apiClient.get("/nfts", {
+        params: { project_id: projectId, coupon_id: couponId },
+        headers: { Authorization: authToken },
+      });
+      const items = resp.data.map((d: any) => {
+        return {
+          id: d.id,
+          name: d.name,
+          contractAddress: d.contractAddress,
+          createdAt: new Date(d.createdAt),
+          updatedAt: new Date(d.updatedAt),
+        };
+      });
+      return items;
+    },
+    [apiClient]
+  );
+
   return {
     callGetNft,
+    callGetNfts,
   };
 };

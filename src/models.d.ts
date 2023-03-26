@@ -4,6 +4,7 @@ export type Coupon = {
   name: string;
   description: string;
   contractAddress: string;
+  nftTokenId: string;
   treasuryAddress: string;
   timezone: string;
   startAt: Date;
@@ -39,6 +40,20 @@ export type Nft = {
   id: string;
   contractAddress: string;
   name: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type NftTransfer = {
+  id: string;
+  txHash: string;
+  fromAddress: string | null;
+  toAddress: string | null;
+  valueWei: string | null;
+  gasPrice: string | null;
+  gasLimit: string | null;
+  blockProducedAt: Date;
+  nftId: string;
   createdAt: Date;
   updatedAt: Date;
 };

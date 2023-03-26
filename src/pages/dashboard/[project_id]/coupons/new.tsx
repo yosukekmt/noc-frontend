@@ -221,7 +221,7 @@ export default function CouponDetail() {
                   size="sm"
                   bg="white"
                   type="text"
-                  name="name"
+                  name="coupon_name"
                   value={name}
                   onChange={(evt) => setName(evt.target.value)}
                 />
@@ -246,7 +246,7 @@ export default function CouponDetail() {
                 <Textarea
                   size="sm"
                   bg="white"
-                  name="description"
+                  name="coupon_description"
                   value={description}
                   onChange={(evt) => setDescription(evt.target.value)}
                 />

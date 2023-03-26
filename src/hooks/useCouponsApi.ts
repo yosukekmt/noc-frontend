@@ -60,6 +60,7 @@ export const useCouponsApi = () => {
         timezone: resp.data.timezone,
         startAt: new Date(resp.data.startAt),
         endAt: new Date(resp.data.endAt),
+        nftTokenId: resp.data.timezone,
         createdAt: new Date(resp.data.createdAt),
         updatedAt: new Date(resp.data.updatedAt),
       };
