@@ -1,5 +1,6 @@
 import Footer from "@/components/session/footer";
 import Header from "@/components/session/header";
+import { useBlockchain } from "@/hooks/useBlockchain";
 import { useDatetime } from "@/hooks/useDatetime";
 import { usePublicApi } from "@/hooks/usePublicApi";
 import { Coupon, Nft } from "@/models";
@@ -15,7 +16,6 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { Ethereum, Goerli, Sepolia } from "@thirdweb-dev/chains";
 import {
   ThirdwebProvider,
   useAddress,
@@ -25,8 +25,6 @@ import {
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
-
-const BLOCKCHAIN_NETWORK = process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK;
 
 const MintBody = (props: { coupon: Coupon; nfts: Nft[] }) => {
   const address = useAddress();
@@ -128,12 +126,7 @@ const MintBody = (props: { coupon: Coupon; nfts: Nft[] }) => {
 };
 
 export default function Mint() {
-  const chain =
-    BLOCKCHAIN_NETWORK === "mainnet"
-      ? Ethereum
-      : BLOCKCHAIN_NETWORK === "goerli"
-      ? Goerli
-      : Sepolia;
+  const chain = useBlockchain().network;
   const { coupon_id: couponId } = useRouter().query;
   const { callGetCoupon, callGetNfts } = usePublicApi();
   const [item, setItem] = useState<Coupon | null>(null);
@@ -147,6 +140,7 @@ export default function Mint() {
     },
     [callGetCoupon]
   );
+
   const getNfts = useCallback(
     async (couponId: string): Promise<void> => {
       const items = await callGetNfts(couponId);

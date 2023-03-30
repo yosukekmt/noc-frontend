@@ -1,3 +1,4 @@
+import { useBlockchain } from "@/hooks/useBlockchain";
 import { useFirebase } from "@/hooks/useFirebase";
 import { useNftsApi } from "@/hooks/useNftsApi";
 import { useValidator } from "@/hooks/useValidator";
@@ -28,6 +29,7 @@ export default function PickerDialog(props: {
   onOpen(): void;
   onPicked(item: Nft): void;
 }) {
+  const network = useBlockchain().network;
   const { authToken } = useFirebase();
   const { validateContractAddress } = useValidator();
   const { callGetNft } = useNftsApi();
@@ -74,8 +76,8 @@ export default function PickerDialog(props: {
           <ModalBody bg="gray.100">
             <FormControl>
               <FormLabel fontSize="sm">Network</FormLabel>
-              <Select size="sm" bg="white" name="name" value="ETH_GOERLI">
-                <option>ETH_GOERLI</option>
+              <Select size="sm" bg="white" name="name" value={network.name}>
+                <option>{network.name}</option>
               </Select>
             </FormControl>
             <FormControl mt={2}>

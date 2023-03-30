@@ -8,9 +8,10 @@ import NextLink from "next/link";
 import { useNftTransfersApi } from "@/hooks/useNftTransfersApi";
 import { useUtil } from "@/hooks/useUtil";
 import DashboardLayout from "@/layouts/dashboard-layout";
-import { Coupon, Nft, NftTransfer } from "@/models";
+import { Cashback, Coupon, CouponHolder, Nft, NftTransfer } from "@/models";
 import {
   Box,
+  Button,
   Divider,
   Flex,
   Grid,
@@ -45,6 +46,9 @@ import { useRouter } from "next/router";
 import { Cube, DotsThree, LineSegment, Tag } from "phosphor-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Line } from "react-chartjs-2";
+import { useBlockchain } from "@/hooks/useBlockchain";
+import { useCouponHoldersApi } from "@/hooks/useCouponHoldersApi";
+import { useCashbacksApi } from "@/hooks/useCashbacksApi";
 Chart.register(...registerables);
 
 const SummarySection = (props: {
@@ -54,7 +58,11 @@ const SummarySection = (props: {
   clickDelete: () => void;
 }) => {
   const { formatWithTimezone } = useDatetime();
-  const { truncateContractAddress } = useUtil();
+  const {
+    truncateContractAddress,
+    getExplorerAddressUrl,
+    getOpenseaAddressUrl,
+  } = useBlockchain();
 
   const startAtStr = useMemo(() => {
     if (!props.coupon) return;
@@ -92,7 +100,16 @@ const SummarySection = (props: {
                 </Heading>
               </Box>
               <Spacer />
-              <Box>
+              <Flex align="center">
+                {props.coupon && (
+                  <NextLink
+                    href={`https://mumbai.nudgeonchain.xyz/${props.coupon.id}`}
+                    style={{ width: "100%", display: "block" }}
+                    target="_blank"
+                  >
+                    <Button size="sm">Mint Page</Button>
+                  </NextLink>
+                )}
                 <Menu>
                   <MenuButton
                     as={IconButton}
@@ -106,7 +123,7 @@ const SummarySection = (props: {
                     </MenuItem>
                   </MenuList>
                 </Menu>
-              </Box>
+              </Flex>
             </Flex>
             <Divider mt={2} />
           </GridItem>
@@ -123,20 +140,18 @@ const SummarySection = (props: {
           <GridItem colSpan={{ base: 12, sm: 6, md: 4 }}>
             <Box>
               <Text fontSize="sm" color="gray">
-                Gasback NFT Address
+                Contract Address
               </Text>
               <Text fontSize="sm">
-                {props.coupon && props.coupon.contractAddress}
-              </Text>
-            </Box>
-          </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 6, md: 4 }}>
-            <Box>
-              <Text fontSize="sm" color="gray">
-                Treasury Address
-              </Text>
-              <Text fontSize="sm">
-                {props.coupon && props.coupon.treasuryAddress}
+                {props.coupon && props.coupon.contractAddress && (
+                  <NextLink
+                    href={getExplorerAddressUrl(props.coupon.contractAddress)}
+                    style={{ width: "100%", display: "block" }}
+                    target="_blank"
+                  >
+                    {truncateContractAddress(props.coupon.contractAddress)}
+                  </NextLink>
+                )}
               </Text>
             </Box>
           </GridItem>
@@ -150,15 +165,20 @@ const SummarySection = (props: {
                 props.nfts.flatMap((nft) => {
                   return (
                     <Text fontSize="sm" key={`applicable_nft_${nft.id}`}>
-                      {`${nft.name}(${truncateContractAddress(
-                        nft.contractAddress
-                      )})`}
+                      <NextLink
+                        href={getOpenseaAddressUrl(nft.contractAddress)}
+                        style={{ width: "100%", display: "block" }}
+                        target="_blank"
+                      >
+                        {`${nft.name}(${truncateContractAddress(
+                          nft.contractAddress
+                        )})`}
+                      </NextLink>
                     </Text>
                   );
                 })}
             </Box>
           </GridItem>
-
           <GridItem colSpan={{ base: 12, sm: 6 }}>
             <Box>
               <Text fontSize="sm" color="gray">
@@ -179,6 +199,85 @@ const SummarySection = (props: {
               </Text>
               <Text fontSize="sm">
                 {props.coupon && `(${props.coupon.timezone})`}
+              </Text>
+            </Box>
+          </GridItem>
+        </Grid>
+      </Box>
+    </>
+  );
+};
+const TresurySection = (props: {
+  isInitialized: boolean;
+  coupon: Coupon | null;
+  nfts: Nft[];
+  clickDelete: () => void;
+}) => {
+  const { formatWithTimezone } = useDatetime();
+  const { truncateContractAddress, getExplorerTxUrl, getExplorerAddressUrl } =
+    useBlockchain();
+
+  const startAtStr = useMemo(() => {
+    if (!props.coupon) return;
+    if (!props.coupon.startAt) return;
+    if (!props.coupon.timezone) return;
+
+    return formatWithTimezone(props.coupon.startAt, props.coupon.timezone);
+  }, [formatWithTimezone, props.coupon]);
+
+  const endAtStr = useMemo(() => {
+    if (!props.coupon) return;
+    if (!props.coupon.endAt) return;
+    if (!props.coupon.timezone) return;
+
+    return formatWithTimezone(props.coupon.endAt, props.coupon.timezone);
+  }, [formatWithTimezone, props.coupon]);
+
+  return (
+    <>
+      <Box>
+        <Grid templateColumns="repeat(12, 1fr)" gap={4} mt={24}>
+          <GridItem colSpan={{ base: 12 }}>
+            <Heading as="h4" fontSize="2xl">
+              Treasury Status
+            </Heading>
+            <Divider mt={2} />
+          </GridItem>
+        </Grid>
+        <Grid templateColumns="repeat(12, 1fr)" gap={4} my={4}>
+          <GridItem colSpan={{ base: 12, sm: 6, md: 4 }}>
+            <Box>
+              <Text fontSize="sm" color="gray">
+                Contract Address
+              </Text>
+              <Text fontSize="sm">
+                {props.coupon && props.coupon.treasuryAddress && (
+                  <NextLink
+                    href={getExplorerAddressUrl(props.coupon.treasuryAddress)}
+                    style={{ width: "100%", display: "block" }}
+                    target="_blank"
+                  >
+                    {truncateContractAddress(props.coupon.treasuryAddress)}
+                  </NextLink>
+                )}
+              </Text>
+            </Box>
+          </GridItem>
+          <GridItem colSpan={{ base: 12, sm: 6, md: 4 }}>
+            <Box>
+              <Text fontSize="sm" color="gray">
+                Balance
+              </Text>
+              <Text fontSize="sm">
+                {props.coupon && props.coupon.treasuryAddress && (
+                  <NextLink
+                    href={getExplorerAddressUrl(props.coupon.treasuryAddress)}
+                    style={{ width: "100%", display: "block" }}
+                    target="_blank"
+                  >
+                    Click Here
+                  </NextLink>
+                )}
               </Text>
             </Box>
           </GridItem>
@@ -293,62 +392,6 @@ const StatisticsSection = (props: {
           </GridItem>
         </Grid>
       </Box>
-      <Box>
-        <Grid templateColumns="repeat(12, 1fr)" gap={4} mt={24}>
-          <GridItem colSpan={{ base: 12 }}>
-            <Heading as="h4" fontSize="2xl">
-              Recent Activity
-            </Heading>
-            <Divider mt={2} />
-            <TableContainer>
-              <Table size="sm">
-                <Thead>
-                  <Tr>
-                    <Th>Event</Th>
-                    <Th>From Address</Th>
-                    <Th>To Address</Th>
-                    <Th>Date</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {props.isInitialized &&
-                    props.couponNftTransfers.length === 0 && (
-                      <Tr key="nft_transfers_empty" h={16}>
-                        <Td colSpan={3}>NO Record</Td>
-                      </Tr>
-                    )}
-                  {props.isInitialized &&
-                    props.couponNftTransfers.length !== 0 &&
-                    props.couponNftTransfers.flatMap((item) => {
-                      return (
-                        <NftTransfersTableRow
-                          isInitialized={props.isInitialized}
-                          item={item}
-                        />
-                      );
-                    })}
-                  {!props.isInitialized &&
-                    [...Array(3)].flatMap((x, idx) => {
-                      return (
-                        <Tr key={`nft_transfers_${idx}`} h={16}>
-                          <Td>
-                            <Skeleton h={4} />
-                          </Td>
-                          <Td>
-                            <Skeleton h={4} />
-                          </Td>
-                          <Td>
-                            <Skeleton h={4} />
-                          </Td>
-                        </Tr>
-                      );
-                    })}
-                </Tbody>
-              </Table>
-            </TableContainer>
-          </GridItem>
-        </Grid>
-      </Box>
     </>
   );
 };
@@ -395,8 +438,7 @@ const NftTransfersTableRow = (props: {
     <Tr key={`nft_transfers_${props.item.id}`} h={16}>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink
-          href={`https://goerli.
-                            etherscan.io/tx/${props.item.txHash}`}
+          href={`https://goerli.etherscan.io/tx/${props.item.txHash}`}
           style={{ width: "100%", display: "block" }}
           target="_blank"
         >
@@ -405,7 +447,7 @@ const NftTransfersTableRow = (props: {
       </Td>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink
-          href={`https://goerli.etherscan.io/tx/${item.txHash}`}
+          href={`https://goerli.etherscan.io/tx/${props.item.txHash}`}
           style={{ width: "100%", display: "block" }}
           target="_blank"
         >
@@ -414,7 +456,7 @@ const NftTransfersTableRow = (props: {
       </Td>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink
-          href={`https://goerli.etherscan.io/tx/${item.txHash}`}
+          href={`https://goerli.etherscan.io/tx/${props.item.txHash}`}
           style={{ width: "100%", display: "block" }}
           target="_blank"
         >
@@ -423,7 +465,81 @@ const NftTransfersTableRow = (props: {
       </Td>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink
-          href={`https://goerli.etherscan.io/tx/${item.txHash}`}
+          href={`https://goerli.etherscan.io/tx/${props.item.txHash}`}
+          style={{ width: "100%", display: "block" }}
+          target="_blank"
+        >
+          {blockProducedAtStr}
+        </NextLink>
+      </Td>
+    </Tr>
+  );
+};
+
+const CashbacksTableRow = (props: {
+  isInitialized: boolean;
+  item: Cashback;
+}) => {
+  const { getExplorerTxUrl } = useBlockchain();
+  const { formatWithoutTimezone } = useDatetime();
+
+  const eventStr = useMemo(() => {
+    return "Gas fee cashback";
+  }, []);
+
+  const fromAddressStr = useMemo(() => {
+    return props.item.walletAddress;
+  }, [props.item.walletAddress]);
+
+  const toAddressStr = useMemo(() => {
+    return props.item.amountWei.toString();
+  }, [props.item.amountWei]);
+
+  const blockProducedAtStr = useMemo(() => {
+    return formatWithoutTimezone(props.item.createdAt);
+  }, [formatWithoutTimezone, props.item.createdAt]);
+
+  return (
+    <Tr key={`nft_transfers_${props.item.id}`} h={16}>
+      <Td fontWeight="normal" fontSize="sm">
+        <NextLink
+          href={getExplorerTxUrl(props.item.txHash)}
+          style={{ width: "100%", display: "block" }}
+          target="_blank"
+        >
+          {eventStr}
+        </NextLink>
+      </Td>
+      <Td fontWeight="normal" fontSize="sm">
+        <NextLink
+          href={getExplorerTxUrl(props.item.txHash)}
+          style={{ width: "100%", display: "block" }}
+          target="_blank"
+        >
+          {props.item.txHash ? "Submitted" : "Failed"}
+        </NextLink>
+      </Td>
+      <Td fontWeight="normal" fontSize="sm">
+        <NextLink
+          href={getExplorerTxUrl(props.item.txHash)}
+          style={{ width: "100%", display: "block" }}
+          target="_blank"
+        >
+          {fromAddressStr}
+        </NextLink>
+      </Td>
+      <Td fontWeight="normal" fontSize="sm">
+        <NextLink
+          href={getExplorerTxUrl(props.item.txHash)}
+          style={{ width: "100%", display: "block" }}
+          target="_blank"
+        >
+          {toAddressStr}
+        </NextLink>
+      </Td>
+      <Td fontWeight="normal" fontSize="sm">
+        <NextLink
+          href={getExplorerTxUrl(props.item.txHash)}
           style={{ width: "100%", display: "block" }}
           target="_blank"
         >
@@ -437,6 +553,7 @@ const NftTransfersTableRow = (props: {
 const NftTransfersSection = (props: {
   isInitialized: boolean;
   nftTransfers: NftTransfer[];
+  cashbacks: Cashback[];
 }) => {
   return (
     <Box>
@@ -450,23 +567,24 @@ const NftTransfersSection = (props: {
             <Table size="sm">
               <Thead>
                 <Tr>
-                  <Th>Event</Th>
-                  <Th>From Address</Th>
-                  <Th>To Address</Th>
-                  <Th>Date</Th>
+                  <Th>EVENT</Th>
+                  <Th>STATUS</Th>
+                  <Th>WALLET</Th>
+                  <Th>AMOUNT(Wei)</Th>
+                  <Th>DATE</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {props.isInitialized && props.nftTransfers.length === 0 && (
+                {props.isInitialized && props.cashbacks.length === 0 && (
                   <Tr key="nft_transfers_empty" h={16}>
                     <Td colSpan={3}>NO Record</Td>
                   </Tr>
                 )}
                 {props.isInitialized &&
-                  props.nftTransfers.length !== 0 &&
-                  props.nftTransfers.flatMap((item) => {
+                  props.cashbacks.length !== 0 &&
+                  props.cashbacks.flatMap((item) => {
                     return (
-                      <NftTransfersTableRow
+                      <CashbacksTableRow
                         isInitialized={props.isInitialized}
                         item={item}
                       />
@@ -476,6 +594,12 @@ const NftTransfersSection = (props: {
                   [...Array(3)].flatMap((x, idx) => {
                     return (
                       <Tr key={`nft_transfers_${idx}`} h={16}>
+                        <Td>
+                          <Skeleton h={4} />
+                        </Td>
+                        <Td>
+                          <Skeleton h={4} />
+                        </Td>
                         <Td>
                           <Skeleton h={4} />
                         </Td>
@@ -497,12 +621,89 @@ const NftTransfersSection = (props: {
   );
 };
 
+const CouponHoldersTableRow = (props: {
+  isInitialized: boolean;
+  item: CouponHolder;
+}) => {
+  const { getExplorerAddressUrl } = useBlockchain();
+  return (
+    <Tr key={`coupon_holders_${props.item.id}`} h={16}>
+      <Td fontWeight="normal" fontSize="sm">
+        <NextLink
+          href={getExplorerAddressUrl(props.item.walletAddress)}
+          style={{ width: "100%", display: "block" }}
+          target="_blank"
+        >
+          {props.item.walletAddress}
+        </NextLink>
+      </Td>
+    </Tr>
+  );
+};
+
+const CouponHoldersSection = (props: {
+  isInitialized: boolean;
+  couponHolders: CouponHolder[];
+}) => {
+  return (
+    <Box>
+      <Grid templateColumns="repeat(12, 1fr)" gap={4} mt={24}>
+        <GridItem colSpan={{ base: 12 }}>
+          <Heading as="h4" fontSize="2xl">
+            Coupon Holders
+          </Heading>
+          <Divider mt={2} />
+          <TableContainer>
+            <Table size="sm">
+              <Thead>
+                <Tr>
+                  <Th>WALLET</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {props.isInitialized && props.couponHolders.length === 0 && (
+                  <Tr key="coupon_holders_empty" h={16}>
+                    <Td colSpan={3}>NO Record</Td>
+                  </Tr>
+                )}
+                {props.isInitialized &&
+                  props.couponHolders.length !== 0 &&
+                  props.couponHolders.flatMap((item) => {
+                    return (
+                      <CouponHoldersTableRow
+                        isInitialized={props.isInitialized}
+                        item={item}
+                      />
+                    );
+                  })}
+                {!props.isInitialized &&
+                  [...Array(3)].flatMap((x, idx) => {
+                    return (
+                      <Tr key={`coupon_holders_${idx}`} h={16}>
+                        <Td>
+                          <Skeleton h={4} />
+                        </Td>
+                      </Tr>
+                    );
+                  })}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </GridItem>
+      </Grid>
+    </Box>
+  );
+};
+
 export default function CouponDetail() {
   const { project_id: projectId, coupon_id: couponId } = useRouter().query;
 
   const { callGetCoupon } = useCouponsApi();
   const { callGetNft, callGetNfts } = useNftsApi();
   const { callGetNftTransfers } = useNftTransfersApi();
+  const { callGetCouponHolders } = useCouponHoldersApi();
+  const { callGetCashbacks } = useCashbacksApi();
+
   const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [couponNft, setCouponNft] = useState<Nft | null>(null);
   const [nfts, setNfts] = useState<Nft[]>([]);
@@ -510,6 +711,8 @@ export default function CouponDetail() {
     []
   );
   const [nftTransfers, setNftTransfers] = useState<NftTransfer[]>([]);
+  const [couponHolders, setCouponHolders] = useState<CouponHolder[]>([]);
+  const [cashbacks, setCashbacks] = useState<Cashback[]>([]);
   const { authToken, isFirebaseInitialized } = useFirebase();
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -555,12 +758,36 @@ export default function CouponDetail() {
     [callGetNftTransfers]
   );
 
+  const getCouponHoldersApi = useCallback(
+    async (
+      authToken: string,
+      projectId: string,
+      couponId: string
+    ): Promise<void> => {
+      const items = await callGetCouponHolders(authToken, projectId, couponId);
+      setCouponHolders(items);
+    },
+    [callGetCouponHolders]
+  );
+
   const getNftTransfers = useCallback(
     async (authToken: string, nftIds: string[]): Promise<void> => {
       const items = await callGetNftTransfers(authToken, nftIds);
       setNftTransfers(items);
     },
     [callGetNftTransfers]
+  );
+
+  const getCashbacks = useCallback(
+    async (
+      authToken: string,
+      projectId: string,
+      couponId: string
+    ): Promise<void> => {
+      const items = await callGetCashbacks(authToken, projectId, couponId);
+      setCashbacks(items);
+    },
+    [callGetCashbacks]
   );
 
   useEffect(() => {
@@ -624,6 +851,40 @@ export default function CouponDetail() {
     })();
   }, [authToken, getNftTransfers, isFirebaseInitialized, nfts]);
 
+  useEffect(() => {
+    if (!isFirebaseInitialized) return;
+    if (!authToken) return;
+
+    const projectIdStr = projectId as string;
+    const couponIdStr = couponId as string;
+    if (!projectIdStr) return;
+    if (!couponIdStr) return;
+
+    (async () => {
+      await getCouponHoldersApi(authToken, projectIdStr, couponIdStr);
+    })();
+  }, [
+    authToken,
+    couponId,
+    getCouponHoldersApi,
+    isFirebaseInitialized,
+    projectId,
+  ]);
+
+  useEffect(() => {
+    if (!isFirebaseInitialized) return;
+    if (!authToken) return;
+
+    const projectIdStr = projectId as string;
+    const couponIdStr = couponId as string;
+    if (!projectIdStr) return;
+    if (!couponIdStr) return;
+
+    (async () => {
+      await getCashbacks(authToken, projectIdStr, couponIdStr);
+    })();
+  }, [authToken, couponId, getCashbacks, isFirebaseInitialized, projectId]);
+
   const clickDelete = () => {
     deleteDialog.onOpen();
   };
@@ -648,13 +909,24 @@ export default function CouponDetail() {
             nfts={nfts}
             clickDelete={clickDelete}
           />
+          <TresurySection
+            isInitialized={isInitialized}
+            coupon={coupon}
+            nfts={nfts}
+            clickDelete={clickDelete}
+          />
           <StatisticsSection
             isInitialized={isInitialized}
             couponNftTransfers={couponNftTransfers}
           />
+          <CouponHoldersSection
+            isInitialized={isInitialized}
+            couponHolders={couponHolders}
+          />
           <NftTransfersSection
             isInitialized={isInitialized}
             nftTransfers={nftTransfers}
+            cashbacks={cashbacks}
           />
         </Box>
       </DashboardLayout>

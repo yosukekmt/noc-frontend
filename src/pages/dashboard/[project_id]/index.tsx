@@ -48,6 +48,9 @@ const LoadingTBody = () => {
             <Td>
               <Skeleton h={4} />
             </Td>
+            <Td>
+              <Skeleton h={4} />
+            </Td>
           </Tr>
         );
       })}
@@ -88,6 +91,14 @@ const LoadedTbodyRow = (props: { projectId: string; item: Coupon }) => {
           style={{ width: "100%", display: "block" }}
         >
           {props.item.endAt.toLocaleString()}
+        </NextLink>
+      </Td>
+      <Td fontWeight="normal" fontSize="sm">
+        <NextLink
+          href={`/dashboard/${props.projectId}/coupons/${props.item.id}`}
+          style={{ width: "100%", display: "block" }}
+        >
+          {props.item.createdAt.toLocaleString()}
         </NextLink>
       </Td>
     </Tr>
@@ -203,6 +214,7 @@ export default function Project() {
                   <Th>REWARD TYPE</Th>
                   <Th>TIME ZONE</Th>
                   <Th>DURATION</Th>
+                  <Th>CREATED</Th>
                 </Tr>
               </Thead>
               {isInitialized ? (

@@ -57,3 +57,22 @@ export type NftTransfer = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type CouponHolder = {
+  id: string;
+  walletAddress: string;
+  couponId: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type Cashback = {
+  id: string;
+  treasuryAddress: string;
+  walletAddress: string;
+  amountWei: number;
+  txHash: string;
+  couponId: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
