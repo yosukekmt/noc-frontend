@@ -25,6 +25,7 @@ export const useCouponsApi = () => {
           endAt: new Date(d.endAt),
           createdAt: new Date(d.createdAt),
           updatedAt: new Date(d.updatedAt),
+          chainId: d.chainId,
         };
       });
       return items;
@@ -37,6 +38,7 @@ export const useCouponsApi = () => {
       authToken: string,
       data: {
         projectId: string;
+        chainId: number;
         rewardType: "gas_fee_cashback";
         name: string;
         description: string;
@@ -64,6 +66,7 @@ export const useCouponsApi = () => {
         endAt: new Date(resp.data.endAt),
         createdAt: new Date(resp.data.createdAt),
         updatedAt: new Date(resp.data.updatedAt),
+        chainId: resp.data.chainId,
       };
       return item;
     },
@@ -93,6 +96,7 @@ export const useCouponsApi = () => {
         endAt: new Date(resp.data.endAt),
         createdAt: new Date(resp.data.createdAt),
         updatedAt: new Date(resp.data.updatedAt),
+        chainId: resp.data.chainId,
       };
       return item;
     },

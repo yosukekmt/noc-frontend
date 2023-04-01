@@ -6,8 +6,13 @@ export const useNftsApi = () => {
   const { apiClient } = useApiClient();
 
   const callGetNft = useCallback(
-    async (authToken: string, contractAddress: string): Promise<Nft> => {
+    async (
+      authToken: string,
+      chainId: number,
+      contractAddress: string
+    ): Promise<Nft> => {
       const resp = await apiClient.get(`/nfts/${contractAddress}`, {
+        params: { chain_id: chainId },
         headers: { Authorization: authToken },
       });
       const item = {
@@ -16,6 +21,7 @@ export const useNftsApi = () => {
         contractAddress: resp.data.contractAddress,
         createdAt: new Date(resp.data.createdAt),
         updatedAt: new Date(resp.data.updatedAt),
+        chainId: resp.data.chainId,
       };
       return item;
     },
@@ -39,6 +45,7 @@ export const useNftsApi = () => {
           contractAddress: d.contractAddress,
           createdAt: new Date(d.createdAt),
           updatedAt: new Date(d.updatedAt),
+          chainId: d.chainId,
         };
       });
       return items;

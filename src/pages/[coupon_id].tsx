@@ -1,6 +1,5 @@
 import Footer from "@/components/session/footer";
 import Header from "@/components/session/header";
-import { useBlockchain } from "@/hooks/useBlockchain";
 import { useDatetime } from "@/hooks/useDatetime";
 import { usePublicApi } from "@/hooks/usePublicApi";
 import { Coupon, Nft } from "@/models";
@@ -107,7 +106,7 @@ const MintBody = (props: { coupon: Coupon; nfts: Nft[] }) => {
                 <Web3Button
                   contractAddress={props.coupon.contractAddress}
                   action={(contract) =>
-                    contract.erc1155.claim(props.coupon.nftTokenId, 2)
+                    contract.erc1155.claim(props.coupon.nftTokenId, 1)
                   }
                 />
                 <Text fontSize="sm" mt={2}>
@@ -126,7 +125,6 @@ const MintBody = (props: { coupon: Coupon; nfts: Nft[] }) => {
 };
 
 export default function Mint() {
-  const chain = useBlockchain().network;
   const { coupon_id: couponId } = useRouter().query;
   const { callGetCoupon, callGetNfts } = usePublicApi();
   const [item, setItem] = useState<Coupon | null>(null);
@@ -168,9 +166,11 @@ export default function Mint() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
-      <ThirdwebProvider activeChain={chain}>
-        {item && <MintBody coupon={item} nfts={nfts} />}
-      </ThirdwebProvider>
+      {item && (
+        <ThirdwebProvider activeChain={item.chainId as 1 | 5 | 137 | 80001}>
+          {item && <MintBody coupon={item} nfts={nfts} />}
+        </ThirdwebProvider>
+      )}
     </>
   );
 }

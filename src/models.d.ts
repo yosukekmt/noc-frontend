@@ -11,6 +11,7 @@ export type Coupon = {
   endAt: Date;
   createdAt: Date;
   updatedAt: Date;
+  chainId: number;
 };
 
 export type Invitation = {
@@ -42,6 +43,7 @@ export type Nft = {
   name: string;
   createdAt: Date;
   updatedAt: Date;
+  chainId: number;
 };
 
 export type NftTransfer = {
@@ -75,4 +77,11 @@ export type Cashback = {
   couponId: string;
   createdAt: Date;
   updatedAt: Date;
+};
+
+export type Chain = {
+  id: number;
+  name: string;
+  explorerUrl: string;
+  openseaUrl: string;
 };

@@ -1,8 +1,8 @@
-import { useBlockchain } from "@/hooks/useBlockchain";
+import { useChainsApi } from "@/hooks/useChainsApi";
 import { useFirebase } from "@/hooks/useFirebase";
 import { useNftsApi } from "@/hooks/useNftsApi";
 import { useValidator } from "@/hooks/useValidator";
-import { Nft } from "@/models";
+import { Chain, Nft } from "@/models";
 import {
   Button,
   Card,
@@ -24,12 +24,12 @@ import {
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 export default function PickerDialog(props: {
+  chain: Chain;
   isOpen: boolean;
   onClose(): void;
   onOpen(): void;
   onPicked(item: Nft): void;
 }) {
-  const network = useBlockchain().network;
   const { authToken } = useFirebase();
   const { validateContractAddress } = useValidator();
   const { callGetNft } = useNftsApi();
@@ -42,8 +42,12 @@ export default function PickerDialog(props: {
   }, [validateContractAddress, contractAddress]);
 
   const getNft = useCallback(
-    async (authToken: string, contractAddress: string): Promise<void> => {
-      const item = await callGetNft(authToken, contractAddress);
+    async (
+      authToken: string,
+      chainId: number,
+      contractAddress: string
+    ): Promise<void> => {
+      const item = await callGetNft(authToken, chainId, contractAddress);
       setItem(item);
     },
     [callGetNft]
@@ -54,9 +58,15 @@ export default function PickerDialog(props: {
     if (!isValidContractAddress) return;
 
     (async () => {
-      await getNft(authToken, contractAddress);
+      await getNft(authToken, props.chain.id, contractAddress);
     })();
-  }, [authToken, contractAddress, getNft, isValidContractAddress]);
+  }, [
+    authToken,
+    isValidContractAddress,
+    getNft,
+    props.chain.id,
+    contractAddress,
+  ]);
 
   const clickSubmit = (evt: FormEvent) => {
     evt.preventDefault();
@@ -76,9 +86,14 @@ export default function PickerDialog(props: {
           <ModalBody bg="gray.100">
             <FormControl>
               <FormLabel fontSize="sm">Network</FormLabel>
-              <Select size="sm" bg="white" name="name" value={network.name}>
-                <option>{network.name}</option>
-              </Select>
+              <Input
+                size="sm"
+                bg="white"
+                type="text"
+                name="chainId"
+                value={props.chain.name}
+                disabled={true}
+              />
             </FormControl>
             <FormControl mt={2}>
               <FormLabel fontSize="sm">Contract Address</FormLabel>

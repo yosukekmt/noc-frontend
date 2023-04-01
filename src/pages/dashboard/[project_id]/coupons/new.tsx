@@ -1,12 +1,13 @@
 import PickerDialog from "@/components/dashboard/nfts/picker-dialog";
 import { useApiClient } from "@/hooks/useApiClient";
+import { useBlockchain } from "@/hooks/useBlockchain";
+import { useChainsApi } from "@/hooks/useChainsApi";
 import { useCouponsApi } from "@/hooks/useCouponsApi";
 import { useDatetime } from "@/hooks/useDatetime";
 import { useFirebase } from "@/hooks/useFirebase";
-import { useUtil } from "@/hooks/useUtil";
 import { useValidator } from "@/hooks/useValidator";
 import DashboardLayout from "@/layouts/dashboard-layout";
-import { Nft } from "@/models";
+import { Chain, Nft } from "@/models";
 import {
   Box,
   Button,
@@ -32,15 +33,16 @@ import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { Plus, Warning } from "phosphor-react";
-import { FormEvent, useCallback, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
-export default function CouponDetail() {
+export default function NewCoupon() {
   const router = useRouter();
   const { project_id: projectId } = router.query;
   const { getErrorMessage } = useApiClient();
+  const { callGetChains } = useChainsApi();
   const { callCreateCoupons } = useCouponsApi();
   const { authToken, isFirebaseInitialized } = useFirebase();
-  const { truncateContractAddress } = useUtil();
+  const { truncateContractAddress } = useBlockchain();
   const { validateCouponsName, validateCouponsDescription } = useValidator();
   const {
     getDefaultTimezone,
@@ -53,6 +55,8 @@ export default function CouponDetail() {
   } = useDatetime();
 
   const [nfts, setNfts] = useState<Nft[]>([]);
+  const [chains, setChains] = useState<Chain[]>([]);
+  const [chainId, setChainId] = useState<number | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [timezone, setTimezone] = useState(getDefaultTimezone());
@@ -75,6 +79,9 @@ export default function CouponDetail() {
   const endtAt = useMemo(() => {
     return parseDateInput(endDate, endTime, timezone);
   }, [endDate, endTime, timezone, parseDateInput]);
+  const isValidChainId = useMemo(() => {
+    return !!chainId;
+  }, [chainId]);
   const isValidNftIds = useMemo(() => {
     return 0 < nftIds.length;
   }, [nftIds]);
@@ -85,10 +92,27 @@ export default function CouponDetail() {
     return validateCouponsDescription(description);
   }, [validateCouponsDescription, description]);
 
+  const chain = useMemo(() => {
+    if (!chainId) return null;
+    return chains.find((item) => item.id === chainId);
+  }, [chainId, chains]);
+
+  const getChains = useCallback(
+    async (authToken: string): Promise<void> => {
+      const items = await callGetChains(authToken);
+      setChains(items);
+      if (!chainId) {
+        setChainId(items[0].id);
+      }
+    },
+    [callGetChains, chainId]
+  );
+
   const callApiCreateToken = useCallback(
     async (
       authToken: string,
       projectId: string,
+      chainId: number,
       rewardType: "gas_fee_cashback",
       name: string,
       description: string,
@@ -101,6 +125,7 @@ export default function CouponDetail() {
       try {
         const item = await callCreateCoupons(authToken, {
           projectId,
+          chainId,
           rewardType,
           name,
           description,
@@ -123,6 +148,15 @@ export default function CouponDetail() {
     [callCreateCoupons, getErrorMessage, router]
   );
 
+  useEffect(() => {
+    if (!isFirebaseInitialized) return;
+    if (!authToken) return;
+
+    (async () => {
+      await getChains(authToken);
+    })();
+  }, [isFirebaseInitialized, authToken, getChains]);
+
   const onPicked = (item: Nft) => {
     setNfts([...nfts, item]);
   };
@@ -140,6 +174,7 @@ export default function CouponDetail() {
     if (!authToken) return;
     setIsAttempted(true);
 
+    if (!isValidChainId) return;
     if (!isValidNftIds) return;
     if (!isValidName) return;
     if (!isValidDescription) return;
@@ -147,6 +182,7 @@ export default function CouponDetail() {
     callApiCreateToken(
       authToken,
       projectId as string,
+      chainId!,
       "gas_fee_cashback",
       name,
       description,
@@ -178,6 +214,26 @@ export default function CouponDetail() {
               <Text fontSize="sm">
                 Set up your Gasback NFT to engage you customers.
               </Text>
+
+              <FormControl>
+                <FormLabel fontSize="sm">Network</FormLabel>
+                {chainId && (
+                  <Select
+                    size="sm"
+                    bg="white"
+                    name="chainId"
+                    value={chainId}
+                    onChange={(evt) =>
+                      setChainId(Number.parseInt(evt.target.value))
+                    }
+                  >
+                    {chains.flatMap((chain) => {
+                      return <option value={chain.id}>{chain.name}</option>;
+                    })}
+                  </Select>
+                )}
+              </FormControl>
+
               <FormControl mt={2}>
                 <FormLabel fontSize="sm">Applicable NFTs</FormLabel>
                 <Wrap spacing={1} mt={2}>
@@ -275,9 +331,9 @@ export default function CouponDetail() {
                   value={timezone}
                   onChange={(evt) => setTimezone(evt.target.value)}
                 >
-                  {getTimezoneOffsets().flatMap((tz) => {
+                  {getTimezoneOffsets().flatMap((tz, idx) => {
                     return (
-                      <option value={tz.name}>
+                      <option value={tz.name} key={`timezone_${idx}`}>
                         {`${tz.name} (${tz.offset})`}
                       </option>
                     );
@@ -355,12 +411,15 @@ export default function CouponDetail() {
           </Box>
         </Flex>
       </DashboardLayout>
-      <PickerDialog
-        isOpen={pickerDialog.isOpen}
-        onClose={pickerDialog.onClose}
-        onOpen={pickerDialog.onOpen}
-        onPicked={onPicked}
-      />
+      {chain && (
+        <PickerDialog
+          chain={chain}
+          isOpen={pickerDialog.isOpen}
+          onClose={pickerDialog.onClose}
+          onOpen={pickerDialog.onOpen}
+          onPicked={onPicked}
+        />
+      )}
     </>
   );
 }

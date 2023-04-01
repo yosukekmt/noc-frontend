@@ -1,4 +1,4 @@
-import { Coupon, Nft } from "@/models";
+import { Coupon, Nft, Chain } from "@/models";
 import { useCallback } from "react";
 import { useApiClient } from "./useApiClient";
 
@@ -21,6 +21,7 @@ export const usePublicApi = () => {
         endAt: new Date(resp.data.endAt),
         createdAt: new Date(resp.data.createdAt),
         updatedAt: new Date(resp.data.updatedAt),
+        chainId: resp.data.chainId,
       };
       return item;
     },
@@ -38,6 +39,7 @@ export const usePublicApi = () => {
           contractAddress: d.contractAddress,
           createdAt: new Date(d.createdAt),
           updatedAt: new Date(d.updatedAt),
+          chainId: resp.data.chainId,
         };
       });
       return items;
