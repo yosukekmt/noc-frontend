@@ -242,6 +242,7 @@ const SummarySection = (props: {
     </>
   );
 };
+
 const TresurySection = (props: {
   isInitialized: boolean;
   chain: Chain;
@@ -378,7 +379,7 @@ const StatisticsSection = (props: {
         <Grid templateColumns="repeat(12, 1fr)" gap={4} mt={24}>
           <GridItem colSpan={{ base: 12 }}>
             <Heading as="h4" fontSize="2xl">
-              Statistics
+              Statistics(DUMMY)
             </Heading>
             <Divider mt={2} />
           </GridItem>
@@ -447,111 +448,20 @@ const StatisticsSection = (props: {
   );
 };
 
-const NftTransfersTableRow = (props: {
-  isInitialized: boolean;
-  item: NftTransfer;
-}) => {
-  const { formatWithoutTimezone } = useDatetime();
-
-  const eventStr = useMemo(() => {
-    if (
-      props.item.fromAddress === "0x0000000000000000000000000000000000000000"
-    ) {
-      return "Mint";
-    }
-    if (props.item.toAddress === "0x0000000000000000000000000000000000000000") {
-      return "Burn";
-    }
-    return "Transfer";
-  }, [props.item.fromAddress, props.item.toAddress]);
-
-  const fromAddressStr = useMemo(() => {
-    if (
-      props.item.fromAddress === "0x0000000000000000000000000000000000000000"
-    ) {
-      return "-";
-    }
-    return props.item.fromAddress;
-  }, [props.item.fromAddress]);
-
-  const toAddressStr = useMemo(() => {
-    if (props.item.toAddress === "0x0000000000000000000000000000000000000000") {
-      return "-";
-    }
-    return props.item.toAddress;
-  }, [props.item.toAddress]);
-
-  const blockProducedAtStr = useMemo(() => {
-    return formatWithoutTimezone(props.item.blockProducedAt);
-  }, [formatWithoutTimezone, props.item.blockProducedAt]);
-
-  return (
-    <Tr key={`nft_transfers_${props.item.id}`} h={16}>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href={`https://goerli.etherscan.io/tx/${props.item.txHash}`}
-          style={{ width: "100%", display: "block" }}
-          target="_blank"
-        >
-          {eventStr}
-        </NextLink>
-      </Td>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href={`https://goerli.etherscan.io/tx/${props.item.txHash}`}
-          style={{ width: "100%", display: "block" }}
-          target="_blank"
-        >
-          {fromAddressStr}
-        </NextLink>
-      </Td>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href={`https://goerli.etherscan.io/tx/${props.item.txHash}`}
-          style={{ width: "100%", display: "block" }}
-          target="_blank"
-        >
-          {toAddressStr}
-        </NextLink>
-      </Td>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href={`https://goerli.etherscan.io/tx/${props.item.txHash}`}
-          style={{ width: "100%", display: "block" }}
-          target="_blank"
-        >
-          {blockProducedAtStr}
-        </NextLink>
-      </Td>
-    </Tr>
-  );
-};
-
 const CashbacksTableRow = (props: {
   isInitialized: boolean;
   chain: Chain;
   item: Cashback;
 }) => {
-  const { getExplorerTxUrl } = useBlockchain();
+  const { getExplorerTxUrl, getExplorerAddressUrl, truncateContractAddress } =
+    useBlockchain();
   const { formatWithoutTimezone } = useDatetime();
-
-  const eventStr = useMemo(() => {
-    return "Gas fee cashback";
-  }, []);
-
-  const fromAddressStr = useMemo(() => {
-    return props.item.walletAddress;
-  }, [props.item.walletAddress]);
-
-  const toAddressStr = useMemo(() => {
-    return props.item.amountWei.toString();
-  }, [props.item.amountWei]);
 
   const blockProducedAtStr = useMemo(() => {
     return formatWithoutTimezone(props.item.createdAt);
   }, [formatWithoutTimezone, props.item.createdAt]);
 
-  const explorerUrl = useMemo(() => {
+  const explorerTxUrl = useMemo(() => {
     if (!props.chain) return;
     if (!props.chain.explorerUrl) return;
     if (!props.item) return;
@@ -559,20 +469,31 @@ const CashbacksTableRow = (props: {
     return getExplorerTxUrl(props.chain.explorerUrl, props.item.txHash);
   }, [props.chain, props.item, getExplorerTxUrl]);
 
+  const explorerWalletUrl = useMemo(() => {
+    if (!props.chain) return;
+    if (!props.chain.explorerUrl) return;
+    if (!props.item) return;
+    if (!props.item.walletAddress) return;
+    return getExplorerAddressUrl(
+      props.chain.explorerUrl,
+      props.item.walletAddress
+    );
+  }, [props.chain, props.item, getExplorerAddressUrl]);
+
   return (
     <Tr key={`nft_transfers_${props.item.id}`} h={16}>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink
-          href={explorerUrl || ""}
+          href={explorerTxUrl || ""}
           style={{ width: "100%", display: "block" }}
           target="_blank"
         >
-          {eventStr}
+          Gas fee cashback
         </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink
-          href={explorerUrl || ""}
+          href={explorerTxUrl || ""}
           style={{ width: "100%", display: "block" }}
           target="_blank"
         >
@@ -581,25 +502,34 @@ const CashbacksTableRow = (props: {
       </Td>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink
-          href={explorerUrl || ""}
+          href={explorerTxUrl || ""}
           style={{ width: "100%", display: "block" }}
           target="_blank"
         >
-          {fromAddressStr}
+          {truncateContractAddress(props.item.txHash)}
         </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink
-          href={explorerUrl || ""}
+          href={explorerWalletUrl || ""}
           style={{ width: "100%", display: "block" }}
           target="_blank"
         >
-          {toAddressStr}
+          {truncateContractAddress(props.item.walletAddress)}
         </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink
-          href={explorerUrl || ""}
+          href={explorerTxUrl || ""}
+          style={{ width: "100%", display: "block" }}
+          target="_blank"
+        >
+          {`props.item.amountWei.toString() wei`}
+        </NextLink>
+      </Td>
+      <Td fontWeight="normal" fontSize="sm">
+        <NextLink
+          href={explorerTxUrl || ""}
           style={{ width: "100%", display: "block" }}
           target="_blank"
         >
@@ -621,7 +551,7 @@ const NftTransfersSection = (props: {
       <Grid templateColumns="repeat(12, 1fr)" gap={4} mt={24}>
         <GridItem colSpan={{ base: 12 }}>
           <Heading as="h4" fontSize="2xl">
-            Recent Activity
+            Recent Cashbacks
           </Heading>
           <Divider mt={2} />
           <TableContainer>
@@ -630,8 +560,9 @@ const NftTransfersSection = (props: {
                 <Tr>
                   <Th>EVENT</Th>
                   <Th>STATUS</Th>
+                  <Th>TX HASH</Th>
                   <Th>WALLET</Th>
-                  <Th>AMOUNT(Wei)</Th>
+                  <Th>AMOUNT</Th>
                   <Th>DATE</Th>
                 </Tr>
               </Thead>
@@ -689,6 +620,7 @@ const CouponHoldersTableRow = (props: {
   item: CouponHolder;
 }) => {
   const { getExplorerAddressUrl } = useBlockchain();
+  const { formatWithoutTimezone } = useDatetime();
 
   const explorerUrl = useMemo(() => {
     if (!props.chain) return;
@@ -710,6 +642,13 @@ const CouponHoldersTableRow = (props: {
           target="_blank"
         >
           {props.item.walletAddress}
+        </NextLink>
+        <NextLink
+          href={explorerUrl || ""}
+          style={{ width: "100%", display: "block" }}
+          target="_blank"
+        >
+          {formatWithoutTimezone(props.item.createdAt)}
         </NextLink>
       </Td>
     </Tr>
@@ -1021,10 +960,6 @@ export default function CouponDetail() {
               clickDelete={clickDelete}
             />
           )}
-          <StatisticsSection
-            isInitialized={isInitialized}
-            couponNftTransfers={couponNftTransfers}
-          />
           {chain && (
             <CouponHoldersSection
               isInitialized={isInitialized}
@@ -1040,6 +975,10 @@ export default function CouponDetail() {
               cashbacks={cashbacks}
             />
           )}
+          <StatisticsSection
+            isInitialized={isInitialized}
+            couponNftTransfers={couponNftTransfers}
+          />
         </Box>
       </DashboardLayout>
       {coupon && (
