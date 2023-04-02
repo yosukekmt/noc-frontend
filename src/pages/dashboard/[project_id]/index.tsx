@@ -1,8 +1,9 @@
+import { useChainsApi } from "@/hooks/useChainsApi";
 import { useCouponsApi } from "@/hooks/useCouponsApi";
 import { useCurrentUserApi } from "@/hooks/useCurrentUserApi";
 import { useFirebase } from "@/hooks/useFirebase";
 import DashboardLayout from "@/layouts/dashboard-layout";
-import { Coupon } from "@/models";
+import { Coupon, Chain } from "@/models";
 import {
   Box,
   Button,
@@ -28,7 +29,7 @@ import {
 import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const LoadingTBody = () => {
   return (
@@ -51,6 +52,9 @@ const LoadingTBody = () => {
             <Td>
               <Skeleton h={4} />
             </Td>
+            <Td>
+              <Skeleton h={4} />
+            </Td>
           </Tr>
         );
       })}
@@ -58,46 +62,48 @@ const LoadingTBody = () => {
   );
 };
 
-const LoadedTbodyRow = (props: { projectId: string; item: Coupon }) => {
+const LoadedTbodyRow = (props: {
+  chains: Chain[];
+  projectId: string;
+  item: Coupon;
+}) => {
+  const detailUrl = useMemo(() => {
+    return `/dashboard/${props.projectId}/coupons/${props.item.id}`;
+  }, [props.item.id, props.projectId]);
+
+  const chain = useMemo(() => {
+    return props.chains.find((chain) => chain.id === props.item.chainId);
+  }, [props.chains, props.item.chainId]);
+
   return (
     <Tr key={`coupon_${props.item.id}`} h={8}>
       <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href={`/dashboard/${props.projectId}/coupons/${props.item.id}`}
-          style={{ width: "100%", display: "block" }}
-        >
+        <NextLink href={detailUrl} style={{ width: "100%", display: "block" }}>
           <Text>{props.item.name}</Text>
         </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href={`/dashboard/${props.projectId}/coupons/${props.item.id}`}
-          style={{ width: "100%", display: "block" }}
-        >
+        <NextLink href={detailUrl} style={{ width: "100%", display: "block" }}>
           Gas fee cashback
         </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href={`/dashboard/${props.projectId}/coupons/${props.item.id}`}
-          style={{ width: "100%", display: "block" }}
-        >
+        <NextLink href={detailUrl} style={{ width: "100%", display: "block" }}>
+          {chain && chain.name}
+        </NextLink>
+      </Td>
+      <Td fontWeight="normal" fontSize="sm">
+        <NextLink href={detailUrl} style={{ width: "100%", display: "block" }}>
           {props.item.timezone}
         </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href={`/dashboard/${props.projectId}/coupons/${props.item.id}`}
-          style={{ width: "100%", display: "block" }}
-        >
+        <NextLink href={detailUrl} style={{ width: "100%", display: "block" }}>
           {props.item.endAt.toLocaleString()}
         </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href={`/dashboard/${props.projectId}/coupons/${props.item.id}`}
-          style={{ width: "100%", display: "block" }}
-        >
+        <NextLink href={detailUrl} style={{ width: "100%", display: "block" }}>
           {props.item.createdAt.toLocaleString()}
         </NextLink>
       </Td>
@@ -105,7 +111,11 @@ const LoadedTbodyRow = (props: { projectId: string; item: Coupon }) => {
   );
 };
 
-const LoadedTbody = (props: { projectId: string; items: Coupon[] }) => {
+const LoadedTbody = (props: {
+  chains: Chain[];
+  projectId: string;
+  items: Coupon[];
+}) => {
   return (
     <Tbody>
       {0 === props.items.length && (
@@ -117,7 +127,13 @@ const LoadedTbody = (props: { projectId: string; items: Coupon[] }) => {
       )}
       {0 < props.items.length &&
         props.items.flatMap((item) => {
-          return <LoadedTbodyRow projectId={props.projectId} item={item} />;
+          return (
+            <LoadedTbodyRow
+              chains={props.chains}
+              projectId={props.projectId}
+              item={item}
+            />
+          );
         })}
     </Tbody>
   );
@@ -128,10 +144,20 @@ export default function Project() {
   const { project_id: projectId } = router.query;
   const { firebaseSignOut } = useFirebase();
   const { clearCurrentUser } = useCurrentUserApi();
+  const { callGetChains } = useChainsApi();
   const { callGetCoupons } = useCouponsApi();
+  const [chains, setChains] = useState<Chain[]>([]);
   const [items, setItems] = useState<Coupon[]>([]);
   const { authToken, isFirebaseInitialized } = useFirebase();
   const [isInitialized, setIsInitialized] = useState(false);
+
+  const getChains = useCallback(
+    async (authToken: string): Promise<void> => {
+      const items = await callGetChains(authToken);
+      setChains(items);
+    },
+    [callGetChains]
+  );
 
   const getCoupons = useCallback(
     async (authToken: string): Promise<void> => {
@@ -142,28 +168,31 @@ export default function Project() {
   );
 
   useEffect(() => {
-    if (!isFirebaseInitialized) {
-      return;
-    }
-    if (!authToken) {
-      firebaseSignOut();
-      clearCurrentUser();
-      router.push("/");
-      return;
-    }
+    if (!isFirebaseInitialized) return;
+    if (authToken) return;
+
+    firebaseSignOut();
+    clearCurrentUser();
+    router.push("/");
+    return;
+  }, [
+    authToken,
+    clearCurrentUser,
+    firebaseSignOut,
+    isFirebaseInitialized,
+    router,
+  ]);
+
+  useEffect(() => {
+    if (!isFirebaseInitialized) return;
+    if (!authToken) return;
 
     (async () => {
+      await getChains(authToken);
       await getCoupons(authToken);
       setIsInitialized(true);
     })();
-  }, [
-    isFirebaseInitialized,
-    authToken,
-    firebaseSignOut,
-    clearCurrentUser,
-    router,
-    getCoupons,
-  ]);
+  }, [authToken, getChains, getCoupons, isFirebaseInitialized]);
 
   const clickNew = () => {
     router.push(`/dashboard/${projectId}/coupons/new`);
@@ -212,13 +241,18 @@ export default function Project() {
                 <Tr>
                   <Th>NAME</Th>
                   <Th>REWARD TYPE</Th>
+                  <Th>NETWORK</Th>
                   <Th>TIME ZONE</Th>
                   <Th>DURATION</Th>
                   <Th>CREATED</Th>
                 </Tr>
               </Thead>
               {isInitialized ? (
-                <LoadedTbody projectId={projectId as string} items={items} />
+                <LoadedTbody
+                  chains={chains}
+                  projectId={projectId as string}
+                  items={items}
+                />
               ) : (
                 <LoadingTBody />
               )}

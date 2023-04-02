@@ -501,30 +501,34 @@ const CashbacksTableRow = (props: {
         </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href={explorerTxUrl || ""}
-          style={{ width: "100%", display: "block" }}
-          target="_blank"
-        >
-          {truncateContractAddress(props.item.txHash)}
-        </NextLink>
+        {props.item.txHash && (
+          <NextLink
+            href={explorerTxUrl || ""}
+            style={{ width: "100%", display: "block" }}
+            target="_blank"
+          >
+            {truncateContractAddress(props.item.txHash)}
+          </NextLink>
+        )}
+      </Td>
+      <Td fontWeight="normal" fontSize="sm">
+        {props.item.walletAddress && (
+          <NextLink
+            href={explorerWalletUrl || ""}
+            style={{ width: "100%", display: "block" }}
+            target="_blank"
+          >
+            {truncateContractAddress(props.item.walletAddress)}
+          </NextLink>
+        )}
       </Td>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink
-          href={explorerWalletUrl || ""}
+          href="https://www.alchemy.com/gwei-calculator"
           style={{ width: "100%", display: "block" }}
           target="_blank"
         >
-          {truncateContractAddress(props.item.walletAddress)}
-        </NextLink>
-      </Td>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink
-          href={explorerTxUrl || ""}
-          style={{ width: "100%", display: "block" }}
-          target="_blank"
-        >
-          {`props.item.amountWei.toString() wei`}
+          {`${Intl.NumberFormat().format(props.item.amountWei)} Wei`}
         </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
@@ -643,6 +647,8 @@ const CouponHoldersTableRow = (props: {
         >
           {props.item.walletAddress}
         </NextLink>
+      </Td>
+      <Td fontWeight="normal" fontSize="sm">
         <NextLink
           href={explorerUrl || ""}
           style={{ width: "100%", display: "block" }}
@@ -673,6 +679,7 @@ const CouponHoldersSection = (props: {
               <Thead>
                 <Tr>
                   <Th>WALLET</Th>
+                  <Th>SINCE</Th>
                 </Tr>
               </Thead>
               <Tbody>
@@ -741,7 +748,7 @@ export default function CouponDetail() {
       const item = await callGetChain(authToken, chainId);
       setChain(item);
     },
-    []
+    [callGetChain]
   );
   const getCoupon = useCallback(
     async (
@@ -975,10 +982,12 @@ export default function CouponDetail() {
               cashbacks={cashbacks}
             />
           )}
-          <StatisticsSection
-            isInitialized={isInitialized}
-            couponNftTransfers={couponNftTransfers}
-          />
+          {chain && (
+            <StatisticsSection
+              isInitialized={isInitialized}
+              couponNftTransfers={couponNftTransfers}
+            />
+          )}
         </Box>
       </DashboardLayout>
       {coupon && (
