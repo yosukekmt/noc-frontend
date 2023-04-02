@@ -27,6 +27,21 @@ export const usePublicApi = () => {
     },
     [apiClient]
   );
+
+  const callGetChain = useCallback(
+    async (id: string): Promise<Chain> => {
+      const resp = await apiClient.get(`/public/chains/${id}`);
+      const item = {
+        id: resp.data.id,
+        name: resp.data.name,
+        explorerUrl: resp.data.explorerUrl,
+        openseaUrl: resp.data.openseaUrl,
+      };
+      return item;
+    },
+    [apiClient]
+  );
+
   const callGetNfts = useCallback(
     async (couponId: string): Promise<Nft[]> => {
       const resp = await apiClient.get("/public/nfts", {
@@ -46,5 +61,5 @@ export const usePublicApi = () => {
     },
     [apiClient]
   );
-  return { callGetCoupon, callGetNfts };
+  return { callGetCoupon, callGetChain, callGetNfts };
 };
