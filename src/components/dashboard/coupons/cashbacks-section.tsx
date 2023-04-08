@@ -3,6 +3,7 @@ import { useDatetime } from "@/hooks/useDatetime";
 import { Cashback, Chain } from "@/models";
 import {
   Box,
+  Button,
   Divider,
   Grid,
   GridItem,
@@ -20,7 +21,7 @@ import * as Crypto from "crypto";
 import NextLink from "next/link";
 import { useMemo } from "react";
 
-const CashbacksTableLoadingRow = (props: {}) => {
+export const CashbacksTableLoadingRow = (props: {}) => {
   const uiKey = useMemo(() => {
     return `cashbacks_${Crypto.randomBytes(20).toString("hex")}`;
   }, []);
@@ -34,7 +35,7 @@ const CashbacksTableLoadingRow = (props: {}) => {
   );
 };
 
-const CashbacksTableRow = (props: { chain: Chain; item: Cashback }) => {
+export const CashbacksTableRow = (props: { chain: Chain; item: Cashback }) => {
   const { getExplorerTxUrl, getExplorerAddressUrl, truncateContractAddress } =
     useBlockchain();
   const { formatWithoutTimezone } = useDatetime();
@@ -132,10 +133,16 @@ export default function CashbacksSection(props: {
   isInitialized: boolean;
   chain: Chain | undefined;
   cashbacks: Cashback[];
+  projectId: string;
+  couponId: string;
 }) {
   const items = useMemo(() => {
     return props.cashbacks.slice(0, 16);
   }, [props.cashbacks]);
+
+  const isMore = useMemo(() => {
+    return 8 < props.cashbacks.length;
+  }, [props.cashbacks.length]);
 
   return (
     <Box>
@@ -186,6 +193,17 @@ export default function CashbacksSection(props: {
                         </>
                       );
                     })}
+                    {props.projectId && props.couponId && isMore && (
+                      <Tr key="coupon_holders_more" h={16}>
+                        <Td colSpan={2}>
+                          <NextLink
+                            href={`/dashboard/${props.projectId}/coupons/${props.couponId}/cashbacks`}
+                          >
+                            <Button size="sm">View More</Button>
+                          </NextLink>
+                        </Td>
+                      </Tr>
+                    )}
                   </>
                 )}
               </Tbody>

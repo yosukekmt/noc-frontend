@@ -523,8 +523,8 @@ export default function CouponDetail() {
       projectId: string,
       couponId: string
     ): Promise<void> => {
-      const items = await callGetCashbacks(authToken, projectId, couponId, 1);
-      setCashbacks(items);
+      const result = await callGetCashbacks(authToken, projectId, couponId, 1);
+      setCashbacks(result.items);
     },
     [callGetCashbacks]
   );
@@ -634,6 +634,8 @@ export default function CouponDetail() {
             isInitialized={isInitialized}
             chain={chain}
             cashbacks={cashbacks}
+            projectId={projectId}
+            couponId={couponId}
           />
           {chain && <StatisticsSection isInitialized={isInitialized} />}
         </Box>
