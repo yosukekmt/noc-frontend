@@ -9,13 +9,14 @@ export const useCashbacksApi = () => {
     async (
       authToken: string,
       projectId: string,
-      couponId: string
+      couponId: string,
+      page: number
     ): Promise<Cashback[]> => {
       const resp = await apiClient.get("/cashbacks", {
-        params: { project_id: projectId, coupon_id: couponId },
+        params: { project_id: projectId, coupon_id: couponId, page: page },
         headers: { Authorization: authToken },
       });
-      const items = resp.data.map((d: any) => {
+      const items = resp.data.data.map((d: any) => {
         return {
           id: d.id,
           treasuryAddress: d.treasuryAddress,

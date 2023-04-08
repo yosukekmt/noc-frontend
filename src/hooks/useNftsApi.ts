@@ -16,12 +16,12 @@ export const useNftsApi = () => {
         headers: { Authorization: authToken },
       });
       const item = {
-        id: resp.data.id,
-        name: resp.data.name,
-        contractAddress: resp.data.contractAddress,
-        createdAt: new Date(resp.data.createdAt),
-        updatedAt: new Date(resp.data.updatedAt),
-        chainId: resp.data.chainId,
+        id: resp.data.data.id,
+        name: resp.data.data.name,
+        contractAddress: resp.data.data.contractAddress,
+        createdAt: new Date(resp.data.data.createdAt),
+        updatedAt: new Date(resp.data.data.updatedAt),
+        chainId: resp.data.data.chainId,
       };
       return item;
     },
@@ -38,7 +38,7 @@ export const useNftsApi = () => {
         params: { project_id: projectId, coupon_id: couponId },
         headers: { Authorization: authToken },
       });
-      const items = resp.data.map((d: any) => {
+      const items = resp.data.data.map((d: any) => {
         return {
           id: d.id,
           name: d.name,

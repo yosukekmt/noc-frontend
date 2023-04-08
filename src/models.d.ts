@@ -1,3 +1,10 @@
+export type PageInfo = {
+  page: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
+};
+
 export type Coupon = {
   id: string;
   rewardType: "gas_fee_cashback";

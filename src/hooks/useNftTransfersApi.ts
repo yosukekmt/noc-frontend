@@ -11,7 +11,7 @@ export const useNftTransfersApi = () => {
         params: { nft_ids: nftIds },
         headers: { Authorization: authToken },
       });
-      const items = resp.data.map((d: any) => {
+      const items = resp.data.data.map((d: any) => {
         return {
           id: d.id,
           txHash: d.txHash,

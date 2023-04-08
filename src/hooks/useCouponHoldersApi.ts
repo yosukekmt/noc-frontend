@@ -1,4 +1,4 @@
-import { CouponHolder, NftTransfer } from "@/models";
+import { CouponHolder, PageInfo } from "@/models";
 import { useCallback } from "react";
 import { useApiClient } from "./useApiClient";
 
@@ -9,13 +9,28 @@ export const useCouponHoldersApi = () => {
     async (
       authToken: string,
       projectId: string,
-      couponId: string
-    ): Promise<CouponHolder[]> => {
+      couponId: string,
+      page: number,
+      query: string | null = null
+    ): Promise<{ pageInfo: PageInfo; items: CouponHolder[] }> => {
+      const params: any = {
+        project_id: projectId,
+        coupon_id: couponId,
+        page: page,
+      };
+      if (query) params["query"] = query;
+
       const resp = await apiClient.get("/coupon_holders", {
-        params: { project_id: projectId, coupon_id: couponId },
+        params,
         headers: { Authorization: authToken },
       });
-      const items = resp.data.map((d: any) => {
+      const pageInfo = {
+        page: resp.data.pageInfo.page,
+        perPage: resp.data.pageInfo.perPage,
+        total: resp.data.pageInfo.total,
+        totalPages: resp.data.pageInfo.totalPages,
+      };
+      const items = resp.data.data.map((d: any) => {
         return {
           id: d.id,
           walletAddress: d.walletAddress,
@@ -24,7 +39,7 @@ export const useCouponHoldersApi = () => {
           updatedAt: new Date(d.updatedAt),
         };
       });
-      return items;
+      return { pageInfo, items };
     },
     [apiClient]
   );

@@ -20,10 +20,10 @@ export const useCurrentUserApi = () => {
         },
       });
       const item = {
-        id: resp.data.id,
-        email: resp.data.email,
-        createdAt: new Date(resp.data.createdAt),
-        updatedAt: new Date(resp.data.updatedAt),
+        id: resp.data.data.id,
+        email: resp.data.data.email,
+        createdAt: new Date(resp.data.data.createdAt),
+        updatedAt: new Date(resp.data.data.updatedAt),
       };
       setCurrentUser(item);
       return item;

@@ -10,7 +10,7 @@ export const useProjectsApi = () => {
       const resp = await apiClient.get("/projects", {
         headers: { Authorization: authToken },
       });
-      const items = resp.data.map((d: any) => {
+      const items = resp.data.data.map((d: any) => {
         return {
           id: d.id,
           name: d.name,
@@ -29,10 +29,10 @@ export const useProjectsApi = () => {
         headers: { Authorization: authToken },
       });
       const item = {
-        id: resp.data.id,
-        name: resp.data.name,
-        createdAt: new Date(resp.data.createdAt),
-        updatedAt: new Date(resp.data.updatedAt),
+        id: resp.data.data.id,
+        name: resp.data.data.name,
+        createdAt: new Date(resp.data.data.createdAt),
+        updatedAt: new Date(resp.data.data.updatedAt),
       };
       return item;
     },
@@ -49,10 +49,10 @@ export const useProjectsApi = () => {
         headers: { Authorization: authToken },
       });
       const item = {
-        id: resp.data.id,
-        name: resp.data.name,
-        createdAt: new Date(resp.data.createdAt),
-        updatedAt: new Date(resp.data.updatedAt),
+        id: resp.data.data.id,
+        name: resp.data.data.name,
+        createdAt: new Date(resp.data.data.createdAt),
+        updatedAt: new Date(resp.data.data.updatedAt),
       };
       return item;
     },

@@ -11,7 +11,7 @@ export const useInvitationsApi = () => {
         params: { project_id: projectId },
         headers: { Authorization: authToken },
       });
-      const items = resp.data.map((d: any) => {
+      const items = resp.data.data.map((d: any) => {
         return {
           id: d.id,
           email: d.email,

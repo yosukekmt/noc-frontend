@@ -17,7 +17,7 @@ export const useChainsApi = () => {
       if (0 < chains.length) {
         return chains;
       }
-      const items = resp.data.map((d: any) => {
+      const items = resp.data.data.map((d: any) => {
         return {
           id: d.id,
           name: d.name,
@@ -30,6 +30,7 @@ export const useChainsApi = () => {
     },
     [apiClient, chains, setChains]
   );
+
   const callGetChain = useCallback(
     async (authToken: string, chainId: number): Promise<Chain | undefined> => {
       const items = await callGetChains(authToken);

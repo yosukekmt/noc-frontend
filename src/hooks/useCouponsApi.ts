@@ -11,7 +11,7 @@ export const useCouponsApi = () => {
         params: { project_id: projectId },
         headers: { Authorization: authToken },
       });
-      const items = resp.data.map((d: any) => {
+      const items = resp.data.data.map((d: any) => {
         return {
           id: d.id,
           rewardType: d.rewardType,
@@ -54,19 +54,19 @@ export const useCouponsApi = () => {
         },
       });
       const item = {
-        id: resp.data.id,
-        rewardType: resp.data.rewardType,
-        name: resp.data.name,
-        description: resp.data.description,
-        contractAddress: resp.data.contractAddress,
-        nftTokenId: resp.data.nftTokenId,
-        treasuryAddress: resp.data.treasuryAddress,
-        timezone: resp.data.timezone,
-        startAt: new Date(resp.data.startAt),
-        endAt: new Date(resp.data.endAt),
-        createdAt: new Date(resp.data.createdAt),
-        updatedAt: new Date(resp.data.updatedAt),
-        chainId: resp.data.chainId,
+        id: resp.data.data.id,
+        rewardType: resp.data.data.rewardType,
+        name: resp.data.data.name,
+        description: resp.data.data.description,
+        contractAddress: resp.data.data.contractAddress,
+        nftTokenId: resp.data.data.nftTokenId,
+        treasuryAddress: resp.data.data.treasuryAddress,
+        timezone: resp.data.data.timezone,
+        startAt: new Date(resp.data.data.startAt),
+        endAt: new Date(resp.data.data.endAt),
+        createdAt: new Date(resp.data.data.createdAt),
+        updatedAt: new Date(resp.data.data.updatedAt),
+        chainId: resp.data.data.chainId,
       };
       return item;
     },
@@ -84,19 +84,19 @@ export const useCouponsApi = () => {
         headers: { Authorization: authToken },
       });
       const item = {
-        id: resp.data.id,
-        rewardType: resp.data.rewardType,
-        name: resp.data.name,
-        description: resp.data.description,
-        contractAddress: resp.data.contractAddress,
-        nftTokenId: resp.data.nftTokenId,
-        treasuryAddress: resp.data.treasuryAddress,
-        timezone: resp.data.timezone,
-        startAt: new Date(resp.data.startAt),
-        endAt: new Date(resp.data.endAt),
-        createdAt: new Date(resp.data.createdAt),
-        updatedAt: new Date(resp.data.updatedAt),
-        chainId: resp.data.chainId,
+        id: resp.data.data.id,
+        rewardType: resp.data.data.rewardType,
+        name: resp.data.data.name,
+        description: resp.data.data.description,
+        contractAddress: resp.data.data.contractAddress,
+        nftTokenId: resp.data.data.nftTokenId,
+        treasuryAddress: resp.data.data.treasuryAddress,
+        timezone: resp.data.data.timezone,
+        startAt: new Date(resp.data.data.startAt),
+        endAt: new Date(resp.data.data.endAt),
+        createdAt: new Date(resp.data.data.createdAt),
+        updatedAt: new Date(resp.data.data.updatedAt),
+        chainId: resp.data.data.chainId,
       };
       return item;
     },
