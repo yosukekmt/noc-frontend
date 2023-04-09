@@ -102,6 +102,7 @@ const LoadedTbodyRow = (props: {
           {status === "ongoing" && "Ongoing"}
           {status === "finished" && "Finished"}
           {status === "failed" && "Could not process"}
+          {status === "invalidated" && "Invalidated"}
         </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">

@@ -1,5 +1,4 @@
 import { Coupon } from "@/models";
-import { DateTime } from "luxon";
 import { useCallback } from "react";
 import { useApiClient } from "./useApiClient";
 
@@ -26,6 +25,7 @@ export const useCouponsApi = () => {
           endAt: new Date(d.endAt),
           createdAt: new Date(d.createdAt),
           updatedAt: new Date(d.updatedAt),
+          invalidatedAt: d.invalidatedAt && new Date(d.invalidatedAt),
           chainId: d.chainId,
         };
       });
@@ -67,6 +67,9 @@ export const useCouponsApi = () => {
         endAt: new Date(resp.data.data.endAt),
         createdAt: new Date(resp.data.data.createdAt),
         updatedAt: new Date(resp.data.data.updatedAt),
+        invalidatedAt:
+          resp.data.data.invalidatedAt &&
+          new Date(resp.data.data.invalidatedAt),
         chainId: resp.data.data.chainId,
       };
       return item;
@@ -97,6 +100,9 @@ export const useCouponsApi = () => {
         endAt: new Date(resp.data.data.endAt),
         createdAt: new Date(resp.data.data.createdAt),
         updatedAt: new Date(resp.data.data.updatedAt),
+        invalidatedAt:
+          resp.data.data.invalidatedAt &&
+          new Date(resp.data.data.invalidatedAt),
         chainId: resp.data.data.chainId,
       };
       return item;
@@ -118,7 +124,16 @@ export const useCouponsApi = () => {
   const getStatus = useCallback(
     (
       item: Coupon
-    ): "processing" | "scheduled" | "ongoing" | "finished" | "failed" => {
+    ):
+      | "processing"
+      | "scheduled"
+      | "ongoing"
+      | "finished"
+      | "failed"
+      | "invalidated" => {
+      if (!!item.invalidatedAt) {
+        return "invalidated";
+      }
       const isReady =
         !!item.contractAddress && !!item.nftTokenId && !!item.treasuryAddress;
       const currentTime = new Date().getTime();

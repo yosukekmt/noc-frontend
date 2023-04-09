@@ -214,7 +214,6 @@ export default function NewCoupon() {
               <Text fontSize="sm">
                 Set up your Gasback NFT to engage you customers.
               </Text>
-
               <FormControl>
                 <FormLabel fontSize="sm">Network</FormLabel>
                 {chainId && (

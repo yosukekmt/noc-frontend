@@ -67,7 +67,11 @@ export default function DeleteDialog(props: {
           <ModalCloseButton />
           <Divider />
           <ModalBody bg="gray.100">
-            <Text fontSize="md">This coupon will be unabled.</Text>
+            <Text fontSize="md">
+              Are you certain that you wish to invalidate this coupon? Please be
+              aware that if you proceed with this action, the coupon will be
+              permanently deactivated and cannot be reactivated.
+            </Text>
           </ModalBody>
           <Divider />
           <ModalFooter>
@@ -75,7 +79,7 @@ export default function DeleteDialog(props: {
               Cancel
             </Button>
             <Button type="submit" size="sm" isLoading={isLoading} ml={2}>
-              Delete coupon
+              Invalidate coupon
             </Button>
           </ModalFooter>
         </ModalContent>

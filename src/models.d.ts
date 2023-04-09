@@ -18,6 +18,7 @@ export type Coupon = {
   endAt: Date;
   createdAt: Date;
   updatedAt: Date;
+  invalidatedAt: Date;
   chainId: number;
 };
 

@@ -152,7 +152,7 @@ const SummarySection = (props: {
                   />
                   <MenuList>
                     <MenuItem icon={<Cube />} onClick={props.clickDelete}>
-                      Deactivate
+                      Invalidate
                     </MenuItem>
                   </MenuList>
                 </Menu>
@@ -173,6 +173,7 @@ const SummarySection = (props: {
                 {status === "ongoing" && "Ongoing"}
                 {status === "finished" && "Finished"}
                 {status === "failed" && "Could not process"}
+                {status === "invalidated" && "Invalidated"}
               </Text>
             </Box>
           </GridItem>
@@ -462,11 +463,12 @@ const StatisticsSection = (props: { isInitialized: boolean }) => {
 };
 
 export default function CouponDetail() {
+  const router = useRouter();
   const { project_id, coupon_id } = useRouter().query;
 
   const { callGetChain } = useChainsApi();
   const { callGetCoupon } = useCouponsApi();
-  const { callGetNft, callGetNfts } = useNftsApi();
+  const { callGetNfts } = useNftsApi();
   const { callGetCouponHolders } = useCouponHoldersApi();
   const { callGetCashbacks } = useCashbacksApi();
 
@@ -616,7 +618,10 @@ export default function CouponDetail() {
     deleteDialog.onOpen();
   };
 
-  const onDeleted = () => {};
+  const onDeleted = () => {
+    router.push(`/dashboard/${projectId}/coupons/`);
+  };
+
   return (
     <>
       <Head>

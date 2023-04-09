@@ -8,7 +8,7 @@ export const useDatetime = () => {
   }, []);
 
   const getDefaultStartDate = useCallback(() => {
-    return DateTime.now().plus({ days: 3 }).toFormat("yyyy-MM-dd");
+    return DateTime.now().plus({ days: 0 }).toFormat("yyyy-MM-dd");
   }, []);
 
   const getDefaultStartTime = useCallback(() => {
@@ -16,7 +16,7 @@ export const useDatetime = () => {
   }, []);
 
   const getDefaultEndDate = useCallback(() => {
-    return DateTime.now().plus({ days: 6 }).toFormat("yyyy-MM-dd");
+    return DateTime.now().plus({ days: 7 }).toFormat("yyyy-MM-dd");
   }, []);
 
   const getDefaultEndTime = useCallback(() => {
