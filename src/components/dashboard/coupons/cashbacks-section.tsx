@@ -133,8 +133,8 @@ export default function CashbacksSection(props: {
   isInitialized: boolean;
   chain: Chain | undefined;
   cashbacks: Cashback[];
-  projectId: string;
-  couponId: string;
+  projectId: string | undefined;
+  couponId: string | undefined;
 }) {
   const items = useMemo(() => {
     return props.cashbacks.slice(0, 16);

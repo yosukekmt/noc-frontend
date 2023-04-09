@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { FormEvent, useCallback, useState } from "react";
 
-export default function DeleteDialog(props: {
+export default function InvalidateDialog(props: {
   projectId: string;
   item: Coupon;
   isOpen: boolean;

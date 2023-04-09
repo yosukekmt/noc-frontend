@@ -21,6 +21,9 @@ export const usePublicApi = () => {
         endAt: new Date(resp.data.data.endAt),
         createdAt: new Date(resp.data.data.createdAt),
         updatedAt: new Date(resp.data.data.updatedAt),
+        invalidatedAt:
+          resp.data.data.invalidatedAt &&
+          new Date(resp.data.data.invalidatedAt),
         chainId: resp.data.data.chainId,
       };
       return item;

@@ -1,6 +1,8 @@
 import CashbacksSection from "@/components/dashboard/coupons/cashbacks-section";
 import CouponHoldersSection from "@/components/dashboard/coupons/coupon-holders-section";
-import DeleteDialog from "@/components/dashboard/coupons/delete-dialog";
+import InvalidateDialog from "@/components/dashboard/coupons/invalidate-dialog";
+import WithdrawDialog from "@/components/dashboard/coupons/withdraw-dialog";
+import WithdrawSubmittedDialog from "@/components/dashboard/coupons/withdraw-submitted-dialog";
 import { useBlockchain } from "@/hooks/useBlockchain";
 import { useCashbacksApi } from "@/hooks/useCashbacksApi";
 import { useChainsApi } from "@/hooks/useChainsApi";
@@ -264,9 +266,13 @@ const TresurySection = (props: {
   chain: Chain | undefined;
   coupon: Coupon | undefined;
   nfts: Nft[];
+  projectId: string | undefined;
+  couponId: string | undefined;
   clickDelete: () => void;
 }) => {
   const { truncateContractAddress, getExplorerAddressUrl } = useBlockchain();
+  const withdrawDialog = useDisclosure();
+  const requestedDialog = useDisclosure();
 
   const isTreasuryReady = useMemo(() => {
     if (!props.coupon) return;
@@ -283,6 +289,14 @@ const TresurySection = (props: {
       props.coupon.treasuryAddress
     );
   }, [getExplorerAddressUrl, props.chain, props.coupon]);
+
+  const clickWithdraw = () => {
+    withdrawDialog.onOpen();
+  };
+
+  const onSubmitted = () => {
+    requestedDialog.onOpen();
+  };
 
   return (
     <>
@@ -302,7 +316,7 @@ const TresurySection = (props: {
                   variant="ghots"
                 />
                 <MenuList>
-                  <MenuItem icon={<Cube />} onClick={props.clickDelete}>
+                  <MenuItem icon={<Cube />} onClick={clickWithdraw}>
                     Withdraw
                   </MenuItem>
                 </MenuList>
@@ -352,6 +366,26 @@ const TresurySection = (props: {
           </GridItem>
         </Grid>
       </Box>
+      {props.projectId && props.coupon && (
+        <WithdrawDialog
+          projectId={props.projectId}
+          coupon={props.coupon}
+          isOpen={withdrawDialog.isOpen}
+          onClose={withdrawDialog.onClose}
+          onOpen={withdrawDialog.onOpen}
+          onSubmitted={onSubmitted}
+        />
+      )}
+      {props.projectId && props.chain && props.coupon && (
+        <WithdrawSubmittedDialog
+          projectId={props.projectId}
+          chain={props.chain}
+          coupon={props.coupon}
+          isOpen={requestedDialog.isOpen}
+          onClose={requestedDialog.onClose}
+          onOpen={requestedDialog.onOpen}
+        />
+      )}
     </>
   );
 };
@@ -647,6 +681,8 @@ export default function CouponDetail() {
             chain={chain}
             coupon={coupon}
             nfts={nfts}
+            projectId={projectId}
+            couponId={couponId}
             clickDelete={clickDelete}
           />
           <CouponHoldersSection
@@ -666,9 +702,9 @@ export default function CouponDetail() {
           {chain && <StatisticsSection isInitialized={isInitialized} />}
         </Box>
       </DashboardLayout>
-      {coupon && (
-        <DeleteDialog
-          projectId={projectId as string}
+      {coupon && projectId && (
+        <InvalidateDialog
+          projectId={projectId}
           item={coupon}
           isOpen={deleteDialog.isOpen}
           onClose={deleteDialog.onClose}

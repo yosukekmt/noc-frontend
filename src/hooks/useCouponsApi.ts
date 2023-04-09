@@ -121,6 +121,23 @@ export const useCouponsApi = () => {
     [apiClient]
   );
 
+  const callWithdraw = useCallback(
+    async (
+      authToken: string,
+      projectId: string,
+      id: string,
+      walletAddress: string
+    ): Promise<void> => {
+      const data = { walletAddress };
+      await apiClient.put(`/coupons/${id}/withdraw`, data, {
+        params: { project_id: projectId },
+        headers: { Authorization: authToken },
+      });
+      return;
+    },
+    [apiClient]
+  );
+
   const getStatus = useCallback(
     (
       item: Coupon
@@ -165,6 +182,7 @@ export const useCouponsApi = () => {
     callGetCoupon,
     callCreateCoupons,
     callDeleteCoupon,
+    callWithdraw,
     getStatus,
   };
 };
