@@ -1,4 +1,5 @@
 import { Coupon } from "@/models";
+import { DateTime } from "luxon";
 import { useCallback } from "react";
 import { useApiClient } from "./useApiClient";
 
@@ -114,10 +115,41 @@ export const useCouponsApi = () => {
     [apiClient]
   );
 
+  const getStatus = useCallback(
+    (
+      item: Coupon
+    ): "processing" | "scheduled" | "ongoing" | "finished" | "failed" => {
+      const isReady =
+        !!item.contractAddress && !!item.nftTokenId && !!item.treasuryAddress;
+      const currentTime = new Date().getTime();
+      if (!isReady) {
+        const processThreashold = 20 * 60 * 1000; // 20 minutes
+        const duration = currentTime - item.createdAt.getTime();
+        if (processThreashold < duration) {
+          //
+          // 20 minutes or more
+          //
+          return "failed";
+        } else {
+          return "processing";
+        }
+      }
+      if (item.endAt.getTime() < currentTime) {
+        return "finished";
+      }
+      if (currentTime < item.startAt.getTime()) {
+        return "scheduled";
+      }
+      return "ongoing";
+    },
+    []
+  );
+
   return {
     callGetCoupons,
     callGetCoupon,
     callCreateCoupons,
     callDeleteCoupon,
+    getStatus,
   };
 };

@@ -9,6 +9,7 @@ import { useCouponsApi } from "@/hooks/useCouponsApi";
 import { useDatetime } from "@/hooks/useDatetime";
 import { useFirebase } from "@/hooks/useFirebase";
 import { useNftsApi } from "@/hooks/useNftsApi";
+import { useUrl } from "@/hooks/useUrl";
 import DashboardLayout from "@/layouts/dashboard-layout";
 import { Cashback, Chain, Coupon, CouponHolder, Nft } from "@/models";
 import {
@@ -24,26 +25,17 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Skeleton,
   Spacer,
   Stat,
   StatHelpText,
   StatLabel,
   StatNumber,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tr,
   useDisclosure,
   useToken,
   VStack,
 } from "@chakra-ui/react";
 import { Chart, registerables } from "chart.js";
-import * as Crypto from "crypto";
 import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
@@ -59,12 +51,24 @@ const SummarySection = (props: {
   nfts: Nft[];
   clickDelete: () => void;
 }) => {
+  const { getStatus } = useCouponsApi();
   const { formatWithTimezone } = useDatetime();
+  const { getMintUrl } = useUrl();
   const {
     truncateContractAddress,
     getExplorerAddressUrl,
     getOpenseaAddressUrl,
   } = useBlockchain();
+
+  const status = useMemo(() => {
+    if (!props.coupon) return;
+    return getStatus(props.coupon);
+  }, [getStatus, props.coupon]);
+
+  const isContractReady = useMemo(() => {
+    if (!props.coupon) return;
+    return !!props.coupon.contractAddress && !!props.coupon.nftTokenId;
+  }, [props.coupon]);
 
   const startAtStr = useMemo(() => {
     if (!props.coupon) return;
@@ -132,7 +136,7 @@ const SummarySection = (props: {
               <Flex align="center">
                 {props.coupon && (
                   <NextLink
-                    href={`https://mumbai.nudgeonchain.xyz/${props.coupon.id}`}
+                    href={getMintUrl(props.coupon.id)}
                     style={{ width: "100%", display: "block" }}
                     target="_blank"
                   >
@@ -148,7 +152,7 @@ const SummarySection = (props: {
                   />
                   <MenuList>
                     <MenuItem icon={<Cube />} onClick={props.clickDelete}>
-                      Remove
+                      Deactivate
                     </MenuItem>
                   </MenuList>
                 </Menu>
@@ -158,7 +162,21 @@ const SummarySection = (props: {
           </GridItem>
         </Grid>
         <Grid templateColumns="repeat(12, 1fr)" gap={4} my={4}>
-          <GridItem colSpan={{ base: 12, sm: 6, md: 4 }}>
+          <GridItem colSpan={{ base: 12, sm: 6, md: 2 }}>
+            <Box>
+              <Text fontSize="sm" color="gray">
+                Status
+              </Text>
+              <Text fontSize="sm">
+                {status === "processing" && "Processing"}
+                {status === "scheduled" && "Scheduled"}
+                {status === "ongoing" && "Ongoing"}
+                {status === "finished" && "Finished"}
+                {status === "failed" && "Could not process"}
+              </Text>
+            </Box>
+          </GridItem>
+          <GridItem colSpan={{ base: 12, sm: 6, md: 2 }}>
             <Box>
               <Text fontSize="sm" color="gray">
                 Reward type
@@ -166,25 +184,27 @@ const SummarySection = (props: {
               <Text fontSize="sm">Gas fee cashback</Text>
             </Box>
           </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 6, md: 4 }}>
+          <GridItem colSpan={{ base: 12, sm: 6, md: 2 }}>
             <Box>
               <Text fontSize="sm" color="gray">
                 Contract address
               </Text>
               <Text fontSize="sm">
-                {explorerUrl && props.coupon && (
+                {isContractReady && explorerUrl && (
                   <NextLink
-                    href={explorerUrl}
+                    href={explorerUrl!}
                     style={{ width: "100%", display: "block" }}
                     target="_blank"
                   >
-                    {truncateContractAddress(props.coupon.contractAddress)}
+                    {truncateContractAddress(props.coupon!.contractAddress)}
+                    <br />({`Token ID:${props.coupon!.nftTokenId}`})
                   </NextLink>
                 )}
+                {isContractReady === false && "Processing"}
               </Text>
             </Box>
           </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 6, md: 4 }}>
+          <GridItem colSpan={{ base: 12, sm: 6, md: 6 }}>
             <Box>
               <Text fontSize="sm" color="gray">
                 Applicable NFTs
@@ -245,25 +265,12 @@ const TresurySection = (props: {
   nfts: Nft[];
   clickDelete: () => void;
 }) => {
-  const { formatWithTimezone } = useDatetime();
-  const { truncateContractAddress, getExplorerTxUrl, getExplorerAddressUrl } =
-    useBlockchain();
+  const { truncateContractAddress, getExplorerAddressUrl } = useBlockchain();
 
-  const startAtStr = useMemo(() => {
+  const isTreasuryReady = useMemo(() => {
     if (!props.coupon) return;
-    if (!props.coupon.startAt) return;
-    if (!props.coupon.timezone) return;
-
-    return formatWithTimezone(props.coupon.startAt, props.coupon.timezone);
-  }, [formatWithTimezone, props.coupon]);
-
-  const endAtStr = useMemo(() => {
-    if (!props.coupon) return;
-    if (!props.coupon.endAt) return;
-    if (!props.coupon.timezone) return;
-
-    return formatWithTimezone(props.coupon.endAt, props.coupon.timezone);
-  }, [formatWithTimezone, props.coupon]);
+    return !!props.coupon.treasuryAddress;
+  }, [props.coupon]);
 
   const explorerUrl = useMemo(() => {
     if (!props.chain) return;
@@ -281,9 +288,25 @@ const TresurySection = (props: {
       <Box>
         <Grid templateColumns="repeat(12, 1fr)" gap={4} mt={24}>
           <GridItem colSpan={{ base: 12 }}>
-            <Heading as="h4" fontSize="2xl">
-              Treasury Status
-            </Heading>
+            <Flex>
+              <Heading as="h4" fontSize="2xl">
+                Treasury Status
+              </Heading>
+              <Spacer />
+              <Menu>
+                <MenuButton
+                  as={IconButton}
+                  aria-label="Options"
+                  icon={<DotsThree weight="bold" size={24} />}
+                  variant="ghots"
+                />
+                <MenuList>
+                  <MenuItem icon={<Cube />} onClick={props.clickDelete}>
+                    Withdraw
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </Flex>
             <Divider mt={2} />
           </GridItem>
         </Grid>
@@ -294,17 +317,16 @@ const TresurySection = (props: {
                 Contract address
               </Text>
               <Text fontSize="sm">
-                {explorerUrl &&
-                  props.coupon &&
-                  props.coupon.treasuryAddress && (
-                    <NextLink
-                      href={explorerUrl}
-                      style={{ width: "100%", display: "block" }}
-                      target="_blank"
-                    >
-                      {truncateContractAddress(props.coupon.treasuryAddress)}
-                    </NextLink>
-                  )}
+                {isTreasuryReady && explorerUrl && props.coupon && (
+                  <NextLink
+                    href={explorerUrl}
+                    style={{ width: "100%", display: "block" }}
+                    target="_blank"
+                  >
+                    {truncateContractAddress(props.coupon.treasuryAddress)}
+                  </NextLink>
+                )}
+                {isTreasuryReady === false && "Processing"}
               </Text>
             </Box>
           </GridItem>
@@ -314,17 +336,16 @@ const TresurySection = (props: {
                 Balance
               </Text>
               <Text fontSize="sm">
-                {explorerUrl &&
-                  props.coupon &&
-                  props.coupon.treasuryAddress && (
-                    <NextLink
-                      href={explorerUrl}
-                      style={{ width: "100%", display: "block" }}
-                      target="_blank"
-                    >
-                      Click Here
-                    </NextLink>
-                  )}
+                {isTreasuryReady && explorerUrl && props.coupon && (
+                  <NextLink
+                    href={explorerUrl}
+                    style={{ width: "100%", display: "block" }}
+                    target="_blank"
+                  >
+                    Click Here
+                  </NextLink>
+                )}
+                {isTreasuryReady === false && "Processing"}
               </Text>
             </Box>
           </GridItem>

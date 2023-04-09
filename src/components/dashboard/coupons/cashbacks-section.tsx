@@ -175,7 +175,7 @@ export default function CashbacksSection(props: {
                 {props.isInitialized && items.length === 0 && (
                   <>
                     <Tr key="cashbacks_empty" h={16}>
-                      <Td colSpan={6}>NO Record</Td>
+                      <Td colSpan={6}>No Records</Td>
                     </Tr>
                   </>
                 )}

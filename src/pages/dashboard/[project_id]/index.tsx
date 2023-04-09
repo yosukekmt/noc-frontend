@@ -52,9 +52,6 @@ const LoadingTBody = () => {
             <Td>
               <Skeleton h={4} />
             </Td>
-            <Td>
-              <Skeleton h={4} />
-            </Td>
           </Tr>
         );
       })}
@@ -67,6 +64,8 @@ const LoadedTbodyRow = (props: {
   projectId: string;
   item: Coupon;
 }) => {
+  const { getStatus } = useCouponsApi();
+
   const detailUrl = useMemo(() => {
     return `/dashboard/${props.projectId}/coupons/${props.item.id}`;
   }, [props.item.id, props.projectId]);
@@ -74,6 +73,10 @@ const LoadedTbodyRow = (props: {
   const chain = useMemo(() => {
     return props.chains.find((chain) => chain.id === props.item.chainId);
   }, [props.chains, props.item.chainId]);
+
+  const status = useMemo(() => {
+    return getStatus(props.item);
+  }, [getStatus, props.item]);
 
   return (
     <Tr key={`coupon_${props.item.id}`} h={8}>
@@ -94,12 +97,11 @@ const LoadedTbodyRow = (props: {
       </Td>
       <Td fontWeight="normal" fontSize="sm">
         <NextLink href={detailUrl} style={{ width: "100%", display: "block" }}>
-          {props.item.timezone}
-        </NextLink>
-      </Td>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink href={detailUrl} style={{ width: "100%", display: "block" }}>
-          {props.item.endAt.toLocaleString()}
+          {status === "processing" && "Processing"}
+          {status === "scheduled" && "Scheduled"}
+          {status === "ongoing" && "Ongoing"}
+          {status === "finished" && "Finished"}
+          {status === "failed" && "Could not process"}
         </NextLink>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
@@ -242,8 +244,7 @@ export default function Project() {
                   <Th>NAME</Th>
                   <Th>REWARD TYPE</Th>
                   <Th>NETWORK</Th>
-                  <Th>TIME ZONE</Th>
-                  <Th>DURATION</Th>
+                  <Th>STATUS</Th>
                   <Th>CREATED</Th>
                 </Tr>
               </Thead>

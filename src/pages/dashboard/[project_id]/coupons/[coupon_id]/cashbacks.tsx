@@ -1,13 +1,18 @@
 import {
+  CashbacksTableLoadingRow,
+  CashbacksTableRow,
+} from "@/components/dashboard/coupons/cashbacks-section";
+import {
   CouponHoldersTableLoadingRow,
   CouponHoldersTableRow,
 } from "@/components/dashboard/coupons/coupon-holders-section";
+import { useCashbacksApi } from "@/hooks/useCashbacksApi";
 import { useChainsApi } from "@/hooks/useChainsApi";
 import { useCouponHoldersApi } from "@/hooks/useCouponHoldersApi";
 import { useCouponsApi } from "@/hooks/useCouponsApi";
 import { useFirebase } from "@/hooks/useFirebase";
 import DashboardLayout from "@/layouts/dashboard-layout";
-import { Chain, Coupon, CouponHolder, PageInfo } from "@/models";
+import { Cashback, Chain, Coupon, CouponHolder, PageInfo } from "@/models";
 import {
   Box,
   Button,
@@ -37,17 +42,17 @@ import { useRouter } from "next/router";
 import { Spinner, MagnifyingGlass } from "phosphor-react";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
-export default function CouponCouponHolders() {
+export default function Cashbacks() {
   const { project_id, coupon_id } = useRouter().query;
 
   const { callGetChain } = useChainsApi();
   const { callGetCoupon } = useCouponsApi();
-  const { callGetCouponHolders } = useCouponHoldersApi();
+  const { callGetCashbacks } = useCashbacksApi();
 
   const [chain, setChain] = useState<Chain | undefined>(undefined);
   const [coupon, setCoupon] = useState<Coupon | undefined>(undefined);
   const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
-  const [items, setItems] = useState<CouponHolder[]>([]);
+  const [items, setItems] = useState<Cashback[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
 
   const { authToken, isFirebaseInitialized } = useFirebase();
@@ -110,7 +115,7 @@ export default function CouponCouponHolders() {
     [callGetCoupon]
   );
 
-  const getCouponHoldersApi = useCallback(
+  const getCashbacks = useCallback(
     async (
       authToken: string,
       projectId: string,
@@ -118,7 +123,7 @@ export default function CouponCouponHolders() {
       page: number,
       query: string
     ): Promise<void> => {
-      const result = await callGetCouponHolders(
+      const result = await callGetCashbacks(
         authToken,
         projectId,
         couponId,
@@ -128,7 +133,7 @@ export default function CouponCouponHolders() {
       setPageInfo(result.pageInfo);
       setItems(result.items);
     },
-    [callGetCouponHolders]
+    [callGetCashbacks]
   );
 
   useEffect(() => {
@@ -163,13 +168,7 @@ export default function CouponCouponHolders() {
     (async () => {
       setIsLoading(true);
       try {
-        await getCouponHoldersApi(
-          authToken,
-          projectId,
-          couponId,
-          currentPage,
-          query
-        );
+        await getCashbacks(authToken, projectId, couponId, currentPage, query);
         setIsLoading(false);
       } catch (err: unknown) {
         console.error(err);
@@ -181,7 +180,7 @@ export default function CouponCouponHolders() {
     authToken,
     couponId,
     currentPage,
-    getCouponHoldersApi,
+    getCashbacks,
     isFirebaseInitialized,
     projectId,
     query,
@@ -219,7 +218,7 @@ export default function CouponCouponHolders() {
           <Grid templateColumns="repeat(12, 1fr)" gap={4}>
             <GridItem colSpan={{ base: 12 }}>
               <Heading as="h4" fontSize="2xl">
-                Coupon Holders
+                Cashbacks
               </Heading>
               <Divider mt={2} />
               <form onSubmit={clickSubmit}>
@@ -242,22 +241,26 @@ export default function CouponCouponHolders() {
                 <Table size="sm">
                   <Thead>
                     <Tr>
-                      <Th>SINCE</Th>
+                      <Th>EVENT</Th>
+                      <Th>STATUS</Th>
+                      <Th>TX HASH</Th>
                       <Th>WALLET</Th>
+                      <Th>AMOUNT</Th>
+                      <Th>DATE</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
                     {!isInitialized && (
                       <>
-                        <CouponHoldersTableLoadingRow />
-                        <CouponHoldersTableLoadingRow />
-                        <CouponHoldersTableLoadingRow />
+                        <CashbacksTableLoadingRow />
+                        <CashbacksTableLoadingRow />
+                        <CashbacksTableLoadingRow />
                       </>
                     )}
                     {isInitialized && items.length === 0 && (
                       <>
-                        <Tr key="coupon_holders_empty" h={16}>
-                          <Td colSpan={2}>No Records</Td>
+                        <Tr key="cashbacks_empty" h={16}>
+                          <Td colSpan={6}>No Records</Td>
                         </Tr>
                       </>
                     )}
@@ -267,16 +270,13 @@ export default function CouponCouponHolders() {
                           return (
                             <>
                               {chain && (
-                                <CouponHoldersTableRow
-                                  chain={chain}
-                                  item={item}
-                                />
+                                <CashbacksTableRow chain={chain} item={item} />
                               )}
                             </>
                           );
                         })}
-                        <Tr key="coupon_holders_page_info_bottom" h={16}>
-                          <Td colSpan={2}>
+                        <Tr key="cashbacks_page_info_bottom" h={16}>
+                          <Td colSpan={6}>
                             <Flex align="center">
                               <Text>{`Viewing ${viewingMin}-${viewingMax} of ${pageInfo?.total}`}</Text>
                               <Spacer />

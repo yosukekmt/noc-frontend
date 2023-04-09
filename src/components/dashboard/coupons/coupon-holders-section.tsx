@@ -119,7 +119,7 @@ export default function CouponHoldersSection(props: {
                 {props.isInitialized && items.length === 0 && (
                   <>
                     <Tr key="coupon_holders_empty" h={16}>
-                      <Td colSpan={2}>NO Record</Td>
+                      <Td colSpan={2}>No Records</Td>
                     </Tr>
                   </>
                 )}
