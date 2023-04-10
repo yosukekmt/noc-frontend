@@ -9,22 +9,21 @@ export const usePublicApi = () => {
     async (id: string): Promise<Coupon> => {
       const resp = await apiClient.get(`/public/coupons/${id}`);
       const item = {
-        id: resp.data.data.id,
-        rewardType: resp.data.data.rewardType,
-        name: resp.data.data.name,
-        description: resp.data.data.description,
-        contractAddress: resp.data.data.contractAddress,
-        nftTokenId: resp.data.data.nftTokenId,
-        treasuryAddress: resp.data.data.treasuryAddress,
-        timezone: resp.data.data.timezone,
-        startAt: new Date(resp.data.data.startAt),
-        endAt: new Date(resp.data.data.endAt),
-        createdAt: new Date(resp.data.data.createdAt),
-        updatedAt: new Date(resp.data.data.updatedAt),
+        id: resp.data.id,
+        rewardType: resp.data.rewardType,
+        name: resp.data.name,
+        description: resp.data.description,
+        contractAddress: resp.data.contractAddress,
+        nftTokenId: resp.data.nftTokenId,
+        treasuryAddress: resp.data.treasuryAddress,
+        timezone: resp.data.timezone,
+        startAt: new Date(resp.data.startAt),
+        endAt: new Date(resp.data.endAt),
+        createdAt: new Date(resp.data.createdAt),
+        updatedAt: new Date(resp.data.updatedAt),
         invalidatedAt:
-          resp.data.data.invalidatedAt &&
-          new Date(resp.data.data.invalidatedAt),
-        chainId: resp.data.data.chainId,
+          resp.data.invalidatedAt && new Date(resp.data.invalidatedAt),
+        chainId: resp.data.chainId,
       };
       return item;
     },
@@ -35,10 +34,10 @@ export const usePublicApi = () => {
     async (id: string): Promise<Chain> => {
       const resp = await apiClient.get(`/public/chains/${id}`);
       const item = {
-        id: resp.data.data.id,
-        name: resp.data.data.name,
-        explorerUrl: resp.data.data.explorerUrl,
-        openseaUrl: resp.data.data.openseaUrl,
+        id: resp.data.id,
+        name: resp.data.name,
+        explorerUrl: resp.data.explorerUrl,
+        openseaUrl: resp.data.openseaUrl,
       };
       return item;
     },
@@ -50,7 +49,7 @@ export const usePublicApi = () => {
       const resp = await apiClient.get("/public/nfts", {
         params: { coupon_id: couponId },
       });
-      const items = resp.data.data.map((d: any) => {
+      const items = resp.data.map((d: any) => {
         return {
           id: d.id,
           name: d.name,

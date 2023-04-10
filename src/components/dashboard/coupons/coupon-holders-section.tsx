@@ -14,6 +14,7 @@ import {
   Tbody,
   Td,
   Th,
+  Link,
   Thead,
   Tr,
 } from "@chakra-ui/react";
@@ -56,22 +57,22 @@ export const CouponHoldersTableRow = (props: {
   return (
     <Tr key={`coupon_holders_${props.item.id}`} h={8}>
       <Td fontWeight="normal" fontSize="sm">
-        <NextLink
+        <Link
           href={explorerUrl || ""}
           style={{ width: "100%", display: "block" }}
-          target="_blank"
+          isExternal
         >
           {formatWithoutTimezone(props.item.createdAt)}
-        </NextLink>
+        </Link>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
-        <NextLink
+        <Link
           href={explorerUrl || ""}
           style={{ width: "100%", display: "block" }}
-          target="_blank"
+          isExternal
         >
           {props.item.walletAddress}
-        </NextLink>
+        </Link>
       </Td>
     </Tr>
   );

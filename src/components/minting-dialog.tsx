@@ -1,11 +1,10 @@
-import { Chain } from "@/models";
-import NextLink from "next/link";
-
 import { useBlockchain } from "@/hooks/useBlockchain";
+import { Chain } from "@/models";
 import {
   Button,
   Flex,
   Heading,
+  Link,
   Modal,
   ModalBody,
   ModalContent,
@@ -65,7 +64,7 @@ export default function MintingDialog(props: {
           </Flex>
           <Flex w="100%" justify="center">
             {explorerUrl && (
-              <NextLink href={explorerUrl} target="_blank">
+              <Link href={explorerUrl} isExternal>
                 <Button
                   type="submit"
                   w="100%"
@@ -75,7 +74,7 @@ export default function MintingDialog(props: {
                 >
                   View on etherscan
                 </Button>
-              </NextLink>
+              </Link>
             )}
           </Flex>
         </ModalBody>

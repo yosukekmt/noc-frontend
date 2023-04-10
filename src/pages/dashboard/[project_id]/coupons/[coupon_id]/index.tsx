@@ -23,6 +23,7 @@ import {
   GridItem,
   Heading,
   IconButton,
+  Link,
   Menu,
   MenuButton,
   MenuItem,
@@ -121,29 +122,35 @@ const SummarySection = (props: {
         <Grid templateColumns="repeat(12, 1fr)" gap={4} my={4}>
           <GridItem colSpan={{ base: 12 }}>
             <Flex align="center">
-              <Box>
-                <Heading as="h3">
-                  <Flex align="center">
-                    <Tag color="gray" size={16} weight="fill" />
-                    <Text fontSize="sm" color="gray" ml={2}>
-                      Gasback NFT
-                    </Text>
-                  </Flex>
-                </Heading>
-                <Heading as="h4" fontSize="4xl" mt={2}>
-                  {props.coupon && props.coupon.name}
-                </Heading>
-              </Box>
+              <Heading as="h3">
+                <Flex align="center">
+                  <Tag color="gray" size={16} weight="fill" />
+                  <Text fontSize="sm" color="gray" ml={2}>
+                    Gasback NFT
+                  </Text>
+                </Flex>
+              </Heading>
+              <Spacer />
+              <Link href="/how" isExternal>
+                <Button size="xs" variant="outline">
+                  How to use Nudge ONCHAIN
+                </Button>
+              </Link>
+            </Flex>
+            <Flex align="center">
+              <Heading as="h4" fontSize="4xl" mt={2}>
+                {props.coupon && props.coupon.name}
+              </Heading>
               <Spacer />
               <Flex align="center">
                 {props.coupon && (
-                  <NextLink
+                  <Link
                     href={getMintUrl(props.coupon.id)}
                     style={{ width: "100%", display: "block" }}
-                    target="_blank"
+                    isExternal
                   >
                     <Button size="sm">Mint Page</Button>
-                  </NextLink>
+                  </Link>
                 )}
                 <Menu>
                   <MenuButton
@@ -194,14 +201,14 @@ const SummarySection = (props: {
               </Text>
               <Text fontSize="sm">
                 {isContractReady && explorerUrl && (
-                  <NextLink
+                  <Link
                     href={explorerUrl!}
                     style={{ width: "100%", display: "block" }}
-                    target="_blank"
+                    isExternal
                   >
                     {truncateContractAddress(props.coupon!.contractAddress)}
                     <br />({`Token ID:${props.coupon!.nftTokenId}`})
-                  </NextLink>
+                  </Link>
                 )}
                 {isContractReady === false && "Processing"}
               </Text>
@@ -218,15 +225,15 @@ const SummarySection = (props: {
                 props.nfts.flatMap((nft) => {
                   return (
                     <Text fontSize="sm" key={`applicable_nft_${nft.id}`}>
-                      <NextLink
+                      <Link
                         href={openseaAddresses.get(nft.contractAddress) || ""}
                         style={{ width: "100%", display: "block" }}
-                        target="_blank"
+                        isExternal
                       >
                         {`${nft.name}(${truncateContractAddress(
                           nft.contractAddress
                         )})`}
-                      </NextLink>
+                      </Link>
                     </Text>
                   );
                 })}
@@ -333,13 +340,13 @@ const TresurySection = (props: {
               </Text>
               <Text fontSize="sm">
                 {isTreasuryReady && explorerUrl && props.coupon && (
-                  <NextLink
+                  <Link
                     href={explorerUrl}
                     style={{ width: "100%", display: "block" }}
-                    target="_blank"
+                    isExternal
                   >
                     {truncateContractAddress(props.coupon.treasuryAddress)}
-                  </NextLink>
+                  </Link>
                 )}
                 {isTreasuryReady === false && "Processing"}
               </Text>
@@ -352,13 +359,13 @@ const TresurySection = (props: {
               </Text>
               <Text fontSize="sm">
                 {isTreasuryReady && explorerUrl && props.coupon && (
-                  <NextLink
+                  <Link
                     href={explorerUrl}
                     style={{ width: "100%", display: "block" }}
-                    target="_blank"
+                    isExternal
                   >
                     Click Here
-                  </NextLink>
+                  </Link>
                 )}
                 {isTreasuryReady === false && "Processing"}
               </Text>

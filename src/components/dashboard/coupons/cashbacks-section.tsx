@@ -8,6 +8,7 @@ import {
   Grid,
   GridItem,
   Heading,
+  Link,
   Skeleton,
   Table,
   TableContainer,
@@ -68,62 +69,62 @@ export const CashbacksTableRow = (props: { chain: Chain; item: Cashback }) => {
   return (
     <Tr key={uiKey} h={8}>
       <Td fontWeight="normal" fontSize="sm">
-        <NextLink
+        <Link
           href={explorerTxUrl || ""}
           style={{ width: "100%", display: "block" }}
-          target="_blank"
+          isExternal
         >
           Gas fee cashback
-        </NextLink>
+        </Link>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
-        <NextLink
+        <Link
           href={explorerTxUrl || ""}
           style={{ width: "100%", display: "block" }}
-          target="_blank"
+          isExternal
         >
           {props.item.txHash ? "Submitted" : "Failed"}
-        </NextLink>
+        </Link>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
         {props.item.txHash && (
-          <NextLink
+          <Link
             href={explorerTxUrl || ""}
             style={{ width: "100%", display: "block" }}
-            target="_blank"
+            isExternal
           >
             {truncateContractAddress(props.item.txHash)}
-          </NextLink>
+          </Link>
         )}
       </Td>
       <Td fontWeight="normal" fontSize="sm">
         {props.item.walletAddress && (
-          <NextLink
+          <Link
             href={explorerWalletUrl || ""}
             style={{ width: "100%", display: "block" }}
-            target="_blank"
+            isExternal
           >
             {truncateContractAddress(props.item.walletAddress)}
-          </NextLink>
+          </Link>
         )}
       </Td>
       <Td fontWeight="normal" fontSize="sm">
-        <NextLink
+        <Link
           href="https://www.alchemy.com/gwei-calculator"
           style={{ width: "100%", display: "block" }}
-          target="_blank"
+          isExternal
         >
           {`${Intl.NumberFormat().format(props.item.amountWei)} Wei`}
-        </NextLink>
+        </Link>
       </Td>
       <Td fontWeight="normal" fontSize="sm">
-        <NextLink
+        <Link
           href={explorerTxUrl || ""}
           style={{ width: "100%", display: "block" }}
-          target="_blank"
+          isExternal
         >
           {blockProducedAtStr}
-        </NextLink>
+        </Link>
       </Td>
     </Tr>
   );

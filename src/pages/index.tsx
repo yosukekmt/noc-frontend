@@ -1,68 +1,15 @@
-import Logo from "@/components/logo";
-import { useFirebase } from "@/hooks/useFirebase";
+import Footer from "@/components/footer";
+import Header from "@/components/header";
 import {
   Box,
-  Button,
   Container,
-  Flex,
   Grid,
   GridItem,
   Heading,
-  HStack,
-  Icon,
-  Spacer,
   Text,
 } from "@chakra-ui/react";
 import Head from "next/head";
-import NextLink from "next/link";
-import {
-  ArrowRight,
-  ChartLineUp,
-  Cursor,
-  TestTube,
-  Ticket,
-} from "phosphor-react";
-
-const Header = () => {
-  const { authToken } = useFirebase();
-
-  return (
-    <Box h="100%">
-      <Container maxWidth="6xl" h="100%">
-        <Flex align="center" h="100%">
-          <NextLink href="/">
-            <Logo height={12} />
-          </NextLink>
-          <Spacer />
-          {authToken ? (
-            <NextLink href="/dashboard">
-              <Button
-                size="sm"
-                rightIcon={<Icon as={ArrowRight} />}
-                style={{ borderRadius: 20 }}
-              >
-                Dashboard
-              </Button>
-            </NextLink>
-          ) : (
-            <HStack gap={1}>
-              <NextLink href="/session/signin">
-                <Button size="sm" variant="ghost">
-                  Sign in
-                </Button>
-              </NextLink>
-              <NextLink href="/session/signup">
-                <Button size="sm" variant="outline">
-                  Register
-                </Button>
-              </NextLink>
-            </HStack>
-          )}
-        </Flex>
-      </Container>
-    </Box>
-  );
-};
+import { ChartLineUp, Cursor, TestTube, Ticket } from "phosphor-react";
 
 const HeroSection = () => {
   return (
@@ -206,50 +153,6 @@ const FeaturesSection = () => {
   );
 };
 
-const Footer = () => {
-  return (
-    <Box bg="gray.100">
-      <Container maxWidth="6xl">
-        <Grid templateColumns="repeat(12, 1fr)" gap={4} py={12}>
-          <GridItem colSpan={{ base: 12, sm: 4 }}>
-            <NextLink href="/">
-              <Box minW={200} maxW={320} cursor="pointer">
-                <Logo height={12} />
-              </Box>
-            </NextLink>
-          </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 8 }}>
-            <Heading as="h3" size="md" fontWeight="bold">
-              Links
-            </Heading>
-            <Grid templateColumns="repeat(12, 1fr)" gap={4} py={4}>
-              <GridItem colSpan={{ base: 12, sm: 6, md: 4, lg: 2 }}>
-                <NextLink href="/">
-                  <Text fontWeight="light">Docs</Text>
-                </NextLink>
-              </GridItem>
-              <GridItem colSpan={{ base: 12, sm: 6, md: 4, lg: 2 }}>
-                <NextLink href="/">
-                  <Text fontWeight="light">FAQs</Text>
-                </NextLink>
-              </GridItem>
-              <GridItem colSpan={{ base: 12, sm: 6, md: 4, lg: 2 }}>
-                <NextLink href="/">
-                  <Text fontWeight="light">Github</Text>
-                </NextLink>
-              </GridItem>
-              <GridItem colSpan={{ base: 12, sm: 6, md: 4, lg: 2 }}>
-                <NextLink href="/">
-                  <Text fontWeight="light">Contact</Text>
-                </NextLink>
-              </GridItem>
-            </Grid>
-          </GridItem>
-        </Grid>
-      </Container>
-    </Box>
-  );
-};
 export default function Home() {
   return (
     <>
