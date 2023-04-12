@@ -10,6 +10,7 @@ export type Coupon = {
   rewardType: "gas_fee_cashback";
   name: string;
   description: string;
+  imageUrl: string;
   contractAddress: string;
   nftTokenId: string;
   treasuryAddress: string;

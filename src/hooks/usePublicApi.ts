@@ -13,6 +13,7 @@ export const usePublicApi = () => {
         rewardType: resp.data.rewardType,
         name: resp.data.name,
         description: resp.data.description,
+        imageUrl: resp.data.imageUrl,
         contractAddress: resp.data.contractAddress,
         nftTokenId: resp.data.nftTokenId,
         treasuryAddress: resp.data.treasuryAddress,

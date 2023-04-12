@@ -27,6 +27,7 @@ import {
   Menu,
   MenuButton,
   MenuItem,
+  Card,
   MenuList,
   Spacer,
   Stat,
@@ -34,15 +35,15 @@ import {
   StatLabel,
   StatNumber,
   Text,
+  Image,
   useDisclosure,
   useToken,
   VStack,
 } from "@chakra-ui/react";
 import { Chart, registerables } from "chart.js";
 import Head from "next/head";
-import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { Cube, DotsThree, LineSegment, Tag } from "phosphor-react";
+import { Cube, DotsThree, LineSegment, Tag, Spinner } from "phosphor-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Line } from "react-chartjs-2";
 Chart.register(...registerables);
@@ -119,57 +120,77 @@ const SummarySection = (props: {
   return (
     <>
       <Box>
-        <Grid templateColumns="repeat(12, 1fr)" gap={4} my={4}>
-          <GridItem colSpan={{ base: 12 }}>
-            <Flex align="center">
-              <Heading as="h3">
-                <Flex align="center">
-                  <Tag color="gray" size={16} weight="fill" />
-                  <Text fontSize="sm" color="gray" ml={2}>
-                    Gasback NFT
-                  </Text>
-                </Flex>
-              </Heading>
-              <Spacer />
-              <Link href="/how" isExternal>
-                <Button size="xs" variant="outline">
-                  How to use Nudge ONCHAIN
-                </Button>
-              </Link>
-            </Flex>
-            <Flex align="center">
-              <Heading as="h4" fontSize="4xl" mt={2}>
-                {props.coupon && props.coupon.name}
-              </Heading>
-              <Spacer />
-              <Flex align="center">
-                {props.coupon && (
-                  <Link
-                    href={getMintUrl(props.coupon.id)}
-                    style={{ width: "100%", display: "block" }}
-                    isExternal
-                  >
-                    <Button size="sm">Mint Page</Button>
-                  </Link>
-                )}
-                <Menu>
-                  <MenuButton
-                    as={IconButton}
-                    aria-label="Options"
-                    icon={<DotsThree weight="bold" size={24} />}
-                    variant="ghots"
+        <Grid templateColumns="repeat(12, 1fr)" my={4}>
+          <GridItem colSpan={{ base: 12, md: 6 }}>
+            <Flex>
+              <Card
+                width={128}
+                height={128}
+                bg="gray.200"
+                align="center"
+                justify="center"
+              >
+                {props.coupon ? (
+                  <Image
+                    src={props.coupon.imageUrl}
+                    alt="Preview"
+                    w="100%"
+                    h="100%"
                   />
-                  <MenuList>
-                    <MenuItem icon={<Cube />} onClick={props.clickDelete}>
-                      Invalidate
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
-              </Flex>
+                ) : (
+                  <Spinner size={24}>
+                    <animateTransform
+                      attributeName="transform"
+                      attributeType="XML"
+                      type="rotate"
+                      dur="1.8s"
+                      from="0 0 0"
+                      to="360 0 0"
+                      repeatCount="indefinite"
+                    ></animateTransform>
+                  </Spinner>
+                )}
+              </Card>
+              <Box ml={4}>
+                <Heading as="h3">
+                  <Flex align="center">
+                    <Tag color="gray" size={16} weight="fill" />
+                    <Text fontSize="sm" color="gray" ml={2}>
+                      Gasback NFT
+                    </Text>
+                  </Flex>
+                </Heading>
+                <Heading as="h4" fontSize="4xl" mt={2}>
+                  {props.coupon && props.coupon.name}
+                </Heading>
+              </Box>
             </Flex>
-            <Divider mt={2} />
+          </GridItem>
+          <GridItem colSpan={{ base: 12, md: 6 }}>
+            <Flex>
+              <Spacer />
+              {props.coupon && (
+                <Link href={getMintUrl(props.coupon.id)} isExternal>
+                  <Button>Mint Page</Button>
+                </Link>
+              )}
+              <Menu>
+                <MenuButton
+                  as={IconButton}
+                  aria-label="Options"
+                  icon={<DotsThree weight="bold" size={24} />}
+                  variant="ghots"
+                />
+                <MenuList>
+                  <MenuItem icon={<Cube />} onClick={props.clickDelete}>
+                    Invalidate
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </Flex>
           </GridItem>
         </Grid>
+        <Divider mt={2} />
         <Grid templateColumns="repeat(12, 1fr)" gap={4} my={4}>
           <GridItem colSpan={{ base: 12, sm: 6, md: 2 }}>
             <Box>

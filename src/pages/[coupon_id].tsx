@@ -12,6 +12,7 @@ import {
   Container,
   Flex,
   Heading,
+  Image,
   Spacer,
   Text,
   Tooltip,
@@ -27,6 +28,7 @@ import {
 import { SmartContract } from "@thirdweb-dev/sdk";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { Spinner } from "phosphor-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 const MintBody = (props: { coupon: Coupon; chain: Chain; nfts: Nft[] }) => {
@@ -85,7 +87,37 @@ const MintBody = (props: { coupon: Coupon; chain: Chain; nfts: Nft[] }) => {
             <Container maxWidth="xl">
               <Card overflow="hidden" boxShadow="2xl" mt={8}>
                 <CardBody p={12}>
-                  <Heading as="h2" size="sm" color="gray">
+                  <Flex>
+                    <Card
+                      width={256}
+                      height={256}
+                      bg="gray.200"
+                      align="center"
+                      justify="center"
+                    >
+                      {props.coupon ? (
+                        <Image
+                          src={props.coupon.imageUrl}
+                          alt="Preview"
+                          w="100%"
+                          h="100%"
+                        />
+                      ) : (
+                        <Spinner size={24}>
+                          <animateTransform
+                            attributeName="transform"
+                            attributeType="XML"
+                            type="rotate"
+                            dur="1.8s"
+                            from="0 0 0"
+                            to="360 0 0"
+                            repeatCount="indefinite"
+                          ></animateTransform>
+                        </Spinner>
+                      )}
+                    </Card>
+                  </Flex>
+                  <Heading as="h2" size="sm" color="gray" mt={8}>
                     Get gasback NFT
                   </Heading>
                   <Heading as="h3" size="lg">

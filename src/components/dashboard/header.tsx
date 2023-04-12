@@ -18,6 +18,7 @@ import {
   Heading,
   Icon,
   IconButton,
+  Link,
   Menu,
   MenuButton,
   MenuDivider,
@@ -47,7 +48,7 @@ const NavigationBar = ({ projectId = null }: { projectId?: string | null }) => {
   return (
     <Box h={8}>
       <Container maxWidth="6xl" h="100%">
-        <Flex align="center" justify="start" gap={4} h="100%">
+        <Flex align="center" gap={4} h="100%">
           <NextLink href={`/dashboard/${projectId}`}>
             <Button
               fontWeight="bold"
@@ -72,6 +73,12 @@ const NavigationBar = ({ projectId = null }: { projectId?: string | null }) => {
               Team
             </Button>
           </NextLink>
+          <Spacer />
+          <Link href="/how" isExternal>
+            <Button size="xs" variant="outline">
+              How to use Nudge ONCHAIN
+            </Button>
+          </Link>
         </Flex>
       </Container>
     </Box>

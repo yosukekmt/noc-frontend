@@ -1,3 +1,4 @@
+import ImageUploadInput from "@/components/dashboard/image-upload-input";
 import PickerDialog from "@/components/dashboard/nfts/picker-dialog";
 import { useApiClient } from "@/hooks/useApiClient";
 import { useBlockchain } from "@/hooks/useBlockchain";
@@ -37,7 +38,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 export default function NewCoupon() {
   const router = useRouter();
-  const { project_id: projectId } = router.query;
+  const { project_id: project_id } = router.query;
   const { getErrorMessage } = useApiClient();
   const { callGetChains } = useChainsApi();
   const { callCreateCoupons } = useCouponsApi();
@@ -59,6 +60,7 @@ export default function NewCoupon() {
   const [chainId, setChainId] = useState<number | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [timezone, setTimezone] = useState(getDefaultTimezone());
   const [startDate, setStartDate] = useState<string>(getDefaultStartDate());
   const [startTime, setStartTime] = useState<string>(getDefaultStartTime());
@@ -70,6 +72,9 @@ export default function NewCoupon() {
 
   const pickerDialog = useDisclosure();
 
+  const projectId = useMemo(() => {
+    return project_id as string;
+  }, [project_id]);
   const nftIds = useMemo(() => {
     return nfts.map((nft) => nft.id);
   }, [nfts]);
@@ -91,7 +96,9 @@ export default function NewCoupon() {
   const isValidDescription = useMemo(() => {
     return validateCouponsDescription(description);
   }, [validateCouponsDescription, description]);
-
+  const isValidImageUrl = useMemo(() => {
+    return imageUrl && imageUrl.startsWith("http");
+  }, [imageUrl]);
   const chain = useMemo(() => {
     if (!chainId) return null;
     return chains.find((item) => item.id === chainId);
@@ -119,7 +126,8 @@ export default function NewCoupon() {
       timezone: string,
       startAt: Date,
       endAt: Date,
-      nftIds: string[]
+      nftIds: string[],
+      imageUrl: string
     ) => {
       setIsLoading(true);
       try {
@@ -133,6 +141,7 @@ export default function NewCoupon() {
           startAt,
           endAt,
           nftIds,
+          imageUrl,
         });
         router.push(`/dashboard/${projectId}/coupons/${item.id}`);
       } catch (err: unknown) {
@@ -178,10 +187,11 @@ export default function NewCoupon() {
     if (!isValidNftIds) return;
     if (!isValidName) return;
     if (!isValidDescription) return;
+    if (!isValidImageUrl) return;
 
     callApiCreateToken(
       authToken,
-      projectId as string,
+      projectId,
       chainId!,
       "gas_fee_cashback",
       name,
@@ -189,7 +199,8 @@ export default function NewCoupon() {
       timezone,
       startAt,
       endtAt,
-      nftIds
+      nftIds,
+      imageUrl
     );
   };
 
@@ -204,7 +215,7 @@ export default function NewCoupon() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
-      <DashboardLayout projectId={projectId as string}>
+      <DashboardLayout projectId={projectId}>
         <Flex justify="center">
           <Box maxWidth="xl" w="100%">
             <form onSubmit={clickSubmit}>
@@ -232,7 +243,6 @@ export default function NewCoupon() {
                   </Select>
                 )}
               </FormControl>
-
               <FormControl mt={2}>
                 <FormLabel fontSize="sm">Applicable NFTs</FormLabel>
                 <Wrap spacing={1} mt={2}>
@@ -321,6 +331,10 @@ export default function NewCoupon() {
                   )}
                 </Box>
               </FormControl>
+              <ImageUploadInput
+                projectId={projectId}
+                onUploaded={setImageUrl}
+              />
               <FormControl>
                 <FormLabel fontSize="sm">Timezone</FormLabel>
                 <Select

@@ -17,6 +17,7 @@ export const useCouponsApi = () => {
           rewardType: d.rewardType,
           name: d.name,
           description: d.description,
+          imageUrl: d.imageUrl,
           contractAddress: d.contractAddress,
           nftTokenId: d.nftTokenId,
           treasuryAddress: d.treasuryAddress,
@@ -47,6 +48,7 @@ export const useCouponsApi = () => {
         startAt: Date;
         endAt: Date;
         nftIds: string[];
+        imageUrl: string;
       }
     ): Promise<Coupon> => {
       const resp = await apiClient.post("/coupons", data, {
@@ -59,6 +61,7 @@ export const useCouponsApi = () => {
         rewardType: resp.data.data.rewardType,
         name: resp.data.data.name,
         description: resp.data.data.description,
+        imageUrl: resp.data.data.imageUrl,
         contractAddress: resp.data.data.contractAddress,
         nftTokenId: resp.data.data.nftTokenId,
         treasuryAddress: resp.data.data.treasuryAddress,
@@ -92,6 +95,7 @@ export const useCouponsApi = () => {
         rewardType: resp.data.data.rewardType,
         name: resp.data.data.name,
         description: resp.data.data.description,
+        imageUrl: resp.data.data.imageUrl,
         contractAddress: resp.data.data.contractAddress,
         nftTokenId: resp.data.data.nftTokenId,
         treasuryAddress: resp.data.data.treasuryAddress,
@@ -117,6 +121,23 @@ export const useCouponsApi = () => {
         headers: { Authorization: authToken },
       });
       return;
+    },
+    [apiClient]
+  );
+
+  const callGetUploadUrl = useCallback(
+    async (
+      authToken: string,
+      projectId: string,
+      mimeType: string
+    ): Promise<{ getUrl: string; uploadUrl: string }> => {
+      const resp = await apiClient.get("/coupons/upload_url", {
+        params: { project_id: projectId, mime_type: mimeType },
+        headers: { Authorization: authToken },
+      });
+      console.log(resp);
+      console.log(resp.data);
+      return resp.data.data as { getUrl: string; uploadUrl: string };
     },
     [apiClient]
   );
@@ -182,6 +203,7 @@ export const useCouponsApi = () => {
     callGetCoupon,
     callCreateCoupons,
     callDeleteCoupon,
+    callGetUploadUrl,
     callWithdraw,
     getStatus,
   };

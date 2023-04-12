@@ -19,14 +19,14 @@ const HeroSection = () => {
           <GridItem colSpan={{ base: 12, md: 12 }}>
             <Box my={{ base: 16, md: 36 }}>
               <Heading as="h1" size="3xl" lineHeight={1.4}>
-                LTV and CAC
+                LTV &amp; CAC
                 <br />
                 management platform
                 <br />
-                for the blockchain
+                for blockchains
               </Heading>
               <Heading as="h3" size="md" fontWeight="normal" mt={4}>
-                Every blockchain business deserves a sophisticated LTV and CAC
+                Every web3 business deserves a sophisticated LTV &amp; CAC
                 management tool. Nudge ONCHAIN serves as a valuable companion in
                 designing the Nudge for the forthcoming incentive economy era,
                 enabling businesses to optimize their operations and thrive in
