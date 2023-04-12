@@ -1,10 +1,10 @@
 import NewDialog from "@/components/dashboard/projects/new-dialog";
+import HtmlHead from "@/components/html-head";
 import { useFirebase } from "@/hooks/useFirebase";
 import { useProjectsApi } from "@/hooks/useProjectsApi";
 import DashboardLayout from "@/layouts/dashboard-layout";
 import { Project } from "@/models";
 import { Center, Flex, useDisclosure } from "@chakra-ui/react";
-import Head from "next/head";
 import { useRouter } from "next/router";
 import { Spinner } from "phosphor-react";
 import { useCallback, useEffect, useState } from "react";
@@ -47,15 +47,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <Head>
-        <title>Nudge ONCHAIN</title>
-        <meta
-          name="description"
-          content="Native implementation of coupon and cashback systems."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-      </Head>
+      <HtmlHead />
       <DashboardLayout>
         <Flex h={320} align="center" justify="center">
           <Center>

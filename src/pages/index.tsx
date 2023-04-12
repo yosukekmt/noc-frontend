@@ -1,5 +1,6 @@
 import Footer from "@/components/footer";
 import Header from "@/components/header";
+import HtmlHead from "@/components/html-head";
 import {
   Box,
   Container,
@@ -8,7 +9,6 @@ import {
   Heading,
   Text,
 } from "@chakra-ui/react";
-import Head from "next/head";
 import { ChartLineUp, Cursor, TestTube, Ticket } from "phosphor-react";
 
 const HeroSection = () => {
@@ -19,9 +19,9 @@ const HeroSection = () => {
           <GridItem colSpan={{ base: 12, md: 12 }}>
             <Box my={{ base: 16, md: 36 }}>
               <Heading as="h1" size="3xl" lineHeight={1.4}>
-                LTV &amp; CAC
+                Customer engagement
                 <br />
-                management platform
+                platform
                 <br />
                 for blockchains
               </Heading>
@@ -91,14 +91,15 @@ const FeaturesSection = () => {
                 <Box py={8}>
                   <Ticket size={32} />
                   <Heading as="h4" size="md" fontWeight="bold" py={4}>
-                    Auto-cashback NFT
+                    Cashback campaign
                   </Heading>
                   <Text fontSize="lg">
-                    You can make an auto-cashback NFT for your customers. When
-                    they have this NFT, they&apos;ll get cashback for any
-                    transactions they make with your NFT-related purchases. You
-                    can even set how long the cashback campaign lasts and which
-                    NFTs are part of the deal.
+                    You can manage cashback campaigns for your customers by
+                    distributing coupons. When they have this coupon,
+                    they&apos;ll get cashback for any transactions they make
+                    with your NFT-related purchases. You can even set how long
+                    the cashback campaign lasts and which NFTs are part of the
+                    deal.
                   </Text>
                 </Box>
               </GridItem>
@@ -106,13 +107,13 @@ const FeaturesSection = () => {
                 <Box py={8}>
                   <Cursor size={32} />
                   <Heading as="h4" size="md" fontWeight="bold" py={4}>
-                    Minting
+                    No-code coupon page
                   </Heading>
                   <Text fontSize="lg">
-                    You will then get this easy no-code minting page for you to
-                    share with your customers. They can mint their cashback NFTs
-                    for free, and they don&apos;t need to be tech-savvy to do
-                    it.
+                    You will then get this easy no-code coupon page for you to
+                    share with your customers. They can get their cashback
+                    coupons for free, and they don&apos;t need to be tech-savvy
+                    to do it.
                   </Text>
                 </Box>
               </GridItem>
@@ -120,7 +121,7 @@ const FeaturesSection = () => {
                 <Box py={8}>
                   <ChartLineUp size={32} />
                   <Heading as="h4" size="md" fontWeight="bold" py={4}>
-                    Realtime Dashboard
+                    Realtime dashboard
                   </Heading>
                   <Text fontSize="lg">
                     Our dashboard provides a convenient way to manage your
@@ -156,15 +157,7 @@ const FeaturesSection = () => {
 export default function Home() {
   return (
     <>
-      <Head>
-        <title>Nudge ONCHAIN</title>
-        <meta
-          name="description"
-          content="Native implementation of coupon and cashback systems."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-      </Head>
+      <HtmlHead />
       <Box as="header" h={16}>
         <Header />
       </Box>

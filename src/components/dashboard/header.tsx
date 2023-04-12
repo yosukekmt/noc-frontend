@@ -32,7 +32,7 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import NewDialog from "./projects/new-dialog";
 
-export type MenuItemType = "gasback_nfts" | "members" | "";
+export type MenuItemType = "campaigns" | "members" | "";
 
 const NavigationBar = ({ projectId = null }: { projectId?: string | null }) => {
   const { pathname } = useRouter();
@@ -41,7 +41,7 @@ const NavigationBar = ({ projectId = null }: { projectId?: string | null }) => {
     if (pathname.includes("/members")) {
       _setMenuItemType("members");
     } else {
-      _setMenuItemType("gasback_nfts");
+      _setMenuItemType("campaigns");
     }
   }, [pathname]);
 
@@ -55,10 +55,10 @@ const NavigationBar = ({ projectId = null }: { projectId?: string | null }) => {
               fontSize="sm"
               size="xs"
               style={{ borderRadius: 20 }}
-              colorScheme={_menuItemType === "gasback_nfts" ? "blue" : "white"}
-              variant={_menuItemType === "gasback_nfts" ? "solid" : "ghost"}
+              colorScheme={_menuItemType === "campaigns" ? "blue" : "white"}
+              variant={_menuItemType === "campaigns" ? "solid" : "ghost"}
             >
-              Gasback NFTs
+              Campaigns
             </Button>
           </NextLink>
           <NextLink href={`/dashboard/${projectId}/members`}>
@@ -185,7 +185,6 @@ export default function Header({
                   </MenuList>
                 </Menu>
               )}
-
               <Menu>
                 <MenuButton
                   as={IconButton}

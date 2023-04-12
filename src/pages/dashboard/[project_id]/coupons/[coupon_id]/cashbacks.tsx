@@ -2,17 +2,13 @@ import {
   CashbacksTableLoadingRow,
   CashbacksTableRow,
 } from "@/components/dashboard/coupons/cashbacks-section";
-import {
-  CouponHoldersTableLoadingRow,
-  CouponHoldersTableRow,
-} from "@/components/dashboard/coupons/coupon-holders-section";
+import HtmlHead from "@/components/html-head";
 import { useCashbacksApi } from "@/hooks/useCashbacksApi";
 import { useChainsApi } from "@/hooks/useChainsApi";
-import { useCouponHoldersApi } from "@/hooks/useCouponHoldersApi";
 import { useCouponsApi } from "@/hooks/useCouponsApi";
 import { useFirebase } from "@/hooks/useFirebase";
 import DashboardLayout from "@/layouts/dashboard-layout";
-import { Cashback, Chain, Coupon, CouponHolder, PageInfo } from "@/models";
+import { Cashback, Chain, Coupon, PageInfo } from "@/models";
 import {
   Box,
   Button,
@@ -36,10 +32,8 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import next from "next";
-import Head from "next/head";
 import { useRouter } from "next/router";
-import { Spinner, MagnifyingGlass } from "phosphor-react";
+import { MagnifyingGlass, Spinner } from "phosphor-react";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 export default function Cashbacks() {
@@ -204,15 +198,7 @@ export default function Cashbacks() {
 
   return (
     <>
-      <Head>
-        <title>Nudge ONCHAIN</title>
-        <meta
-          name="description"
-          content="Native implementation of coupon and cashback systems."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-      </Head>
+      <HtmlHead />
       <DashboardLayout projectId={projectId as string}>
         <Box>
           <Grid templateColumns="repeat(12, 1fr)" gap={4}>

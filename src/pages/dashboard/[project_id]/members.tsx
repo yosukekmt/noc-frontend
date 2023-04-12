@@ -1,6 +1,7 @@
 import DeleteDialog from "@/components/dashboard/invitations/delete-dialog";
 import NewDialog from "@/components/dashboard/invitations/new-dialog";
 import ProjectUsersDeleteDialog from "@/components/dashboard/project-users/delete-dialog";
+import HtmlHead from "@/components/html-head";
 import { useCurrentUserApi } from "@/hooks/useCurrentUserApi";
 import { useFirebase } from "@/hooks/useFirebase";
 import { useInvitationsApi } from "@/hooks/useInvitationsApi";
@@ -9,11 +10,11 @@ import DashboardLayout from "@/layouts/dashboard-layout";
 import { Invitation, User } from "@/models";
 import { DeleteIcon, HamburgerIcon } from "@chakra-ui/icons";
 import {
+  Badge,
   Button,
   Card,
   CardHeader,
   Divider,
-  Text,
   Flex,
   Grid,
   GridItem,
@@ -33,9 +34,7 @@ import {
   Thead,
   Tr,
   useDisclosure,
-  Badge,
 } from "@chakra-ui/react";
-import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 
@@ -257,15 +256,7 @@ export default function Members() {
 
   return (
     <>
-      <Head>
-        <title>Nudge ONCHAIN</title>
-        <meta
-          name="description"
-          content="Native implementation of coupon and cashback systems."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-      </Head>
+      <HtmlHead />
       <DashboardLayout projectId={projectId as string}>
         <Card variant="outline">
           <CardHeader>

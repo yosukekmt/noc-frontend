@@ -1,3 +1,4 @@
+import HtmlHead from "@/components/html-head";
 import MintingDialog from "@/components/minting-dialog";
 import Footer from "@/components/session/footer";
 import Header from "@/components/session/header";
@@ -26,7 +27,6 @@ import {
   Web3Button,
 } from "@thirdweb-dev/react";
 import { SmartContract } from "@thirdweb-dev/sdk";
-import Head from "next/head";
 import { useRouter } from "next/router";
 import { Spinner } from "phosphor-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -254,15 +254,7 @@ export default function Mint() {
 
   return (
     <>
-      <Head>
-        <title>Nudge ONCHAIN</title>
-        <meta
-          name="description"
-          content="Native implementation of coupon and cashback systems."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-      </Head>
+      <HtmlHead />
       {item && chain && (
         <ThirdwebProvider activeChain={chain.id as 1 | 5 | 137 | 80001}>
           {item && <MintBody coupon={item} chain={chain} nfts={nfts} />}

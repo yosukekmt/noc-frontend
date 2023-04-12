@@ -1,9 +1,10 @@
+import HtmlHead from "@/components/html-head";
 import { useChainsApi } from "@/hooks/useChainsApi";
 import { useCouponsApi } from "@/hooks/useCouponsApi";
 import { useCurrentUserApi } from "@/hooks/useCurrentUserApi";
 import { useFirebase } from "@/hooks/useFirebase";
 import DashboardLayout from "@/layouts/dashboard-layout";
-import { Coupon, Chain } from "@/models";
+import { Chain, Coupon } from "@/models";
 import {
   Box,
   Button,
@@ -26,7 +27,6 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -203,15 +203,7 @@ export default function Project() {
 
   return (
     <>
-      <Head>
-        <title>Nudge ONCHAIN</title>
-        <meta
-          name="description"
-          content="Native implementation of coupon and cashback systems."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-      </Head>
+      <HtmlHead />
       <DashboardLayout projectId={projectId as string}>
         <Card variant="outline">
           <CardHeader>
@@ -219,7 +211,7 @@ export default function Project() {
               <GridItem colSpan={{ base: 12, sm: 6 }}>
                 <Box>
                   <Heading as="h3" fontSize="2xl" fontWeight="bold">
-                    Gasback NFTs
+                    Campaigns
                   </Heading>
                 </Box>
               </GridItem>
@@ -231,7 +223,7 @@ export default function Project() {
                     w={{ base: "100%", sm: "inherit" }}
                     onClick={clickNew}
                   >
-                    New Gasback NFT
+                    New Campaign
                   </Button>
                 </Flex>
               </GridItem>

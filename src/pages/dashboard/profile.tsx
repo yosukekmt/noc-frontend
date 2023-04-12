@@ -1,4 +1,5 @@
 import EditDialog from "@/components/dashboard/current-user/edit-dialog";
+import HtmlHead from "@/components/html-head";
 import { useCurrentUserApi } from "@/hooks/useCurrentUserApi";
 import { useFirebase } from "@/hooks/useFirebase";
 import DashboardLayout from "@/layouts/dashboard-layout";
@@ -15,7 +16,6 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import Head from "next/head";
 import { useEffect, useState } from "react";
 
 export default function Profile() {
@@ -46,15 +46,7 @@ export default function Profile() {
   };
   return (
     <>
-      <Head>
-        <title>Nudge ONCHAIN</title>
-        <meta
-          name="description"
-          content="Native implementation of coupon and cashback systems."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-      </Head>
+      <HtmlHead />
       <DashboardLayout>
         <Box>
           <Heading as="h3" fontSize="2xl" fontWeight="bold" py={4}>

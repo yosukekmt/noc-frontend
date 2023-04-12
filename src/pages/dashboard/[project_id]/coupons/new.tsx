@@ -1,5 +1,6 @@
 import ImageUploadInput from "@/components/dashboard/image-upload-input";
 import PickerDialog from "@/components/dashboard/nfts/picker-dialog";
+import HtmlHead from "@/components/html-head";
 import { useApiClient } from "@/hooks/useApiClient";
 import { useBlockchain } from "@/hooks/useBlockchain";
 import { useChainsApi } from "@/hooks/useChainsApi";
@@ -30,7 +31,6 @@ import {
   useDisclosure,
   Wrap,
 } from "@chakra-ui/react";
-import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { Plus, Warning } from "phosphor-react";
@@ -206,26 +206,18 @@ export default function NewCoupon() {
 
   return (
     <>
-      <Head>
-        <title>Nudge ONCHAIN</title>
-        <meta
-          name="description"
-          content="Native implementation of coupon and cashback systems."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-      </Head>
+      <HtmlHead />
       <DashboardLayout projectId={projectId}>
         <Flex justify="center">
           <Box maxWidth="xl" w="100%">
             <form onSubmit={clickSubmit}>
               <Heading as="h3" fontSize="2xl" fontWeight="bold">
-                Create a new Gasback NFT
+                Create a new campaign
               </Heading>
               <Text fontSize="sm">
-                Set up your Gasback NFT to engage you customers.
+                Set up your campaign to engage you customers.
               </Text>
-              <FormControl>
+              <FormControl mt={2}>
                 <FormLabel fontSize="sm">Network</FormLabel>
                 {chainId && (
                   <Select
@@ -307,7 +299,7 @@ export default function NewCoupon() {
                 </Box>
               </FormControl>
               <FormControl>
-                <FormLabel fontSize="sm">Description</FormLabel>
+                <FormLabel fontSize="sm">Coupon Description</FormLabel>
                 <Textarea
                   size="sm"
                   bg="white"

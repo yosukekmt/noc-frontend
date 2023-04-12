@@ -3,6 +3,7 @@ import CouponHoldersSection from "@/components/dashboard/coupons/coupon-holders-
 import InvalidateDialog from "@/components/dashboard/coupons/invalidate-dialog";
 import WithdrawDialog from "@/components/dashboard/coupons/withdraw-dialog";
 import WithdrawSubmittedDialog from "@/components/dashboard/coupons/withdraw-submitted-dialog";
+import HtmlHead from "@/components/html-head";
 import { useBlockchain } from "@/hooks/useBlockchain";
 import { useCashbacksApi } from "@/hooks/useCashbacksApi";
 import { useChainsApi } from "@/hooks/useChainsApi";
@@ -17,17 +18,18 @@ import { Cashback, Chain, Coupon, CouponHolder, Nft } from "@/models";
 import {
   Box,
   Button,
+  Card,
   Divider,
   Flex,
   Grid,
   GridItem,
   Heading,
   IconButton,
+  Image,
   Link,
   Menu,
   MenuButton,
   MenuItem,
-  Card,
   MenuList,
   Spacer,
   Stat,
@@ -35,15 +37,13 @@ import {
   StatLabel,
   StatNumber,
   Text,
-  Image,
   useDisclosure,
   useToken,
   VStack,
 } from "@chakra-ui/react";
 import { Chart, registerables } from "chart.js";
-import Head from "next/head";
 import { useRouter } from "next/router";
-import { Cube, DotsThree, LineSegment, Tag, Spinner } from "phosphor-react";
+import { Cube, DotsThree, LineSegment, Spinner, Tag } from "phosphor-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Line } from "react-chartjs-2";
 Chart.register(...registerables);
@@ -156,7 +156,7 @@ const SummarySection = (props: {
                   <Flex align="center">
                     <Tag color="gray" size={16} weight="fill" />
                     <Text fontSize="sm" color="gray" ml={2}>
-                      Gasback NFT
+                      Cashback Campaign
                     </Text>
                   </Flex>
                 </Heading>
@@ -171,7 +171,7 @@ const SummarySection = (props: {
               <Spacer />
               {props.coupon && (
                 <Link href={getMintUrl(props.coupon.id)} isExternal>
-                  <Button>Mint Page</Button>
+                  <Button>Coupon Page</Button>
                 </Link>
               )}
               <Menu>
@@ -686,15 +686,7 @@ export default function CouponDetail() {
 
   return (
     <>
-      <Head>
-        <title>Nudge ONCHAIN</title>
-        <meta
-          name="description"
-          content="Native implementation of coupon and cashback systems."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-      </Head>
+      <HtmlHead />
       <DashboardLayout projectId={projectId as string}>
         <Box>
           <SummarySection

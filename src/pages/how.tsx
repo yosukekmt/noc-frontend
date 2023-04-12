@@ -1,15 +1,15 @@
 import Footer from "@/components/footer";
 import Header from "@/components/header";
+import HtmlHead from "@/components/html-head";
 import {
   Box,
+  Center,
   Container,
   Grid,
-  Center,
   GridItem,
   Heading,
   Text,
 } from "@chakra-ui/react";
-import Head from "next/head";
 
 const TopSection = () => {
   return (
@@ -61,9 +61,9 @@ const HowSection = () => {
             </GridItem>
             <GridItem area={"description3"}>
               <Text size="md">
-                3. You&apos;re all set to share the minting page with your
-                customers now. Keep in mind that they can go ahead and mint
-                cashback NFTs even before the campaign starts. But the actual
+                3. You&apos;re all set to share the coupon page with your
+                customers now. Keep in mind that they can go ahead and get
+                cashback coupons even before the campaign starts. But the actual
                 cashback will only be given out during the campaign period.
               </Text>
             </GridItem>
@@ -90,15 +90,7 @@ const HowSection = () => {
 export default function Home() {
   return (
     <>
-      <Head>
-        <title>Nudge ONCHAIN</title>
-        <meta
-          name="description"
-          content="Native implementation of coupon and cashback systems."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-      </Head>
+      <HtmlHead />
       <Box as="header" h={16}>
         <Header />
       </Box>

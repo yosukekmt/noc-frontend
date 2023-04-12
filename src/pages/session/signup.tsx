@@ -1,3 +1,4 @@
+import HtmlHead from "@/components/html-head";
 import Footer from "@/components/session/footer";
 import Header from "@/components/session/header";
 import { useApiClient } from "@/hooks/useApiClient";
@@ -22,7 +23,6 @@ import {
   InputRightElement,
   Text,
 } from "@chakra-ui/react";
-import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { Eye, EyeSlash, Warning } from "phosphor-react";
@@ -128,15 +128,7 @@ export default function Login() {
 
   return (
     <>
-      <Head>
-        <title>Nudge ONCHAIN</title>
-        <meta
-          name="description"
-          content="Native implementation of coupon and cashback systems."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-      </Head>
+      <HtmlHead />
       <Box bg="gray.100" minH="100vh">
         <Box as="header">
           <Header />
