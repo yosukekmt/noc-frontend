@@ -1,26 +1,25 @@
 import { useApiClient } from "@/hooks/useApiClient";
 import { useBlockchain } from "@/hooks/useBlockchain";
 import { useFirebase } from "@/hooks/useFirebase";
-import { Chain, Coupon } from "@/models";
+import { Chain, Project } from "@/models";
 import {
   Button,
   Divider,
+  Link,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Link,
   ModalOverlay,
   Text,
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 
 export default function WithdrawSubmittedDialog(props: {
-  projectId: string;
+  project: Project;
   chain: Chain;
-  coupon: Coupon;
   isOpen: boolean;
   onClose(): void;
   onOpen(): void;
@@ -35,12 +34,12 @@ export default function WithdrawSubmittedDialog(props: {
   const url = useMemo(() => {
     return getExplorerAddressUrl(
       props.chain.explorerUrl,
-      props.coupon.treasuryAddress
+      props.project.walletAddress
     );
   }, [
     getExplorerAddressUrl,
     props.chain.explorerUrl,
-    props.coupon.treasuryAddress,
+    props.project.walletAddress,
   ]);
 
   return (

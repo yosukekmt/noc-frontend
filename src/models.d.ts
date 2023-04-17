@@ -7,13 +7,12 @@ export type PageInfo = {
 
 export type Coupon = {
   id: string;
-  rewardType: "gas_fee_cashback";
+  rewardType: "cashback_gas" | "cashback_005";
   name: string;
   description: string;
   imageUrl: string;
   contractAddress: string;
   nftTokenId: string;
-  treasuryAddress: string;
   timezone: string;
   startAt: Date;
   endAt: Date;
@@ -35,6 +34,7 @@ export type Invitation = {
 export type Project = {
   id: string;
   name: string;
+  walletAddress: string;
   createdAt: Date;
   updatedAt: Date;
 };

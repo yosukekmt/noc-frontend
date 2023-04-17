@@ -1,8 +1,6 @@
 import CashbacksSection from "@/components/dashboard/coupons/cashbacks-section";
 import CouponHoldersSection from "@/components/dashboard/coupons/coupon-holders-section";
 import InvalidateDialog from "@/components/dashboard/coupons/invalidate-dialog";
-import WithdrawDialog from "@/components/dashboard/coupons/withdraw-dialog";
-import WithdrawSubmittedDialog from "@/components/dashboard/coupons/withdraw-submitted-dialog";
 import HtmlHead from "@/components/html-head";
 import { useBlockchain } from "@/hooks/useBlockchain";
 import { useCashbacksApi } from "@/hooks/useCashbacksApi";
@@ -12,9 +10,10 @@ import { useCouponsApi } from "@/hooks/useCouponsApi";
 import { useDatetime } from "@/hooks/useDatetime";
 import { useFirebase } from "@/hooks/useFirebase";
 import { useNftsApi } from "@/hooks/useNftsApi";
+import { useProjectsApi } from "@/hooks/useProjectsApi";
 import { useUrl } from "@/hooks/useUrl";
 import DashboardLayout from "@/layouts/dashboard-layout";
-import { Cashback, Chain, Coupon, CouponHolder, Nft } from "@/models";
+import { Cashback, Chain, Coupon, CouponHolder, Nft, Project } from "@/models";
 import {
   Box,
   Button,
@@ -192,7 +191,15 @@ const SummarySection = (props: {
         </Grid>
         <Divider mt={2} />
         <Grid templateColumns="repeat(12, 1fr)" gap={4} my={4}>
-          <GridItem colSpan={{ base: 12, sm: 6, md: 2 }}>
+          <GridItem colSpan={{ base: 12, sm: 6, md: 3 }}>
+            <Box>
+              <Text fontSize="sm" color="gray">
+                Network
+              </Text>
+              <Text fontSize="sm">{props.chain && props.chain.name}</Text>
+            </Box>
+          </GridItem>
+          <GridItem colSpan={{ base: 12, sm: 6, md: 3 }}>
             <Box>
               <Text fontSize="sm" color="gray">
                 Status
@@ -207,15 +214,20 @@ const SummarySection = (props: {
               </Text>
             </Box>
           </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 6, md: 2 }}>
+          <GridItem colSpan={{ base: 12, sm: 6, md: 3 }}>
             <Box>
               <Text fontSize="sm" color="gray">
                 Reward type
               </Text>
-              <Text fontSize="sm">Gas fee cashback</Text>
+              {props.coupon && props.coupon.rewardType === "cashback_gas" && (
+                <Text fontSize="sm">Gas fee cashback</Text>
+              )}
+              {props.coupon && props.coupon.rewardType === "cashback_005" && (
+                <Text fontSize="sm">5% Cashback</Text>
+              )}
             </Box>
           </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 6, md: 2 }}>
+          <GridItem colSpan={{ base: 12, sm: 6, md: 3 }}>
             <Box>
               <Text fontSize="sm" color="gray">
                 Contract address
@@ -235,7 +247,7 @@ const SummarySection = (props: {
               </Text>
             </Box>
           </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 6, md: 6 }}>
+          <GridItem colSpan={{ base: 12, sm: 4 }}>
             <Box>
               <Text fontSize="sm" color="gray">
                 Applicable NFTs
@@ -260,7 +272,7 @@ const SummarySection = (props: {
                 })}
             </Box>
           </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 6 }}>
+          <GridItem colSpan={{ base: 12, sm: 4 }}>
             <Box>
               <Text fontSize="sm" color="gray">
                 Description
@@ -270,7 +282,7 @@ const SummarySection = (props: {
               </Text>
             </Box>
           </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 6 }}>
+          <GridItem colSpan={{ base: 12, sm: 4 }}>
             <Box>
               <Text fontSize="sm" color="gray">
                 Period
@@ -292,6 +304,7 @@ const SummarySection = (props: {
 const TresurySection = (props: {
   isInitialized: boolean;
   chain: Chain | undefined;
+  project: Project | undefined;
   coupon: Coupon | undefined;
   nfts: Nft[];
   projectId: string | undefined;
@@ -299,32 +312,17 @@ const TresurySection = (props: {
   clickDelete: () => void;
 }) => {
   const { truncateContractAddress, getExplorerAddressUrl } = useBlockchain();
-  const withdrawDialog = useDisclosure();
-  const requestedDialog = useDisclosure();
-
-  const isTreasuryReady = useMemo(() => {
-    if (!props.coupon) return;
-    return !!props.coupon.treasuryAddress;
-  }, [props.coupon]);
 
   const explorerUrl = useMemo(() => {
     if (!props.chain) return;
     if (!props.chain.explorerUrl) return;
-    if (!props.coupon) return;
-    if (!props.coupon.treasuryAddress) return;
+    if (!props.project) return;
+
     return getExplorerAddressUrl(
       props.chain.explorerUrl,
-      props.coupon.treasuryAddress
+      props.project.walletAddress
     );
   }, [getExplorerAddressUrl, props.chain, props.coupon]);
-
-  const clickWithdraw = () => {
-    withdrawDialog.onOpen();
-  };
-
-  const onSubmitted = () => {
-    requestedDialog.onOpen();
-  };
 
   return (
     <>
@@ -335,20 +333,6 @@ const TresurySection = (props: {
               <Heading as="h4" fontSize="2xl">
                 Treasury Status
               </Heading>
-              <Spacer />
-              <Menu>
-                <MenuButton
-                  as={IconButton}
-                  aria-label="Options"
-                  icon={<DotsThree weight="bold" size={24} />}
-                  variant="ghots"
-                />
-                <MenuList>
-                  <MenuItem icon={<Cube />} onClick={clickWithdraw}>
-                    Withdraw
-                  </MenuItem>
-                </MenuList>
-              </Menu>
             </Flex>
             <Divider mt={2} />
           </GridItem>
@@ -360,16 +344,15 @@ const TresurySection = (props: {
                 Contract address
               </Text>
               <Text fontSize="sm">
-                {isTreasuryReady && explorerUrl && props.coupon && (
+                {explorerUrl && props.project && (
                   <Link
                     href={explorerUrl}
                     style={{ width: "100%", display: "block" }}
                     isExternal
                   >
-                    {truncateContractAddress(props.coupon.treasuryAddress)}
+                    {truncateContractAddress(props.project?.walletAddress)}
                   </Link>
                 )}
-                {isTreasuryReady === false && "Processing"}
               </Text>
             </Box>
           </GridItem>
@@ -379,7 +362,7 @@ const TresurySection = (props: {
                 Balance
               </Text>
               <Text fontSize="sm">
-                {isTreasuryReady && explorerUrl && props.coupon && (
+                {explorerUrl && props.project && (
                   <Link
                     href={explorerUrl}
                     style={{ width: "100%", display: "block" }}
@@ -388,32 +371,11 @@ const TresurySection = (props: {
                     Click Here
                   </Link>
                 )}
-                {isTreasuryReady === false && "Processing"}
               </Text>
             </Box>
           </GridItem>
         </Grid>
       </Box>
-      {props.projectId && props.coupon && (
-        <WithdrawDialog
-          projectId={props.projectId}
-          coupon={props.coupon}
-          isOpen={withdrawDialog.isOpen}
-          onClose={withdrawDialog.onClose}
-          onOpen={withdrawDialog.onOpen}
-          onSubmitted={onSubmitted}
-        />
-      )}
-      {props.projectId && props.chain && props.coupon && (
-        <WithdrawSubmittedDialog
-          projectId={props.projectId}
-          chain={props.chain}
-          coupon={props.coupon}
-          isOpen={requestedDialog.isOpen}
-          onClose={requestedDialog.onClose}
-          onOpen={requestedDialog.onOpen}
-        />
-      )}
     </>
   );
 };
@@ -529,12 +491,14 @@ export default function CouponDetail() {
   const { project_id, coupon_id } = useRouter().query;
 
   const { callGetChain } = useChainsApi();
+  const { callGetProject } = useProjectsApi();
   const { callGetCoupon } = useCouponsApi();
   const { callGetNfts } = useNftsApi();
   const { callGetCouponHolders } = useCouponHoldersApi();
   const { callGetCashbacks } = useCashbacksApi();
 
   const [chain, setChain] = useState<Chain | undefined>(undefined);
+  const [project, setProject] = useState<Project | undefined>(undefined);
   const [coupon, setCoupon] = useState<Coupon | undefined>(undefined);
   const [nfts, setNfts] = useState<Nft[]>([]);
 
@@ -571,6 +535,14 @@ export default function CouponDetail() {
       setCoupon(item);
     },
     [callGetCoupon]
+  );
+
+  const getProject = useCallback(
+    async (authToken: string, projectId: string): Promise<void> => {
+      const item = await callGetProject(authToken, projectId);
+      setProject(item);
+    },
+    [callGetProject]
   );
 
   const getNfts = useCallback(
@@ -624,6 +596,17 @@ export default function CouponDetail() {
       setIsInitialized(true);
     })();
   }, [authToken, coupon, getChain, isFirebaseInitialized]);
+
+  useEffect(() => {
+    if (!isFirebaseInitialized) return;
+    if (!authToken) return;
+    if (!projectId) return;
+
+    (async () => {
+      await getProject(authToken, projectId);
+      setIsInitialized(true);
+    })();
+  }, [authToken, getProject, isFirebaseInitialized, projectId]);
 
   useEffect(() => {
     if (!isFirebaseInitialized) return;
@@ -699,9 +682,9 @@ export default function CouponDetail() {
           <TresurySection
             isInitialized={isInitialized}
             chain={chain}
+            project={project}
             coupon={coupon}
             nfts={nfts}
-            projectId={projectId}
             couponId={couponId}
             clickDelete={clickDelete}
           />

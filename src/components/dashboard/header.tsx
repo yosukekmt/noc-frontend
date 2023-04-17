@@ -32,16 +32,18 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import NewDialog from "./projects/new-dialog";
 
-export type MenuItemType = "campaigns" | "members" | "";
+export type MenuItemType = "campaigns" | "members" | "project";
 
 const NavigationBar = ({ projectId = null }: { projectId?: string | null }) => {
   const { pathname } = useRouter();
-  const [_menuItemType, _setMenuItemType] = useState<MenuItemType>("");
+  const [_menuItemType, _setMenuItemType] = useState<MenuItemType>("campaigns");
   useEffect(() => {
-    if (pathname.includes("/members")) {
+    if (pathname.includes("/campaigns")) {
+      _setMenuItemType("campaigns");
+    } else if (pathname.includes("/members")) {
       _setMenuItemType("members");
     } else {
-      _setMenuItemType("campaigns");
+      _setMenuItemType("project");
     }
   }, [pathname]);
 
@@ -49,7 +51,7 @@ const NavigationBar = ({ projectId = null }: { projectId?: string | null }) => {
     <Box h={8}>
       <Container maxWidth="6xl" h="100%">
         <Flex align="center" gap={4} h="100%">
-          <NextLink href={`/dashboard/${projectId}`}>
+          <NextLink href={`/dashboard/${projectId}/campaigns`}>
             <Button
               fontWeight="bold"
               fontSize="sm"
@@ -71,6 +73,18 @@ const NavigationBar = ({ projectId = null }: { projectId?: string | null }) => {
               variant={_menuItemType === "members" ? "solid" : "ghost"}
             >
               Team
+            </Button>
+          </NextLink>
+          <NextLink href={`/dashboard/${projectId}/`}>
+            <Button
+              fontWeight="bold"
+              fontSize="sm"
+              size="xs"
+              style={{ borderRadius: 20 }}
+              colorScheme={_menuItemType === "project" ? "blue" : "white"}
+              variant={_menuItemType === "project" ? "solid" : "ghost"}
+            >
+              Project Treasury
             </Button>
           </NextLink>
           <Spacer />

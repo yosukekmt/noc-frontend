@@ -20,7 +20,6 @@ export const useCouponsApi = () => {
           imageUrl: d.imageUrl,
           contractAddress: d.contractAddress,
           nftTokenId: d.nftTokenId,
-          treasuryAddress: d.treasuryAddress,
           timezone: d.timezone,
           startAt: new Date(d.startAt),
           endAt: new Date(d.endAt),
@@ -41,7 +40,7 @@ export const useCouponsApi = () => {
       data: {
         projectId: string;
         chainId: number;
-        rewardType: "gas_fee_cashback";
+        rewardType: "cashback_gas" | "cashback_005";
         name: string;
         description: string;
         timezone: string;
@@ -142,23 +141,6 @@ export const useCouponsApi = () => {
     [apiClient]
   );
 
-  const callWithdraw = useCallback(
-    async (
-      authToken: string,
-      projectId: string,
-      id: string,
-      walletAddress: string
-    ): Promise<void> => {
-      const data = { walletAddress };
-      await apiClient.put(`/coupons/${id}/withdraw`, data, {
-        params: { project_id: projectId },
-        headers: { Authorization: authToken },
-      });
-      return;
-    },
-    [apiClient]
-  );
-
   const getStatus = useCallback(
     (
       item: Coupon
@@ -172,8 +154,7 @@ export const useCouponsApi = () => {
       if (!!item.invalidatedAt) {
         return "invalidated";
       }
-      const isReady =
-        !!item.contractAddress && !!item.nftTokenId && !!item.treasuryAddress;
+      const isReady = !!item.contractAddress && !!item.nftTokenId;
       const currentTime = new Date().getTime();
       if (!isReady) {
         const processThreashold = 20 * 60 * 1000; // 20 minutes
@@ -204,7 +185,6 @@ export const useCouponsApi = () => {
     callCreateCoupons,
     callDeleteCoupon,
     callGetUploadUrl,
-    callWithdraw,
     getStatus,
   };
 };

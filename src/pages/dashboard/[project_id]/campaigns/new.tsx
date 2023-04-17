@@ -58,6 +58,9 @@ export default function NewCoupon() {
   const [nfts, setNfts] = useState<Nft[]>([]);
   const [chains, setChains] = useState<Chain[]>([]);
   const [chainId, setChainId] = useState<number | null>(null);
+  const [rewardType, setRewardType] = useState<"cashback_gas" | "cashback_005">(
+    "cashback_gas"
+  );
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -120,7 +123,7 @@ export default function NewCoupon() {
       authToken: string,
       projectId: string,
       chainId: number,
-      rewardType: "gas_fee_cashback",
+      rewardType: "cashback_gas" | "cashback_005",
       name: string,
       description: string,
       timezone: string,
@@ -143,7 +146,7 @@ export default function NewCoupon() {
           nftIds,
           imageUrl,
         });
-        router.push(`/dashboard/${projectId}/coupons/${item.id}`);
+        router.push(`/dashboard/${projectId}/campaigns/${item.id}`);
       } catch (err: unknown) {
         console.error(err);
 
@@ -193,7 +196,7 @@ export default function NewCoupon() {
       authToken,
       projectId,
       chainId!,
-      "gas_fee_cashback",
+      rewardType,
       name,
       description,
       timezone,
@@ -297,6 +300,26 @@ export default function NewCoupon() {
                     </Flex>
                   )}
                 </Box>
+              </FormControl>
+              <FormControl mt={2}>
+                <FormLabel fontSize="sm">Reward type</FormLabel>
+
+                <Select
+                  size="sm"
+                  bg="white"
+                  name="rewardType"
+                  value={rewardType}
+                  onChange={(evt) =>
+                    setRewardType(
+                      evt.target.value as "cashback_gas" | "cashback_005"
+                    )
+                  }
+                >
+                  <option value="cashback_gas">Gas fee cashback</option>;
+                  <option value="cashback_005">5% Cashback</option>;
+                </Select>
+
+                <Box h={8} mt={2}></Box>
               </FormControl>
               <FormControl>
                 <FormLabel fontSize="sm">Coupon Description</FormLabel>

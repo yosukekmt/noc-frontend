@@ -22,7 +22,7 @@ export default function Dashboard() {
       if (items.length === 0) {
         newDialog.onOpen();
       } else {
-        router.push(`/dashboard/${items[0].id}`);
+        router.push(`/dashboard/${items[0].id}/campaigns`);
       }
     },
     [callGetProjects, newDialog, router]

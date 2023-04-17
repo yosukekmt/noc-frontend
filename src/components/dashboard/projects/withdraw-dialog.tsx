@@ -1,8 +1,8 @@
 import { useApiClient } from "@/hooks/useApiClient";
-import { useCouponsApi } from "@/hooks/useCouponsApi";
 import { useFirebase } from "@/hooks/useFirebase";
+import { useProjectsApi } from "@/hooks/useProjectsApi";
 import { useValidator } from "@/hooks/useValidator";
-import { Coupon } from "@/models";
+import { Chain, Project } from "@/models";
 import { WarningTwoIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -24,8 +24,8 @@ import {
 import { FormEvent, useCallback, useMemo, useState } from "react";
 
 export default function WithdrawDialog(props: {
-  projectId: string;
-  coupon: Coupon;
+  project: Project;
+  chain: Chain;
   isOpen: boolean;
   onClose(): void;
   onOpen(): void;
@@ -34,7 +34,7 @@ export default function WithdrawDialog(props: {
   const { isOpen, onClose, onOpen } = props;
   const { authToken } = useFirebase();
   const { validateContractAddress } = useValidator();
-  const { callWithdraw } = useCouponsApi();
+  const { callWithdraw } = useProjectsApi();
   const { getErrorMessage } = useApiClient();
   const [walletAddress, setWalletAddress] = useState("");
   const [isAttempted, setIsAttempted] = useState(false);
@@ -48,18 +48,13 @@ export default function WithdrawDialog(props: {
   const requestWithdraw = useCallback(
     async (
       authToken: string,
-      projectId: string,
-      couponId: string,
+      id: string,
+      chainId: number,
       walletAddress: string
     ) => {
       setIsLoading(true);
       try {
-        const item = await callWithdraw(
-          authToken,
-          projectId,
-          couponId,
-          walletAddress
-        );
+        const item = await callWithdraw(authToken, id, chainId, walletAddress);
         props.onSubmitted();
         onClose();
       } catch (err: unknown) {
@@ -83,7 +78,7 @@ export default function WithdrawDialog(props: {
     if (!isValidWalletAddress) {
       return;
     }
-    requestWithdraw(authToken, props.projectId, props.coupon.id, walletAddress);
+    requestWithdraw(authToken, props.project.id, props.chain.id, walletAddress);
   };
 
   return (
@@ -106,6 +101,17 @@ export default function WithdrawDialog(props: {
             </Box>
             <Divider my={4} />
             <FormControl>
+              <FormLabel fontSize="sm">Network</FormLabel>
+              <Input
+                size="sm"
+                bg="white"
+                type="text"
+                name="name"
+                disabled={true}
+                value={props.chain.name}
+              />
+            </FormControl>
+            <FormControl mt={4}>
               <FormLabel fontSize="sm">Reimbursement wallet address</FormLabel>
               <Input
                 size="sm"

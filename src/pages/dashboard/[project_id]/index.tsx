@@ -1,23 +1,24 @@
+import WithdrawSubmittedDialog from "@/components/dashboard/projects/withdraw-submitted-dialog";
+import WithdrawDialog from "@/components/dashboard/projects/withdraw-dialog";
 import HtmlHead from "@/components/html-head";
+import { useBlockchain } from "@/hooks/useBlockchain";
 import { useChainsApi } from "@/hooks/useChainsApi";
-import { useCouponsApi } from "@/hooks/useCouponsApi";
-import { useCurrentUserApi } from "@/hooks/useCurrentUserApi";
 import { useFirebase } from "@/hooks/useFirebase";
+import { useProjectsApi } from "@/hooks/useProjectsApi";
 import DashboardLayout from "@/layouts/dashboard-layout";
-import { Chain, Coupon } from "@/models";
+import { Chain, Project } from "@/models";
 import {
   Box,
   Button,
   Card,
   CardHeader,
-  Center,
   Divider,
-  Flex,
   Grid,
   GridItem,
   Heading,
+  Icon,
+  Link,
   Skeleton,
-  Spacer,
   Table,
   TableContainer,
   Tbody,
@@ -26,133 +27,90 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from "@chakra-ui/react";
-import NextLink from "next/link";
 import { useRouter } from "next/router";
+import { ArrowSquareOut, Swap } from "phosphor-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-const LoadingTBody = () => {
+const TableCell = (props: { project: Project; chain: Chain }) => {
+  const { getExplorerAddressUrl } = useBlockchain();
+  const requestDialog = useDisclosure();
+  const requestedDialog = useDisclosure();
+
+  const walletExplorerUrl = useMemo(() => {
+    return getExplorerAddressUrl(
+      props.chain.explorerUrl,
+      props.project.walletAddress
+    );
+  }, [
+    getExplorerAddressUrl,
+    props.chain.explorerUrl,
+    props.project.walletAddress,
+  ]);
+
+  const clickWithdraw = () => {
+    requestDialog.onOpen();
+  };
+
+  const onSubmitted = () => {
+    requestedDialog.onOpen();
+  };
   return (
-    <Tbody>
-      {[...Array(3)].flatMap((x, idx) => {
-        return (
-          <Tr key={`coupon_${idx}`} h={16}>
-            <Td>
-              <Skeleton h={4} />
-            </Td>
-            <Td>
-              <Skeleton h={4} />
-            </Td>
-            <Td>
-              <Skeleton h={4} />
-            </Td>
-            <Td>
-              <Skeleton h={4} />
-            </Td>
-            <Td>
-              <Skeleton h={4} />
-            </Td>
-          </Tr>
-        );
-      })}
-    </Tbody>
+    <>
+      <Td>
+        <Text fontWeight="normal" fontSize="sm">
+          <Link href={walletExplorerUrl} isExternal>
+            <Button
+              size="xs"
+              variant="ghost"
+              leftIcon={<Icon as={ArrowSquareOut} />}
+            >
+              Details
+            </Button>
+          </Link>
+          <Button
+            size="xs"
+            variant="ghost"
+            leftIcon={<Icon as={Swap} />}
+            onClick={clickWithdraw}
+          >
+            Withdraw
+          </Button>
+        </Text>
+      </Td>
+      <WithdrawDialog
+        project={props.project}
+        chain={props.chain}
+        isOpen={requestDialog.isOpen}
+        onClose={requestDialog.onClose}
+        onOpen={requestDialog.onOpen}
+        onSubmitted={onSubmitted}
+      />
+      <WithdrawSubmittedDialog
+        project={props.project}
+        chain={props.chain}
+        isOpen={requestedDialog.isOpen}
+        onClose={requestedDialog.onClose}
+        onOpen={requestedDialog.onOpen}
+      />
+    </>
   );
 };
 
-const LoadedTbodyRow = (props: {
-  chains: Chain[];
-  projectId: string;
-  item: Coupon;
-}) => {
-  const { getStatus } = useCouponsApi();
-
-  const detailUrl = useMemo(() => {
-    return `/dashboard/${props.projectId}/coupons/${props.item.id}`;
-  }, [props.item.id, props.projectId]);
-
-  const chain = useMemo(() => {
-    return props.chains.find((chain) => chain.id === props.item.chainId);
-  }, [props.chains, props.item.chainId]);
-
-  const status = useMemo(() => {
-    return getStatus(props.item);
-  }, [getStatus, props.item]);
-
-  return (
-    <Tr key={`coupon_${props.item.id}`} h={8}>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink href={detailUrl} style={{ width: "100%", display: "block" }}>
-          <Text>{props.item.name}</Text>
-        </NextLink>
-      </Td>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink href={detailUrl} style={{ width: "100%", display: "block" }}>
-          Gas fee cashback
-        </NextLink>
-      </Td>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink href={detailUrl} style={{ width: "100%", display: "block" }}>
-          {chain && chain.name}
-        </NextLink>
-      </Td>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink href={detailUrl} style={{ width: "100%", display: "block" }}>
-          {status === "processing" && "Processing"}
-          {status === "scheduled" && "Scheduled"}
-          {status === "ongoing" && "Ongoing"}
-          {status === "finished" && "Finished"}
-          {status === "failed" && "Could not process"}
-          {status === "invalidated" && "Invalidated"}
-        </NextLink>
-      </Td>
-      <Td fontWeight="normal" fontSize="sm">
-        <NextLink href={detailUrl} style={{ width: "100%", display: "block" }}>
-          {props.item.createdAt.toLocaleString()}
-        </NextLink>
-      </Td>
-    </Tr>
-  );
-};
-
-const LoadedTbody = (props: {
-  chains: Chain[];
-  projectId: string;
-  items: Coupon[];
-}) => {
-  return (
-    <Tbody>
-      {0 === props.items.length && (
-        <Tr key={"coupons_empty"} h={16}>
-          <Td colSpan={5}>
-            <Center>There is not any coupons.</Center>
-          </Td>
-        </Tr>
-      )}
-      {0 < props.items.length &&
-        props.items.flatMap((item) => {
-          return (
-            <LoadedTbodyRow
-              chains={props.chains}
-              projectId={props.projectId}
-              item={item}
-            />
-          );
-        })}
-    </Tbody>
-  );
-};
-
-export default function Project() {
+export default function ProjectCampaigns() {
   const router = useRouter();
-  const { project_id: projectId } = router.query;
-  const { firebaseSignOut } = useFirebase();
-  const { clearCurrentUser } = useCurrentUserApi();
+  const { project_id } = router.query;
   const { callGetChains } = useChainsApi();
-  const { callGetCoupons } = useCouponsApi();
+  const { callGetProject } = useProjectsApi();
   const [chains, setChains] = useState<Chain[]>([]);
-  const [items, setItems] = useState<Coupon[]>([]);
+  const [item, setItem] = useState<Project | undefined>(undefined);
   const { authToken, isFirebaseInitialized } = useFirebase();
   const [isInitialized, setIsInitialized] = useState(false);
+
+  const projectId = useMemo(() => {
+    return project_id && (project_id as string);
+  }, [project_id]);
 
   const getChains = useCallback(
     async (authToken: string): Promise<void> => {
@@ -162,29 +120,13 @@ export default function Project() {
     [callGetChains]
   );
 
-  const getCoupons = useCallback(
-    async (authToken: string): Promise<void> => {
-      const items = await callGetCoupons(authToken, projectId as string);
-      setItems(items);
+  const getProject = useCallback(
+    async (authToken: string, projectId: string): Promise<void> => {
+      const item = await callGetProject(authToken, projectId);
+      setItem(item);
     },
-    [callGetCoupons, projectId]
+    [callGetProject]
   );
-
-  useEffect(() => {
-    if (!isFirebaseInitialized) return;
-    if (authToken) return;
-
-    firebaseSignOut();
-    clearCurrentUser();
-    router.push("/");
-    return;
-  }, [
-    authToken,
-    clearCurrentUser,
-    firebaseSignOut,
-    isFirebaseInitialized,
-    router,
-  ]);
 
   useEffect(() => {
     if (!isFirebaseInitialized) return;
@@ -192,40 +134,33 @@ export default function Project() {
 
     (async () => {
       await getChains(authToken);
-      await getCoupons(authToken);
+    })();
+  }, [authToken, getChains, isFirebaseInitialized]);
+
+  useEffect(() => {
+    if (!isFirebaseInitialized) return;
+    if (!authToken) return;
+    if (!projectId) return;
+
+    (async () => {
+      await getProject(authToken, projectId);
       setIsInitialized(true);
     })();
-  }, [authToken, getChains, getCoupons, isFirebaseInitialized]);
-
-  const clickNew = () => {
-    router.push(`/dashboard/${projectId}/coupons/new`);
-  };
+  }, [authToken, getProject, isFirebaseInitialized, projectId]);
 
   return (
     <>
       <HtmlHead />
-      <DashboardLayout projectId={projectId as string}>
+      <DashboardLayout projectId={projectId}>
         <Card variant="outline">
           <CardHeader>
             <Grid templateColumns="repeat(12, 1fr)" gap={4}>
-              <GridItem colSpan={{ base: 12, sm: 6 }}>
+              <GridItem colSpan={{ base: 12 }}>
                 <Box>
                   <Heading as="h3" fontSize="2xl" fontWeight="bold">
-                    Campaigns
+                    Project Treasury
                   </Heading>
                 </Box>
-              </GridItem>
-              <GridItem colSpan={{ base: 12, sm: 6 }}>
-                <Flex align="center" h="100%">
-                  <Spacer />
-                  <Button
-                    size="sm"
-                    w={{ base: "100%", sm: "inherit" }}
-                    onClick={clickNew}
-                  >
-                    New Campaign
-                  </Button>
-                </Flex>
               </GridItem>
             </Grid>
           </CardHeader>
@@ -235,21 +170,39 @@ export default function Project() {
               <Thead>
                 <Tr>
                   <Th>NAME</Th>
-                  <Th>REWARD TYPE</Th>
-                  <Th>NETWORK</Th>
-                  <Th>STATUS</Th>
-                  <Th>CREATED</Th>
+                  <Th>WALLET ADDRESS</Th>
+                  {chains.map((chain) => {
+                    return <Th key={`chain_${chain.id}`}>{chain.name}</Th>;
+                  })}
                 </Tr>
               </Thead>
-              {isInitialized ? (
-                <LoadedTbody
-                  chains={chains}
-                  projectId={projectId as string}
-                  items={items}
-                />
-              ) : (
-                <LoadingTBody />
-              )}
+              <Tbody>
+                <Tr>
+                  <Td>
+                    <Text fontWeight="normal" fontSize="sm">
+                      {item && item.name}
+                    </Text>
+                  </Td>
+                  <Td>
+                    <Text fontWeight="normal" fontSize="sm">
+                      {item && item.walletAddress}
+                    </Text>
+                  </Td>
+                  {chains.map((chain) => {
+                    if (item) {
+                      return (
+                        <TableCell
+                          key={`chain_${chain.id}`}
+                          project={item}
+                          chain={chain}
+                        />
+                      );
+                    } else {
+                      return <Skeleton key={`chain_${chain.id}`} h={4} />;
+                    }
+                  })}
+                </Tr>
+              </Tbody>
             </Table>
           </TableContainer>
         </Card>
