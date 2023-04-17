@@ -305,11 +305,6 @@ const TresurySection = (props: {
   isInitialized: boolean;
   chain: Chain | undefined;
   project: Project | undefined;
-  coupon: Coupon | undefined;
-  nfts: Nft[];
-  projectId: string | undefined;
-  couponId: string | undefined;
-  clickDelete: () => void;
 }) => {
   const { truncateContractAddress, getExplorerAddressUrl } = useBlockchain();
 
@@ -322,7 +317,7 @@ const TresurySection = (props: {
       props.chain.explorerUrl,
       props.project.walletAddress
     );
-  }, [getExplorerAddressUrl, props.chain, props.coupon]);
+  }, [props.chain, props.project, getExplorerAddressUrl]);
 
   return (
     <>
@@ -683,10 +678,6 @@ export default function CouponDetail() {
             isInitialized={isInitialized}
             chain={chain}
             project={project}
-            coupon={coupon}
-            nfts={nfts}
-            couponId={couponId}
-            clickDelete={clickDelete}
           />
           <CouponHoldersSection
             isInitialized={isInitialized}
