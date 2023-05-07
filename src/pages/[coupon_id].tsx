@@ -1,5 +1,5 @@
+import ClaimButton from "@/components/claim/claim-button";
 import HtmlHead from "@/components/html-head";
-import MintingDialog from "@/components/minting-dialog";
 import Footer from "@/components/session/footer";
 import Header from "@/components/session/header";
 import { useBlockchain } from "@/hooks/useBlockchain";
@@ -17,64 +17,25 @@ import {
   Spacer,
   Text,
   Tooltip,
-  useDisclosure,
   VStack,
 } from "@chakra-ui/react";
-import {
-  ThirdwebProvider,
-  useAddress,
-  useContract,
-  Web3Button,
-} from "@thirdweb-dev/react";
-import { SmartContract } from "@thirdweb-dev/sdk";
 import { useRouter } from "next/router";
 import { Spinner } from "phosphor-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 const MintBody = (props: { coupon: Coupon; chain: Chain; nfts: Nft[] }) => {
-  const address = useAddress();
   const { formatWithTimezone } = useDatetime();
   const { truncateContractAddress } = useBlockchain();
-  const [txHash, setTxHash] = useState<string | null>(null);
-  const [mintingStatus, setMintingStatus] = useState<
-    "started" | "succeeded" | "failed"
-  >("started");
-  const mintingDialog = useDisclosure();
-
-  useContract(props.coupon.contractAddress, "edition-drop");
-
   const startAtStr = useMemo(() => {
     if (!props.coupon.startAt) return;
     if (!props.coupon.timezone) return;
-
     return formatWithTimezone(props.coupon.startAt, props.coupon.timezone);
   }, [formatWithTimezone, props.coupon.startAt, props.coupon.timezone]);
-
   const endAtStr = useMemo(() => {
     if (!props.coupon.endAt) return;
     if (!props.coupon.timezone) return;
-
     return formatWithTimezone(props.coupon.endAt, props.coupon.timezone);
   }, [formatWithTimezone, props.coupon.endAt, props.coupon.timezone]);
-
-  const clickClaim = async (contract: SmartContract) => {
-    mintingDialog.onOpen();
-    setMintingStatus("started");
-    const result = await contract.erc1155.claim(props.coupon.nftTokenId, 1);
-    setTxHash(result.receipt.transactionHash);
-  };
-
-  const onSuccess = (result: SmartContract) => {
-    console.log("result");
-    console.log(result);
-    setMintingStatus("succeeded");
-  };
-
-  const onError = (err: unknown) => {
-    console.error("err");
-    console.error(err);
-    setMintingStatus("failed");
-  };
 
   return (
     <>
@@ -176,16 +137,7 @@ const MintBody = (props: { coupon: Coupon; chain: Chain; nfts: Nft[] }) => {
                     })}
                   </VStack>
                   <Box mt={8}>
-                    <Web3Button
-                      contractAddress={props.coupon.contractAddress}
-                      colorMode="light"
-                      accentColor="black"
-                      action={(contract) => clickClaim(contract)}
-                      onSuccess={(result) => onSuccess(result)}
-                      onError={(error) => onError(error)}
-                    >
-                      Claim Gasback NFT
-                    </Web3Button>
+                    <ClaimButton chain={props.chain} coupon={props.coupon} />
                   </Box>
                   <Text fontSize="sm" mt={2}>
                     Not sure how to use it?
@@ -199,14 +151,7 @@ const MintBody = (props: { coupon: Coupon; chain: Chain; nfts: Nft[] }) => {
           <Footer />
         </Box>
       </Box>
-      <MintingDialog
-        chain={props.chain}
-        txHash={txHash}
-        status={mintingStatus}
-        isOpen={mintingDialog.isOpen}
-        onClose={mintingDialog.onClose}
-        onOpen={mintingDialog.onOpen}
-      />
+      s
     </>
   );
 };
@@ -255,11 +200,7 @@ export default function Mint() {
   return (
     <>
       <HtmlHead />
-      {item && chain && (
-        <ThirdwebProvider activeChain={chain.id as 1 | 5 | 137 | 80001}>
-          {item && <MintBody coupon={item} chain={chain} nfts={nfts} />}
-        </ThirdwebProvider>
-      )}
+      {item && chain && <MintBody coupon={item} chain={chain} nfts={nfts} />}
     </>
   );
 }

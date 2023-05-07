@@ -15,16 +15,15 @@
     "@emotion/styled": "^11.10.6",
     "@faker-js/faker": "^7.6.0",
     "@next/font": "13.1.5",
-    "@thirdweb-dev/react": "^3.10.3",
-    "@thirdweb-dev/sdk": "^3.10.3",
     "@types/node": "18.11.18",
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
     "axios": "^1.3.5",
     "chart.js": "^4.2.1",
+    "connectkit": "^1.2.3",
     "eslint": "8.32.0",
     "eslint-config-next": "13.1.5",
-    "ethers": "5",
+    "ethers": "^5",
     "firebase": "^9.17.1",
     "framer-motion": "^9.0.4",
     "jotai": "^1.13.1",
@@ -36,7 +35,8 @@
     "react-chartjs-2": "^5.2.0",
     "react-dom": "18.2.0",
     "typescript": "^4.7.4",
-    "tzdata": "^1.0.36"
+    "tzdata": "^1.0.36",
+    "wagmi": "^0.12.12"
   },
   "devDependencies": {
     "@types/luxon": "^3.2.0"

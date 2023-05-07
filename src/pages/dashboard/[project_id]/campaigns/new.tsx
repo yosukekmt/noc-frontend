@@ -44,7 +44,11 @@ export default function NewCoupon() {
   const { callCreateCoupons } = useCouponsApi();
   const { authToken, isFirebaseInitialized } = useFirebase();
   const { truncateContractAddress } = useBlockchain();
-  const { validateCouponsName, validateCouponsDescription } = useValidator();
+  const {
+    validateCouponsName,
+    validateCouponsDescription,
+    validateCouponSupply,
+  } = useValidator();
   const {
     getDefaultTimezone,
     getDefaultStartDate,
@@ -63,6 +67,7 @@ export default function NewCoupon() {
   );
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [supply, setSupply] = useState(1000);
   const [imageUrl, setImageUrl] = useState("");
   const [timezone, setTimezone] = useState(getDefaultTimezone());
   const [startDate, setStartDate] = useState<string>(getDefaultStartDate());
@@ -99,6 +104,9 @@ export default function NewCoupon() {
   const isValidDescription = useMemo(() => {
     return validateCouponsDescription(description);
   }, [validateCouponsDescription, description]);
+  const isValidSupply = useMemo(() => {
+    return validateCouponSupply(supply);
+  }, [validateCouponSupply, supply]);
   const isValidImageUrl = useMemo(() => {
     return imageUrl && imageUrl.startsWith("http");
   }, [imageUrl]);
@@ -106,6 +114,16 @@ export default function NewCoupon() {
     if (!chainId) return null;
     return chains.find((item) => item.id === chainId);
   }, [chainId, chains]);
+
+  const timezoneOptions = useMemo((): { value: string; text: string }[] => {
+    const zones = getTimezoneOffsets();
+    return zones.flatMap((zone) => {
+      return {
+        value: zone.name,
+        text: `${zone.name} (${zone.offset})`,
+      };
+    });
+  }, [getTimezoneOffsets]);
 
   const getChains = useCallback(
     async (authToken: string): Promise<void> => {
@@ -126,6 +144,7 @@ export default function NewCoupon() {
       rewardType: "cashback_gas" | "cashback_005",
       name: string,
       description: string,
+      supply: number,
       timezone: string,
       startAt: Date,
       endAt: Date,
@@ -140,6 +159,7 @@ export default function NewCoupon() {
           rewardType,
           name,
           description,
+          supply,
           timezone,
           startAt,
           endAt,
@@ -190,6 +210,7 @@ export default function NewCoupon() {
     if (!isValidNftIds) return;
     if (!isValidName) return;
     if (!isValidDescription) return;
+    if (!isValidSupply) return;
     if (!isValidImageUrl) return;
 
     callApiCreateToken(
@@ -199,6 +220,7 @@ export default function NewCoupon() {
       rewardType,
       name,
       description,
+      supply,
       timezone,
       startAt,
       endtAt,
@@ -233,7 +255,11 @@ export default function NewCoupon() {
                     }
                   >
                     {chains.flatMap((chain) => {
-                      return <option value={chain.id}>{chain.name}</option>;
+                      return (
+                        <option value={chain.id} key={`chain_${chain.id}`}>
+                          {chain.name}
+                        </option>
+                      );
                     })}
                   </Select>
                 )}
@@ -301,26 +327,48 @@ export default function NewCoupon() {
                   )}
                 </Box>
               </FormControl>
-              <FormControl mt={2}>
-                <FormLabel fontSize="sm">Reward type</FormLabel>
-
-                <Select
-                  size="sm"
-                  bg="white"
-                  name="rewardType"
-                  value={rewardType}
-                  onChange={(evt) =>
-                    setRewardType(
-                      evt.target.value as "cashback_gas" | "cashback_005"
-                    )
-                  }
-                >
-                  <option value="cashback_gas">Gas fee cashback</option>;
-                  <option value="cashback_005">5% Cashback</option>;
-                </Select>
-
-                <Box h={8} mt={2}></Box>
-              </FormControl>
+              <Grid templateColumns="repeat(12, 1fr)" gap={4}>
+                <GridItem colSpan={{ base: 12, sm: 6 }}>
+                  <FormControl mt={2}>
+                    <FormLabel fontSize="sm">Reward type</FormLabel>
+                    <Select
+                      size="sm"
+                      bg="white"
+                      name="rewardType"
+                      value={rewardType}
+                      onChange={(evt) =>
+                        setRewardType(
+                          evt.target.value as "cashback_gas" | "cashback_005"
+                        )
+                      }
+                    >
+                      <option value="cashback_gas">Gas fee cashback</option>;
+                      <option value="cashback_005">5% Cashback</option>;
+                    </Select>
+                    <Box h={8} mt={2}></Box>
+                  </FormControl>
+                </GridItem>
+                <GridItem colSpan={{ base: 12, sm: 6 }}>
+                  <FormControl mt={2}>
+                    <FormLabel fontSize="sm">
+                      Number of Supply (1-10000)
+                    </FormLabel>
+                    <Input
+                      size="sm"
+                      bg="white"
+                      type="number"
+                      name="coupon_supply"
+                      min={1}
+                      max={10000}
+                      value={supply.toString()}
+                      onChange={(evt) =>
+                        setSupply(Number.parseInt(evt.target.value))
+                      }
+                    />
+                    <Box h={8} mt={2}></Box>
+                  </FormControl>
+                </GridItem>
+              </Grid>
               <FormControl>
                 <FormLabel fontSize="sm">Coupon Description</FormLabel>
                 <Textarea
@@ -346,10 +394,12 @@ export default function NewCoupon() {
                   )}
                 </Box>
               </FormControl>
-              <ImageUploadInput
-                projectId={projectId}
-                onUploaded={setImageUrl}
-              />
+              <Box>
+                <ImageUploadInput
+                  projectId={projectId}
+                  onUploaded={setImageUrl}
+                />
+              </Box>
               <FormControl>
                 <FormLabel fontSize="sm">Timezone</FormLabel>
                 <Select
@@ -359,10 +409,10 @@ export default function NewCoupon() {
                   value={timezone}
                   onChange={(evt) => setTimezone(evt.target.value)}
                 >
-                  {getTimezoneOffsets().flatMap((tz, idx) => {
+                  {timezoneOptions.flatMap((tz, idx) => {
                     return (
-                      <option value={tz.name} key={`timezone_${idx}`}>
-                        {`${tz.name} (${tz.offset})`}
+                      <option value={tz.value} key={`timezone_${idx}`}>
+                        {tz.text}
                       </option>
                     );
                   })}
@@ -426,7 +476,7 @@ export default function NewCoupon() {
                   </FormControl>
                 </GridItem>
               </Grid>
-              <Flex mt={4}>
+              <Flex mt={4} mb={32}>
                 <NextLink href={`/dashboard/${projectId}`}>
                   <Button size="sm">Cancel</Button>
                 </NextLink>

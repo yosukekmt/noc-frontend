@@ -1,4 +1,4 @@
-import { Coupon, Nft, Chain } from "@/models";
+import { Chain, Coupon, CouponTransfer, Nft } from "@/models";
 import { useCallback } from "react";
 import { useApiClient } from "./useApiClient";
 
@@ -64,5 +64,54 @@ export const usePublicApi = () => {
     },
     [apiClient]
   );
-  return { callGetCoupon, callGetChain, callGetNfts };
+
+  const callCreateCouponTransfer = useCallback(
+    async (data: {
+      couponId: string;
+      walletAddress: string;
+      signedMessage: string;
+      signature: string;
+    }): Promise<CouponTransfer> => {
+      const resp = await apiClient.post("/public/coupon_transfers", data, {});
+      const item = {
+        id: resp.data.id,
+        couponId: resp.data.couponId,
+        walletAddress: resp.data.walletAddress,
+        txHash: resp.data.txHash,
+        succeededAt: new Date(resp.data.succeededAt),
+        failedAt: new Date(resp.data.failedAt),
+        createdAt: new Date(resp.data.createdAt),
+        updatedAt: new Date(resp.data.updatedAt),
+      };
+      return item;
+    },
+    [apiClient]
+  );
+
+  const callGetCouponTransfer = useCallback(
+    async (id: string): Promise<CouponTransfer> => {
+      console.log("callGetCouponTransfer");
+      console.log("id:" + id);
+      const resp = await apiClient.get(`/public/coupon_transfers/${id}`);
+      const item = {
+        id: resp.data.id,
+        couponId: resp.data.couponId,
+        walletAddress: resp.data.walletAddress,
+        txHash: resp.data.txHash,
+        succeededAt: new Date(resp.data.succeededAt),
+        failedAt: new Date(resp.data.failedAt),
+        createdAt: new Date(resp.data.createdAt),
+        updatedAt: new Date(resp.data.updatedAt),
+      };
+      return item;
+    },
+    [apiClient]
+  );
+  return {
+    callGetCoupon,
+    callGetChain,
+    callGetNfts,
+    callCreateCouponTransfer,
+    callGetCouponTransfer,
+  };
 };

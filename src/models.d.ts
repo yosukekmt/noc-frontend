@@ -94,3 +94,14 @@ export type Chain = {
   explorerUrl: string;
   openseaUrl: string;
 };
+
+export type CouponTransfer = {
+  id: string;
+  walletAddress: string;
+  txHash: string;
+  couponId: string;
+  succeededAt: Date;
+  failedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+};

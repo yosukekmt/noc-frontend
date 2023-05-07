@@ -17,6 +17,10 @@ export const useValidator = () => {
     return /^.{1,}$/.test(arg);
   }, []);
 
+  const validateCouponSupply = useCallback((arg: number) => {
+    return 0 < arg && arg <= 10000;
+  }, []);
+
   const validateCouponsDescription = useCallback((arg: string) => {
     return /^.{1,}$/.test(arg);
   }, []);
@@ -31,6 +35,7 @@ export const useValidator = () => {
     validatePassword,
     validateCouponsName,
     validateCouponsDescription,
+    validateCouponSupply,
     validateContractAddress,
   };
 };

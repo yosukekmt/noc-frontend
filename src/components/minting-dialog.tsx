@@ -1,6 +1,8 @@
 import { useBlockchain } from "@/hooks/useBlockchain";
-import { Chain } from "@/models";
+import { usePublicApi } from "@/hooks/usePublicApi";
+import { Chain, Coupon, CouponTransfer } from "@/models";
 import {
+  Box,
   Button,
   Flex,
   Heading,
@@ -13,27 +15,56 @@ import {
   ModalOverlay,
   Text,
 } from "@chakra-ui/react";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import MintError from "./mint-error";
 import MintLoading from "./mint-loading";
 import MintSuccess from "./mint-success";
 
 export default function MintingDialog(props: {
   chain: Chain;
-  txHash: string | null;
-  status: "started" | "succeeded" | "failed";
+  coupon: Coupon;
+  couponTransfer: CouponTransfer;
   isOpen: boolean;
   onClose(): void;
   onOpen(): void;
 }) {
   const { getExplorerTxUrl } = useBlockchain();
+  const { callGetCouponTransfer } = usePublicApi();
+  const [item, setItem] = useState<CouponTransfer>(props.couponTransfer);
+
+  const mintingStatus = useMemo<"started" | "succeeded" | "failed">(() => {
+    if (item.succeededAt) return "succeeded";
+    if (item.failedAt) return "failed";
+    return "started";
+  }, [item.failedAt, item.succeededAt]);
 
   const explorerUrl = useMemo(() => {
     if (!props.chain) return;
     if (!props.chain.explorerUrl) return;
-    if (!props.txHash) return;
-    return getExplorerTxUrl(props.chain.explorerUrl, props.txHash);
-  }, [getExplorerTxUrl, props.chain, props.txHash]);
+    if (!props.couponTransfer.txHash) return;
+    return getExplorerTxUrl(
+      props.chain.explorerUrl,
+      props.couponTransfer.txHash
+    );
+  }, [getExplorerTxUrl, props.chain, props.couponTransfer.txHash]);
+
+  const getCouponTransfer = useCallback(
+    async (id: string) => {
+      try {
+        const item = await callGetCouponTransfer(id);
+        setItem(item);
+
+        if (!item.succeededAt && !item.failedAt) {
+          setTimeout(() => {
+            getCouponTransfer(props.couponTransfer.id);
+          }, 10000);
+        }
+      } catch (err: unknown) {
+        console.error(err);
+      }
+    },
+    [callGetCouponTransfer, props.couponTransfer.id]
+  );
 
   return (
     <Modal
@@ -46,21 +77,22 @@ export default function MintingDialog(props: {
         <ModalHeader />
         <ModalBody>
           <Heading as="h3" size="lg">
-            {props.status === "started" && "Processing..."}
-            {props.status === "succeeded" && "Success!"}
-            {props.status === "failed" && "Error :("}
+            {mintingStatus === "started" && "Processing..."}
+            {mintingStatus === "succeeded" && "Success!"}
+            {mintingStatus === "failed" && "Error :("}
           </Heading>
           <Text fontSize="sm" color="gray" py={4}>
-            {props.status === "started" && "Your Gasback NFT is on its way!"}
-            {props.status === "succeeded" &&
-              "Check your wallet to find your Gasback NFT. You can safely close this window now."}
-            {props.status === "failed" &&
+            {mintingStatus === "started" &&
+              "Your Cashback Coupon is on its way!"}
+            {mintingStatus === "succeeded" &&
+              "Check your wallet to find your Cashback Coupon. You can safely close this window now."}
+            {mintingStatus === "failed" &&
               "Did you declined? or the transaction fee might have been unexpectedly high. Try again."}
           </Text>
           <Flex w="100%" justify="center">
-            {props.status === "started" && <MintLoading />}
-            {props.status === "succeeded" && <MintSuccess />}
-            {props.status === "failed" && <MintError />}
+            {mintingStatus === "started" && <MintLoading />}
+            {mintingStatus === "succeeded" && <MintSuccess />}
+            {mintingStatus === "failed" && <MintError />}
           </Flex>
           <Flex w="100%" justify="center">
             {explorerUrl && (

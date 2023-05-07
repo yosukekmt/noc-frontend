@@ -78,15 +78,10 @@ export default function EditDialog(props: {
       return;
     }
     setIsAttempted(true);
-    if (!isValidPassword) {
-      return;
-    }
-    if (!isValidNewPassword) {
-      return;
-    }
-    if (!isValidNewPasswordConfirmation) {
-      return;
-    }
+    if (!isValidPassword) return;
+    if (!isValidNewPassword) return;
+    if (!isValidNewPasswordConfirmation) return;
+
     apiCallUpdatePassword(password, newPassword);
   };
 

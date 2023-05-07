@@ -1,6 +1,27 @@
 import { useCallback } from "react";
+import {
+  mainnet,
+  goerli,
+  sepolia,
+  polygon,
+  polygonMumbai,
+  Chain,
+} from "wagmi/chains";
 
 export const useBlockchain = () => {
+  const getAlchemyApiKey = (): string => {
+    return process.env.NEXT_PUBLIC_ALCHEMY_API_KEY!;
+  };
+
+  const getChainById = (chainId: number): Chain => {
+    if (chainId === mainnet.id) return mainnet;
+    if (chainId === sepolia.id) return sepolia;
+    if (chainId === polygon.id) return polygon;
+    if (chainId === polygonMumbai.id) return polygonMumbai;
+
+    return goerli;
+  };
+
   const getExplorerTxUrl = useCallback(
     (url: string, txHash: string): string => {
       return `${url}/tx/${txHash}`;
@@ -28,6 +49,8 @@ export const useBlockchain = () => {
   }, []);
 
   return {
+    getAlchemyApiKey,
+    getChainById,
     getExplorerTxUrl,
     getExplorerAddressUrl,
     getOpenseaAddressUrl,

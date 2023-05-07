@@ -17,6 +17,7 @@ export const useCouponsApi = () => {
           rewardType: d.rewardType,
           name: d.name,
           description: d.description,
+          supply: d.supply,
           imageUrl: d.imageUrl,
           contractAddress: d.contractAddress,
           nftTokenId: d.nftTokenId,
@@ -43,6 +44,7 @@ export const useCouponsApi = () => {
         rewardType: "cashback_gas" | "cashback_005";
         name: string;
         description: string;
+        supply: number;
         timezone: string;
         startAt: Date;
         endAt: Date;
@@ -60,6 +62,7 @@ export const useCouponsApi = () => {
         rewardType: resp.data.data.rewardType,
         name: resp.data.data.name,
         description: resp.data.data.description,
+        supply: resp.data.data.supply,
         imageUrl: resp.data.data.imageUrl,
         contractAddress: resp.data.data.contractAddress,
         nftTokenId: resp.data.data.nftTokenId,
@@ -94,6 +97,7 @@ export const useCouponsApi = () => {
         rewardType: resp.data.data.rewardType,
         name: resp.data.data.name,
         description: resp.data.data.description,
+        supply: resp.data.data.supply,
         imageUrl: resp.data.data.imageUrl,
         contractAddress: resp.data.data.contractAddress,
         nftTokenId: resp.data.data.nftTokenId,
