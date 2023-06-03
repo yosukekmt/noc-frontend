@@ -7,8 +7,13 @@ import {
   StyleFunctionProps,
 } from "@chakra-ui/react";
 import type { AppProps } from "next/app";
+import { inputAnatomy } from "@chakra-ui/anatomy";
+import { createMultiStyleConfigHelpers } from "@chakra-ui/react";
 
 export default function App({ Component, pageProps }: AppProps) {
+  const { definePartsStyle, defineMultiStyleConfig } =
+    createMultiStyleConfigHelpers(inputAnatomy.keys);
+
   const theme = extendTheme({
     initialColorMode: "light",
     useSystemColorMode: false,
@@ -76,15 +81,10 @@ export default function App({ Component, pageProps }: AppProps) {
       },
     },
     components: {
-      Heading: defineStyleConfig({
-        baseStyle: {
-          color: "secondary.500",
-        },
-      }),
-      Text: defineStyleConfig({
-        baseStyle: {
-          color: "secondary.500",
-        },
+      Heading: defineStyleConfig({ baseStyle: { color: "secondary.500" } }),
+      Text: defineStyleConfig({ baseStyle: { color: "secondary.500" } }),
+      Input: defineStyleConfig({
+        variants: { outline: defineStyle({ field: { borderRadius: 9999 } }) },
       }),
       Button: defineStyleConfig({
         defaultProps: {

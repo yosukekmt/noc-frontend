@@ -26,8 +26,8 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { Eye, EyeSlash, Warning } from "phosphor-react";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FaExclamationTriangle, FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {
   const router = useRouter();
@@ -131,7 +131,13 @@ export default function Login() {
   return (
     <>
       <HtmlHead />
-      <Box bg="gray.100" minH="100vh">
+      <Box
+        backgroundImage="url(/bg_session.jpg)"
+        backgroundSize="cover"
+        backgroundRepeat="no-repeat"
+        backgroundPosition="center center"
+        minH="100vh"
+      >
         <Box as="header">
           <Header />
         </Box>
@@ -156,12 +162,15 @@ export default function Login() {
                       </InputGroup>
                       <Box h={2} mt={2}>
                         {isAttempted && !isValidEmail && (
-                          <Flex align="center">
-                            <Icon as={Warning} color="red" />
+                          <Flex align="center" px={4}>
+                            <Icon
+                              as={FaExclamationTriangle}
+                              color="danger.500"
+                            />
                             <Text
                               fontSize="sm"
                               fontWeight="normal"
-                              color="red"
+                              color="danger.500"
                               ml={2}
                             >
                               Please enter a valid email.
@@ -191,9 +200,9 @@ export default function Login() {
                             aria-label="Toggle Password"
                             icon={
                               passwordVisible ? (
-                                <Icon as={EyeSlash} />
+                                <Icon as={FaEye} />
                               ) : (
-                                <Icon as={Eye} />
+                                <Icon as={FaEyeSlash} />
                               )
                             }
                             onClick={() => setPasswordVisible(!passwordVisible)}
@@ -201,39 +210,24 @@ export default function Login() {
                         </InputRightElement>
                       </InputGroup>
                       <Box h={2} mt={2}>
-                        {(() => {
-                          if (isAttempted && !isValidPassword) {
-                            return (
-                              <Flex align="center">
-                                <Icon as={Warning} color="red" />
-                                <Text
-                                  fontSize="sm"
-                                  fontWeight="normal"
-                                  color="red"
-                                  ml={2}
-                                >
-                                  Please enter your password.
-                                </Text>
-                              </Flex>
-                            );
-                          } else if (isAttempted && errorMessage) {
-                            return (
-                              <Flex align="center">
-                                <Icon as={Warning} color="red" />
-                                <Text
-                                  fontSize="sm"
-                                  fontWeight="normal"
-                                  color="red"
-                                  ml={2}
-                                >
-                                  {errorMessage}
-                                </Text>
-                              </Flex>
-                            );
-                          } else {
-                            return <></>;
-                          }
-                        })()}
+                        {isAttempted && (!isValidPassword || errorMessage) && (
+                          <Flex align="center" px={4}>
+                            <Icon
+                              as={FaExclamationTriangle}
+                              color="danger.500"
+                            />
+                            <Text
+                              fontSize="sm"
+                              fontWeight="normal"
+                              color="danger.500"
+                              ml={2}
+                            >
+                              {isValidPassword
+                                ? errorMessage
+                                : "Please enter your password."}
+                            </Text>
+                          </Flex>
+                        )}
                       </Box>
                     </FormControl>
                     <Button
@@ -257,9 +251,11 @@ export default function Login() {
             <Flex mt={8}>
               <Text fontSize="sm" color="gray">
                 Don&apos;t have an account?
-                <Box as="span" ml={2}>
-                  <NextLink href="/session/signup">Sign up</NextLink>
-                </Box>
+                <NextLink href="/session/signup">
+                  <Button variant="link" mx={2}>
+                    Sign Up
+                  </Button>
+                </NextLink>
               </Text>
             </Flex>
           </Container>

@@ -3,6 +3,7 @@ import Footer from "@/components/session/footer";
 import Header from "@/components/session/header";
 import {
   Box,
+  Button,
   Card,
   CardBody,
   Container,
@@ -19,7 +20,13 @@ export default function Sent() {
   return (
     <>
       <HtmlHead />
-      <Box bg="gray.100" minH="100vh">
+      <Box
+        backgroundImage="url(/bg_session.jpg)"
+        backgroundSize="cover"
+        backgroundRepeat="no-repeat"
+        backgroundPosition="center center"
+        minH="100vh"
+      >
         <Box as="header">
           <Header />
         </Box>
@@ -34,8 +41,11 @@ export default function Sent() {
                   </Heading>
                   <Text fontSize="sm" pt={4}>
                     If you haven&apos;t received an email in 5 minutes, check
-                    your spam or
-                    <NextLink href="/session/password">resend</NextLink>.
+                    your spam or{" "}
+                    <NextLink href="/session/password">
+                      <Button variant="link">resend</Button>
+                    </NextLink>
+                    .
                   </Text>
                 </CardBody>
               </Card>

@@ -1,5 +1,4 @@
-import { ArrowForwardIcon } from "@chakra-ui/icons";
-import { Box, Container, Flex, Text } from "@chakra-ui/react";
+import { Container, Flex, Link, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 
 export default function Footer() {
@@ -9,12 +8,24 @@ export default function Footer() {
         <Text fontSize="sm" color="gray">
           &copy; Centiv
         </Text>
-        <Text fontSize="sm" color="gray" ml={4}>
-          Contact
+        <Link href="mailto:yosuke.kmt@gmail.com" isExternal>
+          <Text fontSize="sm" color="gray" ml={4}>
+            Contact
+          </Text>
+        </Link>
+        <NextLink href="/privacy">
+          <Text fontSize="sm" color="gray" ml={4}>
+            Privacy
+          </Text>
+        </NextLink>
+        <Text fontSize="sm" color="gray" mx={1}>
+          &amp;
         </Text>
-        <Text fontSize="sm" color="gray" ml={4}>
-          Privacy &amp; Terms
-        </Text>
+        <NextLink href="/terms">
+          <Text fontSize="sm" color="gray">
+            Terms
+          </Text>
+        </NextLink>
       </Flex>
     </Container>
   );

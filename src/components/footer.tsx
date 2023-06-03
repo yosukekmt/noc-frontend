@@ -1,13 +1,5 @@
 import Logo from "@/components/logo";
-import {
-  Box,
-  Container,
-  Grid,
-  Link,
-  GridItem,
-  Heading,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Container, Grid, GridItem, Link, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 
 export default function Footer() {

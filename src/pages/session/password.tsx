@@ -3,7 +3,6 @@ import Footer from "@/components/session/footer";
 import Header from "@/components/session/header";
 import { useFirebase } from "@/hooks/useFirebase";
 import { useValidator } from "@/hooks/useValidator";
-import { WarningTwoIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -14,6 +13,7 @@ import {
   FormControl,
   FormLabel,
   Heading,
+  Icon,
   Input,
   InputGroup,
   Text,
@@ -21,6 +21,7 @@ import {
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { FormEvent, useCallback, useMemo, useState } from "react";
+import { FaExclamationTriangle } from "react-icons/fa";
 
 export default function Password() {
   const router = useRouter();
@@ -63,7 +64,13 @@ export default function Password() {
   return (
     <>
       <HtmlHead />
-      <Box bg="gray.100" minH="100vh">
+      <Box
+        backgroundImage="url(/bg_session.jpg)"
+        backgroundSize="cover"
+        backgroundRepeat="no-repeat"
+        backgroundPosition="center center"
+        minH="100vh"
+      >
         <Box as="header">
           <Header />
         </Box>
@@ -91,39 +98,24 @@ export default function Password() {
                         />
                       </InputGroup>
                       <Box h={2} mt={2}>
-                        {(() => {
-                          if (isAttempted && !isValidEmail) {
-                            return (
-                              <Flex align="center">
-                                <WarningTwoIcon color="red" />
-                                <Text
-                                  fontSize="sm"
-                                  fontWeight="normal"
-                                  color="red"
-                                  ml={2}
-                                >
-                                  Please enter a valid email.
-                                </Text>
-                              </Flex>
-                            );
-                          } else if (isAttempted && errorMessage) {
-                            return (
-                              <Flex align="center">
-                                <WarningTwoIcon color="red" />
-                                <Text
-                                  fontSize="sm"
-                                  fontWeight="normal"
-                                  color="red"
-                                  ml={2}
-                                >
-                                  {errorMessage}
-                                </Text>
-                              </Flex>
-                            );
-                          } else {
-                            return <></>;
-                          }
-                        })()}
+                        {isAttempted && (!isValidEmail || errorMessage) && (
+                          <Flex align="center" px={4}>
+                            <Icon
+                              as={FaExclamationTriangle}
+                              color="danger.500"
+                            />
+                            <Text
+                              fontSize="sm"
+                              fontWeight="normal"
+                              color="danger.500"
+                              ml={2}
+                            >
+                              {isValidEmail
+                                ? errorMessage
+                                : "Please enter a valid email."}
+                            </Text>
+                          </Flex>
+                        )}
                       </Box>
                     </FormControl>
                     <Button
