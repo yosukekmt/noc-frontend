@@ -1,6 +1,7 @@
 import Footer from "@/components/footer";
 import Header from "@/components/header";
 import HtmlHead from "@/components/html-head";
+import TopBg from "@/components/top-bg";
 import {
   Box,
   Button,
@@ -21,25 +22,9 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { Stack } from "phosphor-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { FaArrowRight, FaStarOfLife } from "react-icons/fa";
 import { MdCodeOff, MdDiscount, MdLineAxis, MdStream } from "react-icons/md";
-
-const HeroBg = (props: { height: number }) => {
-  return (
-    <Box
-      width="100%"
-      height={`${props.height}px`}
-      position="absolute"
-      zIndex={-1}
-      backgroundImage="url(/bg_top.jpg)"
-      backgroundSize="cover"
-      backgroundRepeat="no-repeat"
-      backgroundPosition="center center"
-    />
-  );
-};
 
 const HeroSection = (props: { height: number }) => {
   return (
@@ -234,7 +219,7 @@ const FeaturesCard = (props: {
 }) => {
   return (
     <Card variant="outline" p={8} rounded={16}>
-      <Center bgColor={"primary.500"} w={24} h={24} rounded={9999}>
+      <Center bgColor="primary.500" w={24} h={24} rounded={9999}>
         {props.icon}
       </Center>
       <Heading as="h4" size="lg" fontWeight="bold" pt={8} pb={2}>
@@ -407,13 +392,7 @@ export default function Home() {
     base: 800,
     sm: 640,
     md: 800,
-    lg: 800,
-    xl: 800,
   });
-  const [screenWPx, setScreenWPx] = useState(0);
-  const headerHeroWPx = useMemo(() => {
-    return screenWPx;
-  }, [screenWPx]);
   const headerHPx = useMemo(() => {
     return 64;
   }, []);
@@ -421,20 +400,10 @@ export default function Home() {
     return (headerHeroHPx || 0) - headerHPx;
   }, [headerHPx, headerHeroHPx]);
 
-  const handleResize = () => {
-    const { innerWidth } = window;
-    setScreenWPx(innerWidth);
-  };
-  useEffect(() => {
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   return (
     <>
       <HtmlHead />
-      <HeroBg height={headerHeroHPx || 0} />
+      <TopBg height={headerHeroHPx || 0} />
       <Box as="header" height={`${headerHPx}px`}>
         <Header />
       </Box>
