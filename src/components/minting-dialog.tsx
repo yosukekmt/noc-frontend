@@ -41,30 +41,31 @@ export default function MintingDialog(props: {
   const explorerUrl = useMemo(() => {
     if (!props.chain) return;
     if (!props.chain.explorerUrl) return;
-    if (!props.couponTransfer.txHash) return;
-    return getExplorerTxUrl(
-      props.chain.explorerUrl,
-      props.couponTransfer.txHash
-    );
-  }, [getExplorerTxUrl, props.chain, props.couponTransfer.txHash]);
+    if (!item.txHash) return;
+    return getExplorerTxUrl(props.chain.explorerUrl, item.txHash);
+  }, [getExplorerTxUrl, item.txHash, props.chain]);
 
   const getCouponTransfer = useCallback(
     async (id: string) => {
       try {
         const item = await callGetCouponTransfer(id);
         setItem(item);
+        if (item.succeededAt) return;
+        if (item.failedAt) return;
 
-        if (!item.succeededAt && !item.failedAt) {
-          setTimeout(() => {
-            getCouponTransfer(props.couponTransfer.id);
-          }, 10000);
-        }
+        setTimeout(() => {
+          getCouponTransfer(props.couponTransfer.id);
+        }, 10000);
       } catch (err: unknown) {
         console.error(err);
       }
     },
     [callGetCouponTransfer, props.couponTransfer.id]
   );
+
+  useEffect(() => {
+    getCouponTransfer(props.couponTransfer.id);
+  }, [getCouponTransfer, props.couponTransfer.id]);
 
   return (
     <Modal

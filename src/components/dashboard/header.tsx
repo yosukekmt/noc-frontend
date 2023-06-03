@@ -102,7 +102,7 @@ const NavigationBar = ({ projectId = null }: { projectId?: string | null }) => {
 export default function Header({
   projectId = null,
 }: {
-  projectId?: string | null;
+  projectId: string | null;
 }) {
   const router = useRouter();
   const { authToken, firebaseSignOut } = useFirebase();

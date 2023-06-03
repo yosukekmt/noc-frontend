@@ -1,7 +1,28 @@
+@font-face {
+  font-family: "Salvatore";
+  font-weight: 300;
+  src: url("/fonts/Salvatore-Book.otf") format("opentype");
+}
+@font-face {
+  font-family: "Salvatore";
+  font-weight: 400;
+  src: url("/fonts/Salvatore-Regular.otf") format("opentype");
+}
+@font-face {
+  font-family: "Salvatore";
+  font-weight: 700;
+  src: url("/fonts/Salvatore-Bold.otf") format("opentype");
+}
+
 * {
   padding: 0;
   margin: 0;
 }
+
 html {
   scroll-behavior: smooth;
+}
+
+body {
+  background-color: black;
 }

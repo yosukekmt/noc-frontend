@@ -1,7 +1,7 @@
 import Header from "@/components/dashboard/header";
 import { useCurrentUserApi } from "@/hooks/useCurrentUserApi";
 import { useFirebase } from "@/hooks/useFirebase";
-import { Box, Container } from "@chakra-ui/react";
+import { Box, Container, useTheme } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
@@ -12,6 +12,7 @@ export default function DashboardLayout({
   children: JSX.Element;
   projectId?: string | null;
 }) {
+  const theme = useTheme();
   const router = useRouter();
   const { firebaseSignOut } = useFirebase();
   const { clearCurrentUser } = useCurrentUserApi();
@@ -36,7 +37,7 @@ export default function DashboardLayout({
   ]);
 
   return (
-    <Box>
+    <Box bgColor={theme.colors.tertiary}>
       <Box as="header">
         <Header projectId={projectId} />
       </Box>

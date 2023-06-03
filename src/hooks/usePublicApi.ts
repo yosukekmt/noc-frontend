@@ -78,8 +78,8 @@ export const usePublicApi = () => {
         couponId: resp.data.couponId,
         walletAddress: resp.data.walletAddress,
         txHash: resp.data.txHash,
-        succeededAt: new Date(resp.data.succeededAt),
-        failedAt: new Date(resp.data.failedAt),
+        succeededAt: resp.data.succeededAt && new Date(resp.data.succeededAt),
+        failedAt: resp.data.failedAt && new Date(resp.data.failedAt),
         createdAt: new Date(resp.data.createdAt),
         updatedAt: new Date(resp.data.updatedAt),
       };
@@ -98,8 +98,8 @@ export const usePublicApi = () => {
         couponId: resp.data.couponId,
         walletAddress: resp.data.walletAddress,
         txHash: resp.data.txHash,
-        succeededAt: new Date(resp.data.succeededAt),
-        failedAt: new Date(resp.data.failedAt),
+        succeededAt: resp.data.succeededAt && new Date(resp.data.succeededAt),
+        failedAt: resp.data.failedAt && new Date(resp.data.failedAt),
         createdAt: new Date(resp.data.createdAt),
         updatedAt: new Date(resp.data.updatedAt),
       };

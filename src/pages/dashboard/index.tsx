@@ -42,7 +42,7 @@ export default function Dashboard() {
     if (!authToken) {
       return;
     }
-    router.push(`/dashboard/${item.id}`);
+    router.push(`/dashboard/${item.id}/campaigns`);
   };
 
   return (

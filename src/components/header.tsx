@@ -26,6 +26,8 @@ export default function Header() {
           {authToken ? (
             <NextLink href="/dashboard">
               <Button
+                colorScheme="primary"
+                variant="outline"
                 size="sm"
                 rightIcon={<Icon as={ArrowRight} />}
                 style={{ borderRadius: 20 }}

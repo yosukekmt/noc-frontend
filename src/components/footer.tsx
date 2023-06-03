@@ -12,7 +12,7 @@ import NextLink from "next/link";
 
 export default function Footer() {
   return (
-    <Box bg="gray.100">
+    <Box>
       <Container maxWidth="6xl">
         <Grid templateColumns="repeat(12, 1fr)" gap={4} py={12}>
           <GridItem colSpan={{ base: 12, md: 4 }}>
@@ -28,6 +28,12 @@ export default function Footer() {
             </NextLink>
             <NextLink href="/how">
               <Text fontWeight="light">How to use</Text>
+            </NextLink>
+            <NextLink href="/terms">
+              <Text fontWeight="light">Terms</Text>
+            </NextLink>
+            <NextLink href="/privacy">
+              <Text fontWeight="light">Privacy</Text>
             </NextLink>
             <Link href="mailto:yosuke.kmt@gmail.com" isExternal>
               <Text fontWeight="light">Contact</Text>

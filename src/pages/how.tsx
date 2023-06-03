@@ -50,7 +50,7 @@ const HowSection = () => {
                 should run, and choose which NFTs will be applicable.
               </Text>
             </GridItem>
-            <GridItem area={"description2"}>
+            <GridItem area="description2">
               <Text size="md">
                 2. Once you&apos;ve got the campaign deployed on the blockchain,
                 you&apos;ll need to put some funds into your treasury wallet.
@@ -59,7 +59,7 @@ const HowSection = () => {
                 usual transaction methods, like MetaMask.
               </Text>
             </GridItem>
-            <GridItem area={"description3"}>
+            <GridItem area="description3">
               <Text size="md">
                 3. You&apos;re all set to share the coupon page with your
                 customers now. Keep in mind that they can go ahead and get
@@ -67,7 +67,7 @@ const HowSection = () => {
                 cashback will only be given out during the campaign period.
               </Text>
             </GridItem>
-            <GridItem area={"description4"}>
+            <GridItem area="description4">
               <Text size="md">
                 4. Make sure to regularly check the dashboard during the
                 campaign. You&apos;ll be able to see how things are going in
