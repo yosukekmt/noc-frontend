@@ -106,6 +106,7 @@ export default function App({ Component, pageProps }: AppProps) {
             colorScheme: "primary",
             textColor: "secondary",
             color: "secondary",
+            borderRadius: 9999,
           }),
           link: defineStyle({
             colorScheme: "primary",
