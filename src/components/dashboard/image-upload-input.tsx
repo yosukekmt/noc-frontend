@@ -6,13 +6,15 @@ import {
   Card,
   FormControl,
   FormLabel,
+  Icon,
   Image,
   Input,
   Text,
 } from "@chakra-ui/react";
 import * as Crypto from "crypto";
-import { Plus, Spinner } from "phosphor-react";
+import { Spinner } from "phosphor-react";
 import { useMemo, useState } from "react";
+import { FaPlus } from "react-icons/fa";
 
 const ImageUploadInput = (props: {
   projectId: string;
@@ -78,8 +80,10 @@ const ImageUploadInput = (props: {
     <Box mb={8}>
       <FormControl>
         <FormLabel htmlFor={uiKey}>
-          Coupon Image
-          <Text fontSize="sm">(1024px x 1024px)</Text>
+          Campaign Image
+          <Text fontSize="sm" color="gray.500">
+            1024px x 1024px
+          </Text>
           <Input
             id={uiKey}
             type="file"
@@ -89,9 +93,11 @@ const ImageUploadInput = (props: {
             key={inputKey}
           />
           <Card
+            variant="outline"
+            boxShadow="none"
+            borderColor="gray.500"
             width={256}
             height={256}
-            bg="gray.200"
             align="center"
             justify="center"
           >
@@ -111,7 +117,9 @@ const ImageUploadInput = (props: {
             {!isLoading && previewUrl && (
               <Image src={previewUrl} alt="Preview" w="100%" h="100%" />
             )}
-            {!isLoading && !previewUrl && <Plus size={24} color="gray" />}
+            {!isLoading && !previewUrl && (
+              <Icon as={FaPlus} boxSize={8} fontWeight="light" />
+            )}
           </Card>
         </FormLabel>
       </FormControl>

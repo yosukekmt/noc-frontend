@@ -1,15 +1,19 @@
-import { useChainsApi } from "@/hooks/useChainsApi";
 import { useFirebase } from "@/hooks/useFirebase";
 import { useNftsApi } from "@/hooks/useNftsApi";
 import { useValidator } from "@/hooks/useValidator";
 import { Chain, Nft } from "@/models";
+import { CloseIcon } from "@chakra-ui/icons";
 import {
+  Box,
   Button,
   Card,
   Divider,
+  Flex,
   FormControl,
   FormLabel,
   Heading,
+  Icon,
+  IconButton,
   Input,
   Modal,
   ModalBody,
@@ -18,10 +22,10 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select,
   Text,
 } from "@chakra-ui/react";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FaArrowRight } from "react-icons/fa";
 
 export default function PickerDialog(props: {
   chain: Chain;
@@ -41,14 +45,22 @@ export default function PickerDialog(props: {
     return validateContractAddress(contractAddress);
   }, [validateContractAddress, contractAddress]);
 
+  const isNftFound = useMemo(() => {
+    return !!item;
+  }, [item]);
+
+  const isAddable = useMemo(() => {
+    return isValidContractAddress && isNftFound;
+  }, [isNftFound, isValidContractAddress]);
+
   const getNft = useCallback(
     async (
       authToken: string,
       chainId: number,
       contractAddress: string
-    ): Promise<void> => {
+    ): Promise<Nft> => {
       const item = await callGetNft(authToken, chainId, contractAddress);
-      setItem(item);
+      return item;
     },
     [callGetNft]
   );
@@ -58,7 +70,14 @@ export default function PickerDialog(props: {
     if (!isValidContractAddress) return;
 
     (async () => {
-      await getNft(authToken, props.chain.id, contractAddress);
+      setIsLoading(true);
+      try {
+        const item = await getNft(authToken, props.chain.id, contractAddress);
+        setItem(item);
+      } catch (err: unknown) {
+        console.error(err);
+      }
+      setIsLoading(false);
     })();
   }, [
     authToken,
@@ -80,10 +99,22 @@ export default function PickerDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>Create a new coupon NFT</ModalHeader>
+          <ModalHeader>
+            <IconButton
+              onClick={props.onClose}
+              variant="outline"
+              aria-label="Close"
+              colorScheme="whiteAlpha"
+              borderColor="black"
+              color="black"
+              icon={<CloseIcon boxSize={2} />}
+              mr={4}
+            />
+            Add NFT Collection
+          </ModalHeader>
           <ModalCloseButton />
           <Divider />
-          <ModalBody bg="gray.100">
+          <ModalBody>
             <FormControl>
               <FormLabel fontSize="sm">Network</FormLabel>
               <Input
@@ -108,21 +139,37 @@ export default function PickerDialog(props: {
               />
             </FormControl>
             {item && (
-              <Card variant="outline" p={2} mt={2}>
-                <Heading as="h4" fontSize="md" fontWeight="bold">
-                  NFT Name
-                </Heading>
-                <Text>{item.name}</Text>
+              <Card
+                variant="outline"
+                borderColor="tertiary.500"
+                bgColor="tertiary.300"
+                boxShadow="none"
+                px={4}
+                py={2}
+                mt={2}
+              >
+                <Box>
+                  <Text fontSize="md" fontWeight="normal">
+                    {item.name}
+                  </Text>
+                  <Text fontSize="sm" fontWeight="light" color="gray.500">
+                    {item.contractAddress}
+                  </Text>
+                </Box>
               </Card>
             )}
           </ModalBody>
           <Divider />
-          <ModalFooter>
-            <Button size="sm" onClick={props.onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" size="sm" isLoading={isLoading} ml={2}>
-              Add NFT
+          <ModalFooter justifyContent="center">
+            <Button
+              type="submit"
+              size="sm"
+              isDisabled={!isAddable}
+              leftIcon={<Icon as={FaArrowRight} />}
+              isLoading={isLoading}
+              ml={2}
+            >
+              Add Collection
             </Button>
           </ModalFooter>
         </ModalContent>

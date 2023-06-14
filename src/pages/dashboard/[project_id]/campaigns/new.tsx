@@ -13,6 +13,10 @@ import { Chain, Nft } from "@/models";
 import {
   Box,
   Button,
+  Card,
+  Center,
+  Container,
+  Divider,
   Flex,
   FormControl,
   FormLabel,
@@ -20,23 +24,23 @@ import {
   GridItem,
   Heading,
   Icon,
+  IconButton,
   Input,
   Select,
   Spacer,
-  Tag,
-  TagCloseButton,
-  TagLabel,
   Text,
   Textarea,
+  useBreakpointValue,
   useDisclosure,
-  Wrap,
 } from "@chakra-ui/react";
-import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { Plus, Warning } from "phosphor-react";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FaArrowLeft, FaSave, FaTrashAlt } from "react-icons/fa";
 
 export default function NewCoupon() {
+  const isMobileUi = useBreakpointValue({ base: true, md: false });
+
   const router = useRouter();
   const { project_id: project_id } = router.query;
   const { getErrorMessage } = useApiClient();
@@ -233,106 +237,193 @@ export default function NewCoupon() {
     <>
       <HtmlHead />
       <DashboardLayout projectId={projectId}>
-        <Flex justify="center">
-          <Box maxWidth="xl" w="100%">
-            <form onSubmit={clickSubmit}>
-              <Heading as="h3" fontSize="2xl" fontWeight="bold">
-                Create a new campaign
+        <form onSubmit={clickSubmit}>
+          <Card mb={16}>
+            <Flex align="center" px={8} py={4}>
+              <Button
+                rounded="full"
+                bgColor="transparent"
+                borderColor="black"
+                borderWidth="1px"
+                w="40px"
+                h="40px"
+                minW="40px"
+                minH="40px"
+                maxW="40px"
+                maxH="40px"
+                p="3px"
+              >
+                <Flex align="center" justify="center">
+                  <FaArrowLeft color="black" />
+                </Flex>
+              </Button>
+              <Heading
+                as="h3"
+                fontSize={{ base: "xl", md: "2xl" }}
+                fontWeight="bold"
+                ml={4}
+              >
+                Create New Campaign
               </Heading>
-              <Text fontSize="sm">
-                Set up your campaign to engage you customers.
-              </Text>
-              <FormControl mt={2}>
-                <FormLabel fontSize="sm">Network</FormLabel>
-                {chainId && (
-                  <Select
+              {!isMobileUi && (
+                <>
+                  <Spacer />
+                  <Button
+                    type="submit"
                     size="sm"
-                    bg="white"
-                    name="chainId"
-                    value={chainId}
-                    onChange={(evt) =>
-                      setChainId(Number.parseInt(evt.target.value))
-                    }
+                    isLoading={isLoading}
+                    leftIcon={<Icon as={FaSave} />}
                   >
-                    {chains.flatMap((chain) => {
+                    Save Campaign
+                  </Button>
+                </>
+              )}
+            </Flex>
+            <Divider color="gray.100" />
+            <Grid
+              templateAreas={{
+                base: `"form_images" "form_horizontal_divider" "form_main"`,
+                md: `"form_main form_vertical_divider form_images"`,
+              }}
+              gridTemplateColumns={{
+                base: "100% 100% 100%",
+                md: "calc(100% - 321px) 1px 320px",
+              }}
+            >
+              <GridItem area={"form_main"}>
+                <Container pt={8} pb={24}>
+                  <FormControl isRequired>
+                    <FormLabel fontSize="sm">Campaign Name</FormLabel>
+                    <Input
+                      bg="white"
+                      type="text"
+                      name="coupon_name"
+                      value={name}
+                      onChange={(evt) => setName(evt.target.value)}
+                    />
+                    {isAttempted && !isValidName && (
+                      <Flex align="center">
+                        <Icon as={Warning} color="red" />
+                        <Text
+                          fontSize="sm"
+                          fontWeight="normal"
+                          color="red"
+                          ml={2}
+                        >
+                          Please enter a coupon name.
+                        </Text>
+                      </Flex>
+                    )}
+                  </FormControl>
+                  <FormControl isRequired mt={4}>
+                    <Flex align="center" mb={2}>
+                      <FormLabel fontSize="sm" m={0}>
+                        Campaign Description
+                      </FormLabel>
+                      <Spacer />
+                      <Text
+                        fontSize="sm"
+                        color="gray.500"
+                      >{`${description.length}/280 Characters`}</Text>
+                    </Flex>
+                    <Textarea
+                      bg="white"
+                      name="coupon_description"
+                      value={description}
+                      onChange={(evt) => setDescription(evt.target.value)}
+                    />
+                    {isAttempted && !isValidDescription && (
+                      <Flex align="center">
+                        <Icon as={Warning} color="red" />
+                        <Text
+                          fontSize="sm"
+                          fontWeight="normal"
+                          color="red"
+                          ml={2}
+                        >
+                          Please enter a description.
+                        </Text>
+                      </Flex>
+                    )}
+                  </FormControl>
+                  <FormControl isRequired mt={4}>
+                    <FormLabel fontSize="sm">Network</FormLabel>
+                    {chainId && (
+                      <Select
+                        bg="white"
+                        name="chainId"
+                        value={chainId}
+                        onChange={(evt) =>
+                          setChainId(Number.parseInt(evt.target.value))
+                        }
+                      >
+                        {chains.flatMap((chain) => {
+                          return (
+                            <option value={chain.id} key={`chain_${chain.id}`}>
+                              {chain.name}
+                            </option>
+                          );
+                        })}
+                      </Select>
+                    )}
+                  </FormControl>
+                  <FormControl isRequired mt={8}>
+                    <FormLabel fontSize="sm">
+                      Applicable NFT Collections
+                    </FormLabel>
+                    {nfts.flatMap((nft) => {
                       return (
-                        <option value={chain.id} key={`chain_${chain.id}`}>
-                          {chain.name}
-                        </option>
+                        <Card
+                          variant="outline"
+                          borderColor="tertiary.500"
+                          bgColor="tertiary.300"
+                          boxShadow="none"
+                          px={4}
+                          py={2}
+                          mt={2}
+                        >
+                          <Flex align="center">
+                            <Box>
+                              <Text fontSize="md" fontWeight="normal">
+                                {nft.name}
+                              </Text>
+                              <Text
+                                fontSize="sm"
+                                fontWeight="light"
+                                color="gray.500"
+                              >
+                                {nft.contractAddress}
+                              </Text>
+                            </Box>
+                            <Spacer />
+                            <IconButton
+                              onClick={() => clickRemove(nft)}
+                              variant="outline"
+                              aria-label="Close"
+                              colorScheme="whiteAlpha"
+                              borderColor="black"
+                              color="black"
+                              icon={<Icon as={FaTrashAlt} />}
+                              mr={4}
+                            />
+                          </Flex>
+                        </Card>
                       );
                     })}
-                  </Select>
-                )}
-              </FormControl>
-              <FormControl mt={2}>
-                <FormLabel fontSize="sm">Applicable NFTs</FormLabel>
-                <Wrap spacing={1} mt={2}>
-                  {nfts.map((nft) => (
-                    <Tag size="sm" key={`nft_${nft.id}`}>
-                      <TagLabel>{`${nft.name}(${truncateContractAddress(
-                        nft.contractAddress
-                      )})`}</TagLabel>
-                      <TagCloseButton onClick={() => clickRemove(nft)} />
-                    </Tag>
-                  ))}
-                </Wrap>
-                <Button
-                  size="sm"
-                  fontSize="sm"
-                  leftIcon={<Icon as={Plus} weight="bold" />}
-                  onClick={clickAdd}
-                  mt={2}
-                >
-                  Add NFT
-                </Button>
-                <Box h={8} mt={2}>
-                  {isAttempted && !isValidNftIds && (
-                    <Flex align="center">
-                      <Icon as={Warning} color="red" />
-                      <Text
-                        fontSize="sm"
-                        fontWeight="normal"
-                        color="red"
-                        ml={2}
-                      >
-                        Please add at least 1 applicable NFT.
-                      </Text>
-                    </Flex>
-                  )}
-                </Box>
-              </FormControl>
-              <FormControl mt={2}>
-                <FormLabel fontSize="sm">Coupon name</FormLabel>
-                <Input
-                  size="sm"
-                  bg="white"
-                  type="text"
-                  name="coupon_name"
-                  value={name}
-                  onChange={(evt) => setName(evt.target.value)}
-                />
-                <Box h={8} mt={2}>
-                  {isAttempted && !isValidName && (
-                    <Flex align="center">
-                      <Icon as={Warning} color="red" />
-                      <Text
-                        fontSize="sm"
-                        fontWeight="normal"
-                        color="red"
-                        ml={2}
-                      >
-                        Please enter a coupon name.
-                      </Text>
-                    </Flex>
-                  )}
-                </Box>
-              </FormControl>
-              <Grid templateColumns="repeat(12, 1fr)" gap={4}>
-                <GridItem colSpan={{ base: 12, sm: 6 }}>
-                  <FormControl mt={2}>
-                    <FormLabel fontSize="sm">Reward type</FormLabel>
-                    <Select
+                    <Button
                       size="sm"
+                      fontSize="sm"
+                      leftIcon={<Icon as={Plus} weight="bold" />}
+                      onClick={clickAdd}
+                      w="100%"
+                      mt={2}
+                    >
+                      Add Collection
+                    </Button>
+                  </FormControl>
+                  <FormControl isRequired mt={8}>
+                    <FormLabel fontSize="sm">Reward Type</FormLabel>
+                    <Select
                       bg="white"
                       name="rewardType"
                       value={rewardType}
@@ -343,151 +434,124 @@ export default function NewCoupon() {
                       }
                     >
                       <option value="cashback_gas">Gas fee cashback</option>;
-                      <option value="cashback_005">5% Cashback</option>;
                     </Select>
-                    <Box h={8} mt={2}></Box>
                   </FormControl>
-                </GridItem>
-                <GridItem colSpan={{ base: 12, sm: 6 }}>
-                  <FormControl mt={2}>
-                    <FormLabel fontSize="sm">
-                      Number of Supply (1-10000)
+                  <FormControl isRequired mt={8}>
+                    <FormLabel fontSize="sm">Timezone</FormLabel>
+                    <Select
+                      size="sm"
+                      bg="white"
+                      name="name"
+                      value={timezone}
+                      onChange={(evt) => setTimezone(evt.target.value)}
+                    >
+                      {timezoneOptions.flatMap((tz, idx) => {
+                        return (
+                          <option value={tz.value} key={`timezone_${idx}`}>
+                            {tz.text}
+                          </option>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                  <FormControl isRequired mt={4}>
+                    <FormLabel fontSize="sm" mt={2}>
+                      Campaign Start
                     </FormLabel>
-                    <Input
-                      size="sm"
-                      bg="white"
-                      type="number"
-                      name="coupon_supply"
-                      min={1}
-                      max={10000}
-                      value={supply.toString()}
-                      onChange={(evt) =>
-                        setSupply(Number.parseInt(evt.target.value))
-                      }
-                    />
-                    <Box h={8} mt={2}></Box>
+                    <Grid templateColumns="repeat(12, 1fr)" gap={4}>
+                      <GridItem colSpan={{ base: 6 }}>
+                        <Input
+                          size="sm"
+                          bg="white"
+                          name="startDate"
+                          type="date"
+                          value={startDate}
+                          onChange={(evt) => setStartDate(evt.target.value)}
+                        />
+                      </GridItem>
+                      <GridItem colSpan={{ base: 6 }}>
+                        <Input
+                          size="sm"
+                          bg="white"
+                          name="startTime"
+                          type="time"
+                          value={startTime}
+                          onChange={(evt) => setStartTime(evt.target.value)}
+                        />
+                      </GridItem>
+                    </Grid>
                   </FormControl>
-                </GridItem>
-              </Grid>
-              <FormControl>
-                <FormLabel fontSize="sm">Coupon Description</FormLabel>
-                <Textarea
-                  size="sm"
-                  bg="white"
-                  name="coupon_description"
-                  value={description}
-                  onChange={(evt) => setDescription(evt.target.value)}
-                />
-                <Box h={8} mt={2}>
-                  {isAttempted && !isValidDescription && (
-                    <Flex align="center">
-                      <Icon as={Warning} color="red" />
-                      <Text
-                        fontSize="sm"
-                        fontWeight="normal"
-                        color="red"
-                        ml={2}
-                      >
-                        Please enter a description.
-                      </Text>
-                    </Flex>
-                  )}
-                </Box>
-              </FormControl>
-              <Box>
-                <ImageUploadInput
-                  projectId={projectId}
-                  onUploaded={setImageUrl}
-                />
-              </Box>
-              <FormControl>
-                <FormLabel fontSize="sm">Timezone</FormLabel>
-                <Select
-                  size="sm"
-                  bg="white"
-                  name="name"
-                  value={timezone}
-                  onChange={(evt) => setTimezone(evt.target.value)}
+                  <FormControl isRequired mt={4}>
+                    <FormLabel fontSize="sm" mt={2}>
+                      Campaign End
+                    </FormLabel>
+                    <Grid templateColumns="repeat(12, 1fr)" gap={4}>
+                      <GridItem colSpan={{ base: 6 }}>
+                        <Input
+                          size="sm"
+                          bg="white"
+                          name="endDate"
+                          type="date"
+                          value={endDate}
+                          onChange={(evt) => setEndDate(evt.target.value)}
+                        />
+                      </GridItem>
+                      <GridItem colSpan={{ base: 6 }}>
+                        <Input
+                          size="sm"
+                          bg="white"
+                          name="endTime"
+                          type="time"
+                          value={endTime}
+                          onChange={(evt) => setEndTime(evt.target.value)}
+                        />
+                      </GridItem>
+                    </Grid>
+                  </FormControl>
+                </Container>
+              </GridItem>
+              <GridItem area="form_horizontal_divider">
+                <Divider orientation="horizontal" color="pink" />
+              </GridItem>
+              <GridItem area="form_vertical_divider">
+                <Divider orientation="vertical" color="pink" />
+              </GridItem>
+              <GridItem area={"form_images"}>
+                <Container pt={8}>
+                  <Center>
+                    <ImageUploadInput
+                      projectId={projectId}
+                      onUploaded={setImageUrl}
+                    />
+                  </Center>
+                </Container>
+              </GridItem>
+            </Grid>
+            {isMobileUi && (
+              <Box
+                position="fixed"
+                left={0}
+                bottom={0}
+                w="100%"
+                backgroundColor="white"
+                borderTopColor="gray.300"
+                borderTopWidth="1px"
+                px={4}
+                py={2}
+              >
+                <Button
+                  size="lg"
+                  type="submit"
+                  w="100%"
+                  isLoading={isLoading}
+                  leftIcon={<Icon as={FaSave} />}
                 >
-                  {timezoneOptions.flatMap((tz, idx) => {
-                    return (
-                      <option value={tz.value} key={`timezone_${idx}`}>
-                        {tz.text}
-                      </option>
-                    );
-                  })}
-                </Select>
-              </FormControl>
-              <FormLabel fontSize="sm" mt={2}>
-                Coupon valid from
-              </FormLabel>
-              <Grid templateColumns="repeat(12, 1fr)" gap={4}>
-                <GridItem colSpan={{ base: 6 }}>
-                  <FormControl>
-                    <Input
-                      size="sm"
-                      bg="white"
-                      name="startDate"
-                      type="date"
-                      value={startDate}
-                      onChange={(evt) => setStartDate(evt.target.value)}
-                    />
-                  </FormControl>
-                </GridItem>
-                <GridItem colSpan={{ base: 6 }}>
-                  <FormControl>
-                    <Input
-                      size="sm"
-                      bg="white"
-                      name="startTime"
-                      type="time"
-                      value={startTime}
-                      onChange={(evt) => setStartTime(evt.target.value)}
-                    />
-                  </FormControl>
-                </GridItem>
-              </Grid>
-              <FormLabel fontSize="sm" mt={2}>
-                Coupon expires at
-              </FormLabel>
-              <Grid templateColumns="repeat(12, 1fr)" gap={4}>
-                <GridItem colSpan={{ base: 6 }}>
-                  <FormControl>
-                    <Input
-                      size="sm"
-                      bg="white"
-                      name="endDate"
-                      type="date"
-                      value={endDate}
-                      onChange={(evt) => setEndDate(evt.target.value)}
-                    />
-                  </FormControl>
-                </GridItem>
-                <GridItem colSpan={{ base: 6 }}>
-                  <FormControl>
-                    <Input
-                      size="sm"
-                      bg="white"
-                      name="endTime"
-                      type="time"
-                      value={endTime}
-                      onChange={(evt) => setEndTime(evt.target.value)}
-                    />
-                  </FormControl>
-                </GridItem>
-              </Grid>
-              <Flex mt={4} mb={32}>
-                <NextLink href={`/dashboard/${projectId}`}>
-                  <Button size="sm">Cancel</Button>
-                </NextLink>
-                <Spacer />
-                <Button type="submit" size="sm" isLoading={isLoading} ml={2}>
-                  Create
+                  Save Campaign
                 </Button>
-              </Flex>
-            </form>
-          </Box>
-        </Flex>
+              </Box>
+            )}
+          </Card>
+        </form>
       </DashboardLayout>
       {chain && (
         <PickerDialog

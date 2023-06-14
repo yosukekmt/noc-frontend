@@ -69,7 +69,7 @@ const MainNavigation = (props: { projectId: string }) => {
   }, [pathname]);
 
   return (
-    <Flex gap={1} w="100%" justify={{ base: "center", md: "start" }}>
+    <Flex gap={1} w="100%" justify="center">
       <NavButton
         active={true}
         icon={<Icon as={MdTrackChanges} />}

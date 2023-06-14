@@ -84,7 +84,13 @@ export default function App({ Component, pageProps }: AppProps) {
       Heading: defineStyleConfig({ baseStyle: { color: "secondary.500" } }),
       Text: defineStyleConfig({ baseStyle: { color: "secondary.500" } }),
       Input: defineStyleConfig({
-        variants: { outline: defineStyle({ field: { borderRadius: 9999 } }) },
+        variants: { outline: defineStyle({ field: { borderRadius: "full" } }) },
+      }),
+      Textarea: defineStyleConfig({
+        variants: { outline: defineStyle({ borderRadius: 20 }) },
+      }),
+      Select: defineStyleConfig({
+        variants: { outline: defineStyle({ field: { borderRadius: "full" } }) },
       }),
       Button: defineStyleConfig({
         defaultProps: {

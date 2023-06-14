@@ -16,6 +16,7 @@ import {
   Grid,
   GridItem,
   Heading,
+  Icon,
   Skeleton,
   Spacer,
   Table,
@@ -30,6 +31,7 @@ import {
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { FaPlus } from "react-icons/fa";
 
 const LoadingTBody = () => {
   return (
@@ -215,8 +217,12 @@ export default function ProjectCampaigns() {
                 <Flex align="center" h="100%">
                   <Spacer />
                   <NextLink href={`/dashboard/${projectId}/campaigns/new`}>
-                    <Button size="sm" w={{ base: "100%", sm: "inherit" }}>
-                      New Campaign
+                    <Button
+                      size="sm"
+                      w={{ base: "100%", sm: "inherit" }}
+                      leftIcon={<Icon as={FaPlus} />}
+                    >
+                      Create Campaign
                     </Button>
                   </NextLink>
                 </Flex>
