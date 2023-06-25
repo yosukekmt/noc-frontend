@@ -33,6 +33,7 @@ import {
   useBreakpointValue,
   useDisclosure,
 } from "@chakra-ui/react";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { Plus, Warning } from "phosphor-react";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
@@ -239,24 +240,17 @@ export default function NewCoupon() {
       <DashboardLayout projectId={projectId}>
         <form onSubmit={clickSubmit}>
           <Card mb={16}>
-            <Flex align="center" px={8} py={4}>
-              <Button
-                rounded="full"
-                bgColor="transparent"
-                borderColor="black"
-                borderWidth="1px"
-                w="40px"
-                h="40px"
-                minW="40px"
-                minH="40px"
-                maxW="40px"
-                maxH="40px"
-                p="3px"
-              >
-                <Flex align="center" justify="center">
-                  <FaArrowLeft color="black" />
-                </Flex>
-              </Button>
+            <Flex align="center" px={{ base: 4, lg: 8 }} py={4}>
+              <NextLink href={`/dashboard/${projectId}/campaigns/`}>
+                <IconButton
+                  aria-label="back"
+                  variant="outline"
+                  colorScheme="black"
+                  w="40px"
+                  h="40px"
+                  icon={<FaArrowLeft color="black" />}
+                />
+              </NextLink>
               <Heading
                 as="h3"
                 fontSize={{ base: "xl", md: "2xl" }}
@@ -290,7 +284,7 @@ export default function NewCoupon() {
                 md: "calc(100% - 321px) 1px 320px",
               }}
             >
-              <GridItem area={"form_main"}>
+              <GridItem area="form_main">
                 <Container pt={8} pb={24}>
                   <FormControl isRequired>
                     <FormLabel fontSize="sm">Campaign Name</FormLabel>
@@ -516,7 +510,7 @@ export default function NewCoupon() {
               <GridItem area="form_vertical_divider">
                 <Divider orientation="vertical" color="pink" />
               </GridItem>
-              <GridItem area={"form_images"}>
+              <GridItem area="form_images">
                 <Container pt={8}>
                   <Center>
                     <ImageUploadInput

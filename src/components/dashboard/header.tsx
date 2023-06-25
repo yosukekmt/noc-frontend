@@ -71,19 +71,19 @@ const MainNavigation = (props: { projectId: string }) => {
   return (
     <Flex gap={1} w="100%" justify="center">
       <NavButton
-        active={true}
+        active={_menuItemType === "campaigns"}
         icon={<Icon as={MdTrackChanges} />}
         label="Campaigns"
         link={`/dashboard/${props.projectId}/campaigns`}
       />
       <NavButton
-        active={false}
+        active={_menuItemType === "project"}
         icon={<Icon as={MdWallet} />}
         label="Treasury"
         link={`/dashboard/${props.projectId}`}
       />
       <NavButton
-        active={false}
+        active={_menuItemType === "members"}
         icon={<Icon as={MdPerson} />}
         label="Team"
         link={`/dashboard/${props.projectId}/members`}
@@ -459,7 +459,7 @@ export default function Header({
             </Flex>
             <Flex py={2} align="center" h="100%">
               {currentUser && currentProject && (
-                <MainNavigation projectId={currentUser.id} />
+                <MainNavigation projectId={currentProject.id} />
               )}
             </Flex>
           </>
@@ -470,7 +470,7 @@ export default function Header({
             </NextLink>
             <Spacer />
             {currentUser && currentProject && (
-              <MainNavigation projectId={currentUser.id} />
+              <MainNavigation projectId={currentProject.id} />
             )}
             <Spacer />
             {currentUser && currentProject && (

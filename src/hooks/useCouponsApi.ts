@@ -1,4 +1,4 @@
-import { Coupon } from "@/models";
+import { Coupon, CouponStatus } from "@/models";
 import { useCallback } from "react";
 import { useApiClient } from "./useApiClient";
 
@@ -145,43 +145,32 @@ export const useCouponsApi = () => {
     [apiClient]
   );
 
-  const getStatus = useCallback(
-    (
-      item: Coupon
-    ):
-      | "processing"
-      | "scheduled"
-      | "ongoing"
-      | "finished"
-      | "failed"
-      | "invalidated" => {
-      if (!!item.invalidatedAt) {
-        return "invalidated";
+  const getStatus = useCallback((item: Coupon): CouponStatus => {
+    if (!!item.invalidatedAt) {
+      return "invalidated";
+    }
+    const isReady = !!item.contractAddress && !!item.nftTokenId;
+    const currentTime = new Date().getTime();
+    if (!isReady) {
+      const processThreashold = 20 * 60 * 1000; // 20 minutes
+      const duration = currentTime - item.createdAt.getTime();
+      if (processThreashold < duration) {
+        //
+        // 20 minutes or more
+        //
+        return "failed";
+      } else {
+        return "processing";
       }
-      const isReady = !!item.contractAddress && !!item.nftTokenId;
-      const currentTime = new Date().getTime();
-      if (!isReady) {
-        const processThreashold = 20 * 60 * 1000; // 20 minutes
-        const duration = currentTime - item.createdAt.getTime();
-        if (processThreashold < duration) {
-          //
-          // 20 minutes or more
-          //
-          return "failed";
-        } else {
-          return "processing";
-        }
-      }
-      if (item.endAt.getTime() < currentTime) {
-        return "finished";
-      }
-      if (currentTime < item.startAt.getTime()) {
-        return "scheduled";
-      }
-      return "ongoing";
-    },
-    []
-  );
+    }
+    if (item.endAt.getTime() < currentTime) {
+      return "finished";
+    }
+    if (currentTime < item.startAt.getTime()) {
+      return "scheduled";
+    }
+    return "ongoing";
+  }, []);
 
   return {
     callGetCoupons,

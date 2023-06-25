@@ -1,16 +1,21 @@
 import { useCallback } from "react";
 import {
-  mainnet,
+  Chain,
   goerli,
-  sepolia,
+  mainnet,
   polygon,
   polygonMumbai,
-  Chain,
+  sepolia,
 } from "wagmi/chains";
 
 export const useBlockchain = () => {
   const getAlchemyApiKey = (): string => {
     return process.env.NEXT_PUBLIC_ALCHEMY_API_KEY!;
+  };
+  const getIconPathById = (chainId: number): string => {
+    if (chainId === polygon.id) return "/chain_polygon.png";
+    if (chainId === polygonMumbai.id) return "/chain_polygon.png";
+    return "/chain_ethereum.png";
   };
 
   const getChainById = (chainId: number): Chain => {
@@ -50,6 +55,7 @@ export const useBlockchain = () => {
 
   return {
     getAlchemyApiKey,
+    getIconPathById,
     getChainById,
     getExplorerTxUrl,
     getExplorerAddressUrl,

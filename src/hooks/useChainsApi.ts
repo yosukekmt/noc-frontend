@@ -11,6 +11,9 @@ export const useChainsApi = () => {
 
   const callGetChains = useCallback(
     async (authToken: string): Promise<Chain[]> => {
+      if (0 < chains.length) {
+        return chains;
+      }
       const resp = await apiClient.get("/chains", {
         headers: { Authorization: authToken },
       });

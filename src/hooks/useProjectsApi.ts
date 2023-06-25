@@ -29,6 +29,7 @@ export const useProjectsApi = () => {
       const resp = await apiClient.get(`/projects/${id}`, {
         headers: { Authorization: authToken },
       });
+
       const item = {
         id: resp.data.data.id,
         name: resp.data.data.name,

@@ -1,5 +1,5 @@
-import WithdrawSubmittedDialog from "@/components/dashboard/projects/withdraw-submitted-dialog";
 import WithdrawDialog from "@/components/dashboard/projects/withdraw-dialog";
+import WithdrawSubmittedDialog from "@/components/dashboard/projects/withdraw-submitted-dialog";
 import HtmlHead from "@/components/html-head";
 import { useBlockchain } from "@/hooks/useBlockchain";
 import { useChainsApi } from "@/hooks/useChainsApi";
@@ -8,32 +8,24 @@ import { useProjectsApi } from "@/hooks/useProjectsApi";
 import DashboardLayout from "@/layouts/dashboard-layout";
 import { Chain, Project } from "@/models";
 import {
-  Box,
   Button,
   Card,
+  CardBody,
   CardHeader,
-  Divider,
   Grid,
   GridItem,
   Heading,
   Icon,
   Link,
   Skeleton,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tr,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { ArrowSquareOut, Swap } from "phosphor-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
-const TableCell = (props: { project: Project; chain: Chain }) => {
+const ProjectCell = (props: { project: Project; chain: Chain }) => {
   const { getExplorerAddressUrl } = useBlockchain();
   const requestDialog = useDisclosure();
   const requestedDialog = useDisclosure();
@@ -58,27 +50,47 @@ const TableCell = (props: { project: Project; chain: Chain }) => {
   };
   return (
     <>
-      <Td>
-        <Text fontWeight="normal" fontSize="sm">
-          <Link href={walletExplorerUrl} isExternal>
+      <Card
+        variant="outline"
+        borderColor="tertiary.500"
+        bgColor="tertiary.300"
+        boxShadow="none"
+        px={4}
+        py={4}
+        mt={2}
+      >
+        <Grid
+          templateAreas={{
+            base: `"project_name" "project_wallet" "project_withdraw"`,
+            md: `"project_name project_wallet project_withdraw"`,
+          }}
+          gridTemplateColumns={{
+            base: "100% 100% 100%",
+            md: "280px calc(100% - 400px) 120px",
+          }}
+        >
+          <GridItem area="project_name">
+            <Text>{props.chain.name}</Text>
+          </GridItem>
+          <GridItem area="project_wallet">
+            <Link href={walletExplorerUrl} isExternal>
+              <Button fontWeight="light" variant="link">
+                {props.project.walletAddress}
+              </Button>
+            </Link>
+          </GridItem>
+          <GridItem area="project_withdraw">
             <Button
-              size="xs"
-              variant="ghost"
-              leftIcon={<Icon as={ArrowSquareOut} />}
+              variant="link"
+              leftIcon={<Icon as={FaExternalLinkAlt} />}
+              onClick={clickWithdraw}
+              mt={{ base: 4, md: 0 }}
             >
-              Details
+              Withdraw
             </Button>
-          </Link>
-          <Button
-            size="xs"
-            variant="ghost"
-            leftIcon={<Icon as={Swap} />}
-            onClick={clickWithdraw}
-          >
-            Withdraw
-          </Button>
-        </Text>
-      </Td>
+          </GridItem>
+        </Grid>
+      </Card>
       <WithdrawDialog
         project={props.project}
         chain={props.chain}
@@ -154,57 +166,31 @@ export default function ProjectCampaigns() {
       <DashboardLayout projectId={projectId}>
         <Card variant="outline">
           <CardHeader>
-            <Grid templateColumns="repeat(12, 1fr)" gap={4}>
-              <GridItem colSpan={{ base: 12 }}>
-                <Box>
-                  <Heading as="h3" fontSize="2xl" fontWeight="bold">
-                    Project Treasury
-                  </Heading>
-                </Box>
-              </GridItem>
-            </Grid>
+            <Heading as="h3" fontSize="2xl" fontWeight="bold">
+              Treasury
+            </Heading>
           </CardHeader>
-          <Divider />
-          <TableContainer>
-            <Table size="sm">
-              <Thead>
-                <Tr>
-                  <Th>NAME</Th>
-                  <Th>WALLET ADDRESS</Th>
-                  {chains.map((chain) => {
-                    return <Th key={`chain_${chain.id}`}>{chain.name}</Th>;
-                  })}
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr>
-                  <Td>
-                    <Text fontWeight="normal" fontSize="sm">
-                      {item && item.name}
-                    </Text>
-                  </Td>
-                  <Td>
-                    <Text fontWeight="normal" fontSize="sm">
-                      {item && item.walletAddress}
-                    </Text>
-                  </Td>
-                  {chains.map((chain) => {
-                    if (item) {
-                      return (
-                        <TableCell
-                          key={`chain_${chain.id}`}
-                          project={item}
-                          chain={chain}
-                        />
-                      );
-                    } else {
-                      return <Skeleton key={`chain_${chain.id}`} h={4} />;
-                    }
-                  })}
-                </Tr>
-              </Tbody>
-            </Table>
-          </TableContainer>
+          <CardBody pt={0}>
+            {isInitialized && item ? (
+              <>
+                {chains.map((chain) => {
+                  return (
+                    <ProjectCell
+                      key={`chain_${chain.id}`}
+                      project={item}
+                      chain={chain}
+                    />
+                  );
+                })}
+              </>
+            ) : (
+              <>
+                <Skeleton h={4} mt={2} />
+                <Skeleton h={4} mt={2} />
+                <Skeleton h={4} mt={2} />
+              </>
+            )}
+          </CardBody>
         </Card>
       </DashboardLayout>
     </>

@@ -1,6 +1,8 @@
-import CashbacksSection from "@/components/dashboard/coupons/cashbacks-section";
-import CouponHoldersSection from "@/components/dashboard/coupons/coupon-holders-section";
+import ChainNameValue from "@/components/dashboard/coupons/chain-name-value";
+import CouponRewardTypeValue from "@/components/dashboard/coupons/coupon-reward-type-value";
+import CouponStatusValue from "@/components/dashboard/coupons/coupon-status-value";
 import InvalidateDialog from "@/components/dashboard/coupons/invalidate-dialog";
+import NftLink from "@/components/dashboard/coupons/nft-link";
 import HtmlHead from "@/components/html-head";
 import { useBlockchain } from "@/hooks/useBlockchain";
 import { useCashbacksApi } from "@/hooks/useCashbacksApi";
@@ -14,6 +16,7 @@ import { useProjectsApi } from "@/hooks/useProjectsApi";
 import { useUrl } from "@/hooks/useUrl";
 import DashboardLayout from "@/layouts/dashboard-layout";
 import { Cashback, Chain, Coupon, CouponHolder, Nft, Project } from "@/models";
+import { SearchIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -23,6 +26,7 @@ import {
   Grid,
   GridItem,
   Heading,
+  Icon,
   IconButton,
   Image,
   Link,
@@ -30,22 +34,17 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Skeleton,
   Spacer,
-  Stat,
-  StatHelpText,
-  StatLabel,
-  StatNumber,
   Text,
   useDisclosure,
-  useToken,
-  VStack,
 } from "@chakra-ui/react";
-import { Chart, registerables } from "chart.js";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { Cube, DotsThree, LineSegment, Spinner, Tag } from "phosphor-react";
+import { Cube, DotsThree } from "phosphor-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Line } from "react-chartjs-2";
-Chart.register(...registerables);
+import { FaArrowLeft, FaTrash, FaTrashAlt } from "react-icons/fa";
+import { FiArrowUpRight } from "react-icons/fi";
 
 const SummarySection = (props: {
   isInitialized: boolean;
@@ -56,22 +55,10 @@ const SummarySection = (props: {
 }) => {
   const { getStatus } = useCouponsApi();
   const { formatWithTimezone } = useDatetime();
-  const { getMintUrl } = useUrl();
-  const {
-    truncateContractAddress,
-    getExplorerAddressUrl,
-    getOpenseaAddressUrl,
-  } = useBlockchain();
-
   const status = useMemo(() => {
     if (!props.coupon) return;
     return getStatus(props.coupon);
   }, [getStatus, props.coupon]);
-
-  const isContractReady = useMemo(() => {
-    if (!props.coupon) return;
-    return !!props.coupon.contractAddress && !!props.coupon.nftTokenId;
-  }, [props.coupon]);
 
   const startAtStr = useMemo(() => {
     if (!props.coupon) return;
@@ -89,215 +76,117 @@ const SummarySection = (props: {
     return formatWithTimezone(props.coupon.endAt, props.coupon.timezone);
   }, [formatWithTimezone, props.coupon]);
 
-  const explorerUrl = useMemo(() => {
-    if (!props.chain) return;
-    if (!props.chain.explorerUrl) return;
-    if (!props.coupon) return;
-    if (!props.coupon.contractAddress) return;
-    return getExplorerAddressUrl(
-      props.chain.explorerUrl,
-      props.coupon.contractAddress
-    );
-  }, [getExplorerAddressUrl, props.chain, props.coupon]);
-
-  const openseaAddresses = useMemo(() => {
-    if (!props.chain) return;
-    if (!props.chain.explorerUrl) return;
-
-    const addresses: Map<string, string> = new Map();
-
-    props.nfts.forEach((nft) => {
-      const openseaAddress = getOpenseaAddressUrl(
-        props.chain!.openseaUrl,
-        nft.contractAddress
-      );
-      addresses.set(nft.contractAddress, openseaAddress);
-    });
-    return addresses;
-  }, [getOpenseaAddressUrl, props.chain, props.nfts]);
-
   return (
-    <>
+    <Box>
       <Box>
-        <Grid templateColumns="repeat(12, 1fr)" my={4}>
-          <GridItem colSpan={{ base: 12, md: 6 }}>
-            <Flex>
-              <Card
-                width={128}
-                height={128}
-                bg="gray.200"
-                align="center"
-                justify="center"
-              >
-                {props.coupon ? (
-                  <Image
-                    src={props.coupon.imageUrl}
-                    alt="Preview"
-                    w="100%"
-                    h="100%"
-                  />
-                ) : (
-                  <Spinner size={24}>
-                    <animateTransform
-                      attributeName="transform"
-                      attributeType="XML"
-                      type="rotate"
-                      dur="1.8s"
-                      from="0 0 0"
-                      to="360 0 0"
-                      repeatCount="indefinite"
-                    ></animateTransform>
-                  </Spinner>
-                )}
-              </Card>
-              <Box ml={4}>
-                <Heading as="h3">
-                  <Flex align="center">
-                    <Tag color="gray" size={16} weight="fill" />
-                    <Text fontSize="sm" color="gray" ml={2}>
-                      Cashback Campaign
-                    </Text>
-                  </Flex>
-                </Heading>
-                <Heading as="h4" fontSize="4xl" mt={2}>
-                  {props.coupon && props.coupon.name}
-                </Heading>
-              </Box>
-            </Flex>
-          </GridItem>
-          <GridItem colSpan={{ base: 12, md: 6 }}>
-            <Flex>
-              <Spacer />
-              {props.coupon && (
-                <Link href={getMintUrl(props.coupon.id)} isExternal>
-                  <Button>Coupon Page</Button>
-                </Link>
-              )}
-              <Menu>
-                <MenuButton
-                  as={IconButton}
-                  aria-label="Options"
-                  icon={<DotsThree weight="bold" size={24} />}
-                  variant="ghots"
-                />
-                <MenuList>
-                  <MenuItem icon={<Cube />} onClick={props.clickDelete}>
-                    Invalidate
-                  </MenuItem>
-                </MenuList>
-              </Menu>
-            </Flex>
-          </GridItem>
-        </Grid>
-        <Divider mt={2} />
-        <Grid templateColumns="repeat(12, 1fr)" gap={4} my={4}>
-          <GridItem colSpan={{ base: 12, sm: 6, md: 3 }}>
-            <Box>
-              <Text fontSize="sm" color="gray">
-                Network
-              </Text>
-              <Text fontSize="sm">{props.chain && props.chain.name}</Text>
-            </Box>
-          </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 6, md: 3 }}>
-            <Box>
-              <Text fontSize="sm" color="gray">
-                Status
-              </Text>
-              <Text fontSize="sm">
-                {status === "processing" && "Processing"}
-                {status === "scheduled" && "Scheduled"}
-                {status === "ongoing" && "Ongoing"}
-                {status === "finished" && "Finished"}
-                {status === "failed" && "Could not process"}
-                {status === "invalidated" && "Invalidated"}
-              </Text>
-            </Box>
-          </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 6, md: 3 }}>
-            <Box>
-              <Text fontSize="sm" color="gray">
-                Reward type
-              </Text>
-              {props.coupon && props.coupon.rewardType === "cashback_gas" && (
-                <Text fontSize="sm">Gas fee cashback</Text>
-              )}
-              {props.coupon && props.coupon.rewardType === "cashback_005" && (
-                <Text fontSize="sm">5% Cashback</Text>
-              )}
-            </Box>
-          </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 6, md: 3 }}>
-            <Box>
-              <Text fontSize="sm" color="gray">
-                Contract address
-              </Text>
-              <Text fontSize="sm">
-                {isContractReady && explorerUrl && (
-                  <Link
-                    href={explorerUrl!}
-                    style={{ width: "100%", display: "block" }}
-                    isExternal
-                  >
-                    {truncateContractAddress(props.coupon!.contractAddress)}
-                    <br />({`Token ID:${props.coupon!.nftTokenId}`})
-                  </Link>
-                )}
-                {isContractReady === false && "Processing"}
-              </Text>
-            </Box>
-          </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 4 }}>
-            <Box>
-              <Text fontSize="sm" color="gray">
-                Applicable NFTs
-              </Text>
-              {props.nfts.length === 0 && <Text fontSize="sm">No NFT set</Text>}
-              {openseaAddresses &&
-                0 < props.nfts.length &&
-                props.nfts.flatMap((nft) => {
+        <Heading as="h4" fontSize="md">
+          Status
+        </Heading>
+        {props.isInitialized && status ? (
+          <CouponStatusValue status={status!} />
+        ) : (
+          <Skeleton h={4} />
+        )}
+      </Box>
+      <Box mt={8}>
+        <Heading as="h4" fontSize="md">
+          Reward Type
+        </Heading>
+
+        {props.isInitialized && props.coupon && props.coupon.rewardType ? (
+          <CouponRewardTypeValue rewardType={props.coupon.rewardType} />
+        ) : (
+          <Skeleton h={4} />
+        )}
+      </Box>
+      <Box mt={8}>
+        <Heading as="h4" fontSize="md">
+          Network
+        </Heading>
+        {props.isInitialized && props.coupon && props.coupon.chainId ? (
+          <ChainNameValue chainId={props.coupon.chainId} />
+        ) : (
+          <Skeleton h={4} />
+        )}
+      </Box>
+      <Box mt={8}>
+        <Heading as="h4" fontSize="md">
+          Applicable NFT Collections
+        </Heading>
+
+        {props.isInitialized && props.chain && props.chain.openseaUrl ? (
+          <>
+            {props.nfts.length === 0 && (
+              <Text fontSize="sm">No NFT Collections</Text>
+            )}
+            {0 < props.nfts.length && (
+              <>
+                {props.nfts.flatMap((nft) => {
                   return (
-                    <Text fontSize="sm" key={`applicable_nft_${nft.id}`}>
-                      <Link
-                        href={openseaAddresses.get(nft.contractAddress) || ""}
-                        style={{ width: "100%", display: "block" }}
-                        isExternal
-                      >
-                        {`${nft.name}(${truncateContractAddress(
-                          nft.contractAddress
-                        )})`}
-                      </Link>
-                    </Text>
+                    <NftLink
+                      openseaUrl={props.chain!.openseaUrl}
+                      name={nft.name}
+                      contractAddress={nft.contractAddress}
+                    />
                   );
                 })}
-            </Box>
-          </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 4 }}>
-            <Box>
-              <Text fontSize="sm" color="gray">
-                Description
-              </Text>
-              <Text fontSize="sm">
-                {props.coupon && props.coupon.description}
-              </Text>
-            </Box>
-          </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 4 }}>
-            <Box>
-              <Text fontSize="sm" color="gray">
-                Period
-              </Text>
-              <Text fontSize="sm">
-                {props.coupon && `${startAtStr} - ${endAtStr}`}
-              </Text>
-              <Text fontSize="sm">
-                {props.coupon && `(${props.coupon.timezone})`}
-              </Text>
-            </Box>
-          </GridItem>
-        </Grid>
+              </>
+            )}
+          </>
+        ) : (
+          <Skeleton h={4} />
+        )}
       </Box>
-    </>
+      <Box mt={8}>
+        <Heading as="h4" fontSize="md">
+          Starts
+        </Heading>
+
+        {props.isInitialized && startAtStr ? (
+          <Text fontSize="md" fontWeight="light" color="gray">
+            {startAtStr}
+          </Text>
+        ) : (
+          <Skeleton h={4} />
+        )}
+      </Box>
+      <Box mt={8}>
+        <Heading as="h4" fontSize="md">
+          Ends
+        </Heading>
+        {props.isInitialized && startAtStr ? (
+          <Text fontSize="md" fontWeight="light" color="gray">
+            {endAtStr}
+          </Text>
+        ) : (
+          <Skeleton h={4} />
+        )}
+      </Box>
+      <Box mt={8}>
+        <Heading as="h4" fontSize="md">
+          Timezone
+        </Heading>
+        {props.isInitialized && props.coupon && props.coupon.timezone ? (
+          <Text fontSize="md" fontWeight="light" color="gray">
+            {props.coupon && props.coupon.timezone}
+          </Text>
+        ) : (
+          <Skeleton h={4} />
+        )}
+      </Box>
+      <Box mt={8}>
+        <Heading as="h4" fontSize="md">
+          Campaign Description
+        </Heading>
+        {props.isInitialized && props.coupon && props.coupon.description ? (
+          <Text fontSize="md" fontWeight="light" color="gray">
+            {props.coupon && props.coupon.description}
+          </Text>
+        ) : (
+          <Skeleton h={4} />
+        )}
+      </Box>
+    </Box>
   );
 };
 
@@ -320,164 +209,396 @@ const TresurySection = (props: {
   }, [props.chain, props.project, getExplorerAddressUrl]);
 
   return (
-    <>
-      <Box>
-        <Grid templateColumns="repeat(12, 1fr)" gap={4} mt={24}>
-          <GridItem colSpan={{ base: 12 }}>
-            <Flex>
-              <Heading as="h4" fontSize="2xl">
-                Treasury Status
-              </Heading>
-            </Flex>
-            <Divider mt={2} />
-          </GridItem>
-        </Grid>
-        <Grid templateColumns="repeat(12, 1fr)" gap={4} my={4}>
-          <GridItem colSpan={{ base: 12, sm: 6, md: 4 }}>
-            <Box>
-              <Text fontSize="sm" color="gray">
-                Contract address
-              </Text>
-              <Text fontSize="sm">
-                {explorerUrl && props.project && (
-                  <Link
-                    href={explorerUrl}
-                    style={{ width: "100%", display: "block" }}
-                    isExternal
-                  >
-                    {truncateContractAddress(props.project?.walletAddress)}
-                  </Link>
-                )}
-              </Text>
-            </Box>
-          </GridItem>
-          <GridItem colSpan={{ base: 12, sm: 6, md: 4 }}>
-            <Box>
-              <Text fontSize="sm" color="gray">
-                Balance
-              </Text>
-              <Text fontSize="sm">
-                {explorerUrl && props.project && (
-                  <Link
-                    href={explorerUrl}
-                    style={{ width: "100%", display: "block" }}
-                    isExternal
-                  >
-                    Click Here
-                  </Link>
-                )}
-              </Text>
-            </Box>
-          </GridItem>
-        </Grid>
-      </Box>
-    </>
+    <Box>
+      <Flex align="center">
+        <Heading as="h3" fontSize="lg">
+          Treasury Status
+        </Heading>
+        <Spacer />
+        {props.project && (
+          <Link
+            href={`/dashboard/${props.project.id}`}
+            isExternal
+            display="flex"
+          >
+            <Button
+              variant="link"
+              size="sm"
+              leftIcon={<Icon as={FiArrowUpRight} boxSize={4} />}
+            >
+              Withdraw
+            </Button>
+          </Link>
+        )}
+      </Flex>
+      <Grid templateColumns="repeat(12, 1fr)" my={4}>
+        <GridItem colSpan={{ base: 12, md: 6 }}>
+          <Heading as="h4" fontSize="md">
+            Contract Address
+          </Heading>
+          {explorerUrl && props.project && (
+            <Link
+              href={explorerUrl}
+              style={{ width: "100%", display: "block" }}
+              isExternal
+              display="flex"
+            >
+              <Button
+                variant="link"
+                fontSize="md"
+                fontWeight="light"
+                color="gray"
+              >
+                {truncateContractAddress(props.project?.walletAddress)}
+              </Button>
+            </Link>
+          )}
+        </GridItem>
+        <GridItem colSpan={{ base: 12, md: 6 }}>
+          <Heading as="h4" fontSize="md">
+            Funds Balance
+          </Heading>
+          {explorerUrl && props.project && (
+            <Link
+              href={explorerUrl}
+              style={{ width: "100%", display: "block" }}
+              isExternal
+            >
+              <Button
+                variant="link"
+                fontSize="md"
+                fontWeight="light"
+                color="gray"
+              >
+                Click Here
+              </Button>
+            </Link>
+          )}
+        </GridItem>
+      </Grid>
+    </Box>
   );
 };
 
-const StatisticsSection = (props: { isInitialized: boolean }) => {
-  const [lineColor1, lineColor2] = useToken("colors", ["blue", "gray"]);
-  const chartData = {
-    labels: [
-      "5/9",
-      "6/9",
-      "7/9",
-      "8/9",
-      "9/9",
-      "10/9",
-      "11/9",
-      "12/9",
-      "13/9",
-      "14/9",
-      "15/9",
-      "16/9",
-    ],
-    datasets: [
-      {
-        data: [12, 19, 3, 5, 2, 3, 12, 19, 3, 5, 2, 3],
-        borderColor: lineColor1,
-        borderWidth: 1,
-      },
-      {
-        data: [2, 3, 2, 1, 2, 3, 4, 20, 13, 23, 12, 23],
-        borderColor: lineColor2,
-        borderWidth: 1,
-      },
-    ],
-  };
+const CouponHoldersSection = (props: {
+  isInitialized: boolean;
+  chain: Chain | undefined;
+  couponHolders: CouponHolder[];
+  projectId: string | undefined;
+  couponId: string | undefined;
+}) => {
+  const items = useMemo(() => {
+    return props.couponHolders.slice(0, 8);
+  }, [props.couponHolders]);
+
+  const isMore = useMemo(() => {
+    return 8 < props.couponHolders.length;
+  }, [props.couponHolders.length]);
 
   return (
-    <>
-      <Box>
-        <Grid templateColumns="repeat(12, 1fr)" gap={4} mt={24}>
-          <GridItem colSpan={{ base: 12 }}>
-            <Heading as="h4" fontSize="2xl">
-              Statistics(DUMMY)
-            </Heading>
-            <Divider mt={2} />
-          </GridItem>
-          <GridItem colSpan={{ base: 12, md: 8 }}>
-            <Box w="100%" h="100%">
-              <Box mb={4}>
+    <Box>
+      <Flex align="center">
+        <Heading as="h3" fontSize="lg">
+          Coupon Holders
+        </Heading>
+      </Flex>
+      {!props.isInitialized && (
+        <>
+          {[0, 1, 2].flatMap((idx) => {
+            return (
+              <Card
+                variant="outline"
+                borderColor="tertiary.500"
+                bgColor="tertiary.300"
+                boxShadow="none"
+                px={4}
+                py={2}
+                mt={2}
+              >
+                <Skeleton h={4} />
+              </Card>
+            );
+          })}
+        </>
+      )}
+      {props.isInitialized && items.length === 0 && <Text>No Records</Text>}
+      {props.isInitialized && items.length !== 0 && (
+        <>
+          {items.flatMap((item) => {
+            return (
+              <Card
+                variant="outline"
+                borderColor="tertiary.500"
+                bgColor="tertiary.300"
+                boxShadow="none"
+                px={4}
+                py={2}
+                mt={2}
+              >
                 <Flex align="center">
-                  <LineSegment size={24} color={lineColor1} />
-                  <Text fontSize="md" ml={2} mr={8}>
-                    Last 7 days
-                  </Text>
-                  <LineSegment size={24} color={lineColor2} />
-                  <Text fontSize="md" ml={2}>
-                    Previous period
-                  </Text>
+                  <Text>0x23e23...</Text>
+                  <Spacer />
+                  <Text>Since 17/04/2023, 17:03</Text>
                 </Flex>
-              </Box>
-              <Line
-                data={chartData}
-                height={120}
-                options={{
-                  layout: { autoPadding: false },
-                  elements: {
-                    point: {
-                      radius: 0,
-                    },
-                  },
-                  plugins: {
-                    legend: {
-                      display: false,
-                    },
-                  },
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                    },
-                  },
-                }}
-              />
-            </Box>
-          </GridItem>
-          <GridItem colSpan={{ base: 12, md: 4 }}>
-            <VStack align="start" h="100%">
-              <Stat>
-                <StatLabel>Total mints</StatLabel>
-                <StatNumber>1294</StatNumber>
-                <StatHelpText>+10.57% vs previous week</StatHelpText>
-              </Stat>
-              <Divider my={2} />
-              <Stat>
-                <StatLabel>Total redemptions</StatLabel>
-                <StatNumber>223</StatNumber>
-                <StatHelpText>+1.22% vs previous week</StatHelpText>
-              </Stat>
-              <Divider my={2} />
-              <Stat>
-                <StatLabel>Tresury balance</StatLabel>
-                <StatNumber>1.3202389</StatNumber>
-                <StatHelpText>ETH</StatHelpText>
-              </Stat>
-            </VStack>
-          </GridItem>
-        </Grid>
-      </Box>
-    </>
+              </Card>
+            );
+          })}
+          {props.projectId && props.couponId && isMore && (
+            <Button
+              size="md"
+              mt={2}
+              w="100%"
+              variant="outline"
+              colorScheme="black"
+            >
+              Show More
+            </Button>
+          )}
+        </>
+      )}
+    </Box>
+  );
+};
+
+export const CashbackRow = (props: {
+  txHash: string;
+  walletAddress: string;
+  explorerTxUrl: string;
+  explorerWalletUrl: string;
+  amountWei: number;
+  blockProducedAt: Date;
+}) => {
+  const { truncateContractAddress } = useBlockchain();
+  const { formatWithoutTimezone } = useDatetime();
+
+  const truncatedTxHash = useMemo(() => {
+    return truncateContractAddress(props.txHash);
+  }, [props.txHash, truncateContractAddress]);
+  const truncatedWalletAddress = useMemo(() => {
+    return truncateContractAddress(props.walletAddress);
+  }, [props.walletAddress, truncateContractAddress]);
+  const formattedAmountWei = useMemo(() => {
+    return Intl.NumberFormat().format(props.amountWei);
+  }, [props.amountWei]);
+  const blockProducedAtStr = useMemo(() => {
+    return formatWithoutTimezone(props.blockProducedAt);
+  }, [formatWithoutTimezone, props.blockProducedAt]);
+
+  return (
+    <Card
+      variant="outline"
+      borderColor="tertiary.500"
+      bgColor="tertiary.300"
+      boxShadow="none"
+      px={4}
+      py={2}
+      mt={2}
+    >
+      <Flex align="center">
+        <Text>Event Hash</Text>
+        <Spacer />
+        <Text>Status</Text>
+        <Text>Wallet Addres</Text>
+        <Text>Amount</Text>
+        <Text>17/04/2023, 17:03</Text>
+      </Flex>
+    </Card>
+  );
+};
+
+export const CashbackRect = (props: {
+  txHash: string;
+  walletAddress: string;
+  explorerTxUrl: string;
+  explorerWalletUrl: string;
+  amountWei: number;
+  blockProducedAt: Date;
+}) => {
+  const { truncateContractAddress } = useBlockchain();
+  const { formatWithoutTimezone } = useDatetime();
+
+  const truncatedTxHash = useMemo(() => {
+    return truncateContractAddress(props.txHash);
+  }, [props.txHash, truncateContractAddress]);
+  const truncatedWalletAddress = useMemo(() => {
+    return truncateContractAddress(props.walletAddress);
+  }, [props.walletAddress, truncateContractAddress]);
+  const formattedAmountWei = useMemo(() => {
+    return Intl.NumberFormat().format(props.amountWei);
+  }, [props.amountWei]);
+  const blockProducedAtStr = useMemo(() => {
+    return formatWithoutTimezone(props.blockProducedAt);
+  }, [formatWithoutTimezone, props.blockProducedAt]);
+
+  return (
+    <Card
+      variant="outline"
+      borderColor="tertiary.500"
+      bgColor="tertiary.300"
+      boxShadow="none"
+      px={4}
+      py={2}
+      mt={2}
+    >
+      <Link
+        href={props.explorerTxUrl}
+        style={{ width: "100%", display: "block" }}
+        isExternal
+      >
+        <Text fontWeight="normal" fontSize="sm">
+          Gas fee cashback
+        </Text>
+      </Link>
+      <Link
+        href={props.explorerTxUrl || ""}
+        style={{ width: "100%", display: "block" }}
+        isExternal
+      >
+        <Text fontWeight="normal" fontSize="sm">
+          {props.txHash ? "Submitted" : "Failed"}
+        </Text>
+      </Link>
+
+      {props.txHash && (
+        <Link
+          href={props.explorerTxUrl}
+          style={{ width: "100%", display: "block" }}
+          isExternal
+        >
+          <Text fontWeight="normal" fontSize="sm">
+            {truncatedTxHash}
+          </Text>
+        </Link>
+      )}
+      <Link
+        href="https://www.alchemy.com/gwei-calculator"
+        style={{ width: "100%", display: "block" }}
+        isExternal
+      >
+        <Text fontWeight="normal" fontSize="sm">
+          {`${formattedAmountWei} Wei`}
+        </Text>
+      </Link>
+
+      <Link
+        href={props.explorerTxUrl}
+        style={{ width: "100%", display: "block" }}
+        isExternal
+      >
+        <Text fontWeight="normal" fontSize="sm">
+          {blockProducedAtStr}
+        </Text>
+      </Link>
+    </Card>
+  );
+};
+
+export const CashbackCell = (props: { chain: Chain; item: Cashback }) => {
+  const { getExplorerTxUrl, getExplorerAddressUrl } = useBlockchain();
+  const explorerTxUrl = useMemo(() => {
+    return getExplorerTxUrl(props.chain.explorerUrl, props.item.txHash);
+  }, [props.chain, props.item, getExplorerTxUrl]);
+
+  const explorerWalletUrl = useMemo(() => {
+    return getExplorerAddressUrl(
+      props.chain.explorerUrl,
+      props.item.walletAddress
+    );
+  }, [props.chain, props.item, getExplorerAddressUrl]);
+
+  return true ? (
+    <CashbackRow
+      txHash={props.item.txHash}
+      walletAddress={props.item.walletAddress}
+      explorerTxUrl={explorerTxUrl}
+      explorerWalletUrl={explorerWalletUrl}
+      amountWei={props.item.amountWei}
+      blockProducedAt={props.item.createdAt}
+    />
+  ) : (
+    <CashbackRect
+      txHash={props.item.txHash}
+      walletAddress={props.item.walletAddress}
+      explorerTxUrl={explorerTxUrl}
+      explorerWalletUrl={explorerWalletUrl}
+      amountWei={props.item.amountWei}
+      blockProducedAt={props.item.createdAt}
+    />
+  );
+};
+
+const CashbacksSection = (props: {
+  isInitialized: boolean;
+  chain: Chain | undefined;
+  cashbacks: Cashback[];
+  projectId: string | undefined;
+  couponId: string | undefined;
+}) => {
+  const items = useMemo(() => {
+    return props.cashbacks.slice(0, 16);
+  }, [props.cashbacks]);
+
+  const isMore = useMemo(() => {
+    return 8 < props.cashbacks.length;
+  }, [props.cashbacks.length]);
+
+  return (
+    <Box>
+      <Flex align="center">
+        <Heading as="h3" fontSize="lg">
+          Recent Cashbacks
+        </Heading>
+      </Flex>
+
+      {!props.isInitialized && (
+        <>
+          {[0, 1, 2].flatMap((idx) => {
+            return (
+              <Card
+                variant="outline"
+                borderColor="tertiary.500"
+                bgColor="tertiary.300"
+                boxShadow="none"
+                px={4}
+                py={2}
+                mt={2}
+              >
+                <Skeleton h={4} />
+              </Card>
+            );
+          })}
+        </>
+      )}
+      {props.isInitialized && items.length === 0 && <Text>No Records</Text>}
+      {props.isInitialized && items.length !== 0 && (
+        <>
+          {props.chain && (
+            <>
+              {items.flatMap((item) => {
+                return (
+                  <CashbackCell
+                    chain={props.chain!}
+                    item={item}
+                    key={`cashbacks_${item.id}`}
+                  />
+                );
+              })}
+            </>
+          )}
+          {props.projectId && props.couponId && isMore && (
+            <Button
+              size="md"
+              mt={2}
+              w="100%"
+              variant="outline"
+              colorScheme="black"
+            >
+              Show More
+            </Button>
+          )}
+        </>
+      )}
+    </Box>
   );
 };
 
@@ -491,6 +612,7 @@ export default function CouponDetail() {
   const { callGetNfts } = useNftsApi();
   const { callGetCouponHolders } = useCouponHoldersApi();
   const { callGetCashbacks } = useCashbacksApi();
+  const { getMintUrl } = useUrl();
 
   const [chain, setChain] = useState<Chain | undefined>(undefined);
   const [project, setProject] = useState<Project | undefined>(undefined);
@@ -665,36 +787,142 @@ export default function CouponDetail() {
   return (
     <>
       <HtmlHead />
-      <DashboardLayout projectId={projectId as string}>
-        <Box>
-          <SummarySection
-            isInitialized={isInitialized}
-            chain={chain}
-            coupon={coupon}
-            nfts={nfts}
-            clickDelete={clickDelete}
-          />
-          <TresurySection
-            isInitialized={isInitialized}
-            chain={chain}
-            project={project}
-          />
-          <CouponHoldersSection
-            isInitialized={isInitialized}
-            chain={chain}
-            couponHolders={couponHolders}
-            projectId={projectId}
-            couponId={couponId}
-          />
-          <CashbacksSection
-            isInitialized={isInitialized}
-            chain={chain}
-            cashbacks={cashbacks}
-            projectId={projectId}
-            couponId={couponId}
-          />
-          {chain && <StatisticsSection isInitialized={isInitialized} />}
-        </Box>
+      <DashboardLayout projectId={projectId}>
+        <Card mb={16}>
+          <Flex align="center" px={{ base: 4, md: 8 }} py={4}>
+            <NextLink href={`/dashboard/${projectId}/campaigns/`}>
+              <IconButton
+                aria-label="back"
+                variant="outline"
+                colorScheme="black"
+                w="40px"
+                h="40px"
+                icon={<FaArrowLeft color="black" />}
+              />
+            </NextLink>
+            {isInitialized && coupon ? (
+              <>
+                <Image
+                  src={coupon.imageUrl}
+                  w="40px"
+                  h="40px"
+                  alt="Icon"
+                  ml={4}
+                  rounded={4}
+                />
+                <Heading
+                  as="h3"
+                  fontSize={{ base: "xl", md: "2xl" }}
+                  fontWeight="bold"
+                  ml={4}
+                  noOfLines={1}
+                >
+                  {coupon.name}
+                </Heading>
+              </>
+            ) : (
+              <Skeleton h={4} />
+            )}
+            <Spacer />
+            {isInitialized && coupon && (
+              <>
+                <Link href={getMintUrl(coupon.id)} isExternal>
+                  <IconButton
+                    display={{ base: "block", md: "none" }}
+                    w="40px"
+                    h="40px"
+                    aria-label="Mint Page"
+                    icon={<FiArrowUpRight size={16} />}
+                  />
+                  <Button
+                    display={{ base: "none", md: "block" }}
+                    size="sm"
+                    leftIcon={<Icon as={FiArrowUpRight} boxSize={4} />}
+                  >
+                    Coupon Page
+                  </Button>
+                </Link>
+                <Menu>
+                  <MenuButton
+                    as={IconButton}
+                    aria-label="Options"
+                    icon={<DotsThree weight="bold" size={24} />}
+                    variant="ghots"
+                    w="40px"
+                    h="40px"
+                    ml={2}
+                  />
+                  <MenuList>
+                    <MenuItem
+                      icon={<FaTrash size={16} />}
+                      onClick={clickDelete}
+                    >
+                      Invalidate
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+              </>
+            )}
+          </Flex>
+          <Divider color="gray.100" />
+          <Grid
+            templateAreas={{
+              base: `"coupon_summary" "coupon_horizontal_divider" "coupon_stats"`,
+              md: `"coupon_summary coupon_vertical_divider coupon_stats"`,
+            }}
+            gridTemplateColumns={{
+              base: "100% 100% 100%",
+              md: "320px 1px calc(100% - 321px)",
+            }}
+          >
+            <GridItem
+              area="coupon_summary"
+              px={{ base: 4, md: 8 }}
+              py={{ base: 8 }}
+            >
+              <SummarySection
+                isInitialized={isInitialized}
+                chain={chain}
+                coupon={coupon}
+                nfts={nfts}
+                clickDelete={clickDelete}
+              />
+            </GridItem>
+            <GridItem area="coupon_horizontal_divider">
+              <Divider orientation="horizontal" color="pink" />
+            </GridItem>
+            <GridItem area="coupon_vertical_divider">
+              <Divider orientation="vertical" color="pink" />
+            </GridItem>
+            <GridItem
+              area="coupon_stats"
+              px={{ base: 4, md: 8 }}
+              py={{ base: 8 }}
+            >
+              <TresurySection
+                isInitialized={isInitialized}
+                chain={chain}
+                project={project}
+              />
+              <Divider my={8} />
+              <CouponHoldersSection
+                isInitialized={isInitialized}
+                chain={chain}
+                couponHolders={couponHolders}
+                projectId={projectId}
+                couponId={couponId}
+              />
+              <Divider my={8} />
+              <CashbacksSection
+                isInitialized={isInitialized}
+                chain={chain}
+                cashbacks={cashbacks}
+                projectId={projectId}
+                couponId={couponId}
+              />
+            </GridItem>
+          </Grid>
+        </Card>
       </DashboardLayout>
       {coupon && projectId && (
         <InvalidateDialog

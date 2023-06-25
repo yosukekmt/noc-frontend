@@ -1,3 +1,12 @@
+export type CouponStatus =
+  | "processing"
+  | "scheduled"
+  | "ongoing"
+  | "finished"
+  | "failed"
+  | "invalidated";
+export type CouponRewardType = "cashback_gas" | "cashback_005";
+
 export type PageInfo = {
   page: number;
   perPage: number;
@@ -7,7 +16,7 @@ export type PageInfo = {
 
 export type Coupon = {
   id: string;
-  rewardType: "cashback_gas" | "cashback_005";
+  rewardType: CouponRewardType;
   name: string;
   description: string;
   imageUrl: string;

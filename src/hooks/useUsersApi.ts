@@ -19,6 +19,8 @@ export const useUsersApi = () => {
           updatedAt: new Date(d.updatedAt),
         };
       });
+      console.log("items");
+      console.log(items);
       return items;
     },
     [apiClient]

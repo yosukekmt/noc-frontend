@@ -11,8 +11,10 @@ import { Invitation, User } from "@/models";
 import { DeleteIcon, HamburgerIcon } from "@chakra-ui/icons";
 import {
   Badge,
+  Box,
   Button,
   Card,
+  CardBody,
   CardHeader,
   Divider,
   Flex,
@@ -26,107 +28,73 @@ import {
   MenuList,
   Skeleton,
   Spacer,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
+  Text,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-const LoadingTBody = () => {
-  return (
-    <Tbody>
-      {[...Array(3)].flatMap((x, idx) => {
-        return (
-          <Tr key={`members_${idx}`} h={16}>
-            <Td>
-              <Skeleton h={4} />
-            </Td>
-            <Td>
-              <Skeleton h={4} />
-            </Td>
-            <Td></Td>
-          </Tr>
-        );
-      })}
-    </Tbody>
-  );
-};
-
-const InvitationLoadedTbody = (props: {
+const InvitationCell = (props: {
   projectId: string;
-  items: Invitation[];
+  invitation: Invitation;
   onDeleted: (itemId: string) => void;
 }) => {
   const deleteDialog = useDisclosure();
-  const [targetItem, setTargetItem] = useState<Invitation | null>(null);
 
-  const clickDelete = (item: Invitation) => {
-    setTargetItem(item);
+  const clickDelete = () => {
     deleteDialog.onOpen();
   };
-
   return (
     <>
-      {props.items.map((item, idx) => {
-        return (
-          <Tr key={`members_${idx}`} h={16}>
-            <Td fontWeight="normal" fontSize="sm">
-              {item.email}
-            </Td>
-            <Td fontWeight="normal" fontSize="sm">
-              <Badge>Invited</Badge>
-            </Td>
-            <Td textAlign="end">
-              <Menu>
-                <MenuButton
-                  as={IconButton}
-                  aria-label="Options"
-                  icon={<HamburgerIcon />}
-                  variant="ghots"
-                />
-                <MenuList>
-                  <MenuItem
-                    icon={<DeleteIcon />}
-                    onClick={() => clickDelete(item)}
-                  >
-                    Remove
-                  </MenuItem>
-                </MenuList>
-              </Menu>
-            </Td>
-          </Tr>
-        );
-      })}
-      {targetItem && (
-        <DeleteDialog
-          projectId={props.projectId}
-          item={targetItem}
-          isOpen={deleteDialog.isOpen}
-          onClose={deleteDialog.onClose}
-          onOpen={deleteDialog.onOpen}
-          onDeleted={props.onDeleted}
-        />
-      )}
+      <Card
+        variant="outline"
+        borderColor="tertiary.500"
+        bgColor="tertiary.300"
+        boxShadow="none"
+        px={4}
+        py={4}
+        mt={2}
+      >
+        <Flex align="center">
+          <Text>{props.invitation.email}</Text>
+          <Spacer />
+          <Badge>Invited</Badge>
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              aria-label="Options"
+              icon={<HamburgerIcon />}
+              variant="ghots"
+            />
+            <MenuList>
+              <MenuItem icon={<DeleteIcon />} onClick={clickDelete}>
+                Remove
+              </MenuItem>
+            </MenuList>
+          </Menu>
+        </Flex>
+      </Card>
+      <DeleteDialog
+        projectId={props.projectId}
+        item={props.invitation}
+        isOpen={deleteDialog.isOpen}
+        onClose={deleteDialog.onClose}
+        onOpen={deleteDialog.onOpen}
+        onDeleted={props.onDeleted}
+      />
     </>
   );
 };
 
-const UserLoadedTbody = (props: {
+const UserCell = (props: {
   projectId: string;
-  items: User[];
+  user: User;
   onDeleted: (itemId: string) => void;
 }) => {
+  const deleteDialog = useDisclosure();
   const { authToken } = useFirebase();
   const { getCurrentUser } = useCurrentUserApi();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const deleteDialog = useDisclosure();
-  const [targetItem, setTargetItem] = useState<User | null>(null);
 
   useEffect(() => {
     if (!authToken) return;
@@ -137,64 +105,61 @@ const UserLoadedTbody = (props: {
     })();
   }, [authToken, getCurrentUser]);
 
-  const clickDelete = (item: User) => {
-    setTargetItem(item);
+  const clickDelete = () => {
     deleteDialog.onOpen();
   };
-
   return (
     <>
-      {props.items.map((item, idx) => {
-        return (
-          <Tr key={`members_${idx}`} h={16}>
-            <Td fontWeight="normal" fontSize="sm">
-              {item.email}
-            </Td>
-            <Td fontWeight="normal" fontSize="sm">
-              <Badge>Joined</Badge>
-            </Td>
-            <Td textAlign="end">
-              {currentUser && item.email !== currentUser.email && (
-                <Menu>
-                  <MenuButton
-                    as={IconButton}
-                    aria-label="Options"
-                    icon={<HamburgerIcon />}
-                    variant="ghots"
-                  />
-                  <MenuList>
-                    <MenuItem
-                      icon={<DeleteIcon />}
-                      onClick={() => clickDelete(item)}
-                      disabled={
-                        !!currentUser && item.email === currentUser.email
-                      }
-                    >
-                      Remove
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
-              )}
-            </Td>
-          </Tr>
-        );
-      })}
-      {targetItem && (
-        <ProjectUsersDeleteDialog
-          projectId={props.projectId}
-          item={targetItem}
-          isOpen={deleteDialog.isOpen}
-          onClose={deleteDialog.onClose}
-          onOpen={deleteDialog.onOpen}
-          onDeleted={props.onDeleted}
-        />
-      )}
+      <Card
+        variant="outline"
+        borderColor="tertiary.500"
+        bgColor="tertiary.300"
+        boxShadow="none"
+        px={4}
+        py={4}
+        mt={2}
+      >
+        <Flex align="center">
+          <Text>{props.user.email}</Text>
+          <Spacer />
+          <Badge>Joined</Badge>
+          {currentUser && props.user.email !== currentUser.email && (
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                aria-label="Options"
+                icon={<HamburgerIcon />}
+                variant="ghots"
+              />
+              <MenuList>
+                <MenuItem
+                  icon={<DeleteIcon />}
+                  onClick={clickDelete}
+                  disabled={
+                    !!currentUser && props.user.email === currentUser.email
+                  }
+                >
+                  Remove
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          )}
+        </Flex>
+      </Card>
+      <ProjectUsersDeleteDialog
+        projectId={props.projectId}
+        item={props.user}
+        isOpen={deleteDialog.isOpen}
+        onClose={deleteDialog.onClose}
+        onOpen={deleteDialog.onOpen}
+        onDeleted={props.onDeleted}
+      />
     </>
   );
 };
 
 export default function Members() {
-  const { project_id: projectId } = useRouter().query;
+  const { project_id } = useRouter().query;
   const { authToken } = useFirebase();
   const { callGetInvitations } = useInvitationsApi();
   const { callGetUsers } = useUsersApi();
@@ -203,6 +168,10 @@ export default function Members() {
   const [isInitialized, setIsInitialized] = useState(false);
   const newDialog = useDisclosure();
 
+  const projectId = useMemo(() => {
+    return project_id && (project_id as string);
+  }, [project_id]);
+
   const getInvitations = useCallback(
     async (authToken: string, projectId: string): Promise<void> => {
       const items = await callGetInvitations(authToken, projectId);
@@ -210,6 +179,7 @@ export default function Members() {
     },
     [callGetInvitations]
   );
+
   const getUsers = useCallback(
     async (authToken: string, projectId: string): Promise<void> => {
       const items = await callGetUsers(authToken, projectId);
@@ -257,7 +227,7 @@ export default function Members() {
   return (
     <>
       <HtmlHead />
-      <DashboardLayout projectId={projectId as string}>
+      <DashboardLayout projectId={projectId}>
         <Card variant="outline">
           <CardHeader>
             <Grid templateColumns="repeat(12, 1fr)" gap={4}>
@@ -281,33 +251,38 @@ export default function Members() {
             </Grid>
           </CardHeader>
           <Divider />
-          <TableContainer>
-            <Table size="sm">
-              <Thead>
-                <Tr>
-                  <Th>EMAIL</Th>
-                  <Th>STATUS</Th>
-                  <Th></Th>
-                </Tr>
-              </Thead>
-              {isInitialized ? (
-                <>
-                  <InvitationLoadedTbody
-                    projectId={projectId as string}
-                    items={invitations}
-                    onDeleted={onInvitationDeleted}
-                  />
-                  <UserLoadedTbody
-                    projectId={projectId as string}
-                    items={users}
-                    onDeleted={onUserDeleted}
-                  />
-                </>
-              ) : (
-                <LoadingTBody />
-              )}
-            </Table>
-          </TableContainer>
+          <CardBody pt={0}>
+            {isInitialized && projectId ? (
+              <>
+                {invitations.map((invitation) => {
+                  return (
+                    <InvitationCell
+                      projectId={projectId}
+                      invitation={invitation}
+                      onDeleted={onInvitationDeleted}
+                      key={`invitation_${invitation.id}`}
+                    />
+                  );
+                })}
+                {users.map((user) => {
+                  return (
+                    <UserCell
+                      projectId={projectId}
+                      user={user}
+                      onDeleted={onUserDeleted}
+                      key={`user_${user.id}`}
+                    />
+                  );
+                })}
+              </>
+            ) : (
+              <>
+                <Skeleton h={4} mt={2} />
+                <Skeleton h={4} mt={2} />
+                <Skeleton h={4} mt={2} />
+              </>
+            )}
+          </CardBody>
         </Card>
       </DashboardLayout>
       <NewDialog
