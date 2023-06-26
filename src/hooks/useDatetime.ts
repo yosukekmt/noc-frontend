@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { DateTime, Duration } from "luxon";
+import { DateTime, Duration, Interval } from "luxon";
 import { zones } from "tzdata";
 
 export const useDatetime = () => {
@@ -41,6 +41,15 @@ export const useDatetime = () => {
 
   const formatWithoutTimezone = useCallback((date: Date) => {
     return DateTime.fromJSDate(date).toFormat("d LLL, yyyy HH:mm");
+  }, []);
+
+  const formatDaysLeft = useCallback((date: Date) => {
+    const later = DateTime.fromJSDate(date);
+    const now = DateTime.now();
+    const diffDays = Interval.fromDateTimes(later, now).length("days");
+
+    if (later < now) return -diffDays;
+    else return diffDays;
   }, []);
 
   const getTimezones = useCallback(() => {
@@ -85,5 +94,6 @@ export const useDatetime = () => {
     getTimezoneOffsets,
     formatWithTimezone,
     formatWithoutTimezone,
+    formatDaysLeft,
   };
 };

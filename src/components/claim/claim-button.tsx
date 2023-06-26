@@ -1,14 +1,15 @@
 import { useBlockchain } from "@/hooks/useBlockchain";
 import { usePublicApi } from "@/hooks/usePublicApi";
 import { Chain, Coupon, CouponTransfer } from "@/models";
-import { Button, Spinner, useDisclosure } from "@chakra-ui/react";
+import { Button, Icon, useDisclosure } from "@chakra-ui/react";
 import {
   ConnectKitButton,
   ConnectKitProvider,
   getDefaultClient,
 } from "connectkit";
 import { useCallback, useEffect, useState } from "react";
-import { createClient, useAccount, useSignMessage, WagmiConfig } from "wagmi";
+import { FaPlus } from "react-icons/fa";
+import { createClient, useSignMessage, WagmiConfig } from "wagmi";
 import MintingDialog from "../minting-dialog";
 
 const ConnectButton = (props: {
@@ -26,38 +27,26 @@ const ConnectButton = (props: {
   const { data, error, isLoading, signMessage } = useSignMessage({
     onError(error, variables, context) {
       setIsProcessing(false);
-
       console.log("onError");
-      console.log("error");
-      console.log(error);
-      console.log("variables");
-      console.log(variables);
-      console.log("context");
-      console.log(context);
+      console.error(error);
+      console.error(variables);
+      console.error(context);
     },
     onMutate(variables) {
       console.log("onMutate");
-      console.log("variables");
       console.log(variables);
     },
     onSettled(data, error, variables, context) {
       console.log("onSettled");
-      console.log("data");
       console.log(data);
-      console.log("error");
       console.log(error);
-      console.log("variables");
       console.log(variables);
-      console.log("context");
       console.log(context);
     },
     onSuccess(data, variables, context) {
       console.log("onSuccess");
-      console.log("data");
       console.log(data);
-      console.log("variables");
       console.log(variables);
-      console.log("context");
       console.log(context);
       setIsProcessing(false);
       props.onSigned(
@@ -72,23 +61,15 @@ const ConnectButton = (props: {
   const signTerms = useCallback(
     async (couponId: string, walletAddress: string): Promise<void> => {
       setIsProcessing(true);
-      console.log("hgoe4");
-
       const message = `Welcome to Nudge ONCHAIN!\nClick to sign in and agree to the Nudge ONCHAIN Terms of Service (https://nudgeonchain.xyz/terms) and Privacy Policy (https://nudgeonchain.xyz/privacy). Don't worry, this action won't initiate a blockchain transaction or cost any gas fees.\n\nWallet address:\n${walletAddress}\nCoupon ID:\n${couponId}`;
-      console.log("hgoe5");
       signMessage({ message });
-      console.log("hgoe5");
     },
     [signMessage]
   );
 
   useEffect(() => {
-    console.log("hgoe");
     if (!isConnected) return;
-    console.log("hgoe1");
-
     if (!address) return;
-    console.log("hgoe3");
 
     (() => signTerms(props.coupon.id, address))();
   }, [address, isConnected, props.coupon.id, signTerms]);
@@ -118,8 +99,8 @@ const ConnectButton = (props: {
             }
           }
           return (
-            <Button {...props} onClick={show}>
-              Claim Coupon
+            <Button leftIcon={<Icon as={FaPlus} />} onClick={show}>
+              Claim Cashback Coupon
             </Button>
           );
         }}
