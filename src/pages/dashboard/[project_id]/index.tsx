@@ -79,7 +79,7 @@ export default function ProjectCampaigns() {
               Treasury
             </Heading>
           </CardHeader>
-          <CardBody pt={0}>
+          <CardBody>
             {isInitialized && item ? (
               <Grid templateColumns="repeat(12, 1fr)" gap={2}>
                 {chains.map((chain) => {

@@ -2,12 +2,14 @@ import { useApiClient } from "@/hooks/useApiClient";
 import { useFirebase } from "@/hooks/useFirebase";
 import { useInvitationsApi } from "@/hooks/useInvitationsApi";
 import { Invitation } from "@/models";
+import { CloseIcon } from "@chakra-ui/icons";
 import {
   Button,
   Divider,
+  Flex,
+  IconButton,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
@@ -63,10 +65,22 @@ export default function DeleteDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>Invalidate an invitation</ModalHeader>
-          <ModalCloseButton />
-          <Divider />
-          <ModalBody bg="gray.100">
+          <ModalHeader>
+            <Flex align="center">
+              <IconButton
+                onClick={props.onClose}
+                variant="outline"
+                aria-label="Close"
+                colorScheme="blackAlpha"
+                borderColor="black"
+                color="black"
+                icon={<CloseIcon boxSize={2} />}
+                mr={4}
+              />
+              Invalidate an invitation
+            </Flex>
+          </ModalHeader>
+          <ModalBody>
             <Text fontSize="md">
               <Text as="span" fontWeight="bold">
                 {props.item.email}

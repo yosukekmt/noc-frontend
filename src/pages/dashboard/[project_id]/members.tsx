@@ -1,17 +1,13 @@
-import DeleteDialog from "@/components/dashboard/invitations/delete-dialog";
+import InvitationCell from "@/components/dashboard/coupons/invitation-cell";
+import UserCell from "@/components/dashboard/coupons/user-cell";
 import NewDialog from "@/components/dashboard/invitations/new-dialog";
-import ProjectUsersDeleteDialog from "@/components/dashboard/project-users/delete-dialog";
 import HtmlHead from "@/components/html-head";
-import { useCurrentUserApi } from "@/hooks/useCurrentUserApi";
 import { useFirebase } from "@/hooks/useFirebase";
 import { useInvitationsApi } from "@/hooks/useInvitationsApi";
 import { useUsersApi } from "@/hooks/useUsersApi";
 import DashboardLayout from "@/layouts/dashboard-layout";
 import { Invitation, User } from "@/models";
-import { DeleteIcon, HamburgerIcon } from "@chakra-ui/icons";
 import {
-  Badge,
-  Box,
   Button,
   Card,
   CardBody,
@@ -21,142 +17,12 @@ import {
   Grid,
   GridItem,
   Heading,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Skeleton,
   Spacer,
-  Text,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-
-const InvitationCell = (props: {
-  projectId: string;
-  invitation: Invitation;
-  onDeleted: (itemId: string) => void;
-}) => {
-  const deleteDialog = useDisclosure();
-
-  const clickDelete = () => {
-    deleteDialog.onOpen();
-  };
-  return (
-    <>
-      <Card
-        variant="outline"
-        borderColor="tertiary.500"
-        bgColor="tertiary.300"
-        boxShadow="none"
-        px={4}
-        py={4}
-        mt={2}
-      >
-        <Flex align="center">
-          <Text>{props.invitation.email}</Text>
-          <Spacer />
-          <Badge>Invited</Badge>
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              aria-label="Options"
-              icon={<HamburgerIcon />}
-              variant="ghots"
-            />
-            <MenuList>
-              <MenuItem icon={<DeleteIcon />} onClick={clickDelete}>
-                Remove
-              </MenuItem>
-            </MenuList>
-          </Menu>
-        </Flex>
-      </Card>
-      <DeleteDialog
-        projectId={props.projectId}
-        item={props.invitation}
-        isOpen={deleteDialog.isOpen}
-        onClose={deleteDialog.onClose}
-        onOpen={deleteDialog.onOpen}
-        onDeleted={props.onDeleted}
-      />
-    </>
-  );
-};
-
-const UserCell = (props: {
-  projectId: string;
-  user: User;
-  onDeleted: (itemId: string) => void;
-}) => {
-  const deleteDialog = useDisclosure();
-  const { authToken } = useFirebase();
-  const { getCurrentUser } = useCurrentUserApi();
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    if (!authToken) return;
-
-    (async () => {
-      const item = await getCurrentUser(authToken);
-      setCurrentUser(item);
-    })();
-  }, [authToken, getCurrentUser]);
-
-  const clickDelete = () => {
-    deleteDialog.onOpen();
-  };
-  return (
-    <>
-      <Card
-        variant="outline"
-        borderColor="tertiary.500"
-        bgColor="tertiary.300"
-        boxShadow="none"
-        px={4}
-        py={4}
-        mt={2}
-      >
-        <Flex align="center">
-          <Text>{props.user.email}</Text>
-          <Spacer />
-          <Badge>Joined</Badge>
-          {currentUser && props.user.email !== currentUser.email && (
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                aria-label="Options"
-                icon={<HamburgerIcon />}
-                variant="ghots"
-              />
-              <MenuList>
-                <MenuItem
-                  icon={<DeleteIcon />}
-                  onClick={clickDelete}
-                  disabled={
-                    !!currentUser && props.user.email === currentUser.email
-                  }
-                >
-                  Remove
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          )}
-        </Flex>
-      </Card>
-      <ProjectUsersDeleteDialog
-        projectId={props.projectId}
-        item={props.user}
-        isOpen={deleteDialog.isOpen}
-        onClose={deleteDialog.onClose}
-        onOpen={deleteDialog.onOpen}
-        onDeleted={props.onDeleted}
-      />
-    </>
-  );
-};
 
 export default function Members() {
   const { project_id } = useRouter().query;
@@ -250,31 +116,32 @@ export default function Members() {
               </GridItem>
             </Grid>
           </CardHeader>
-          <Divider />
-          <CardBody pt={0}>
+          <CardBody>
             {isInitialized && projectId ? (
-              <>
+              <Grid templateColumns="repeat(12, 1fr)" gap={2}>
                 {invitations.map((invitation) => {
                   return (
-                    <InvitationCell
-                      projectId={projectId}
-                      invitation={invitation}
-                      onDeleted={onInvitationDeleted}
-                      key={`invitation_${invitation.id}`}
-                    />
+                    <GridItem colSpan={12} key={`invitation_${invitation.id}`}>
+                      <InvitationCell
+                        projectId={projectId}
+                        invitation={invitation}
+                        onDeleted={onInvitationDeleted}
+                      />
+                    </GridItem>
                   );
                 })}
                 {users.map((user) => {
                   return (
-                    <UserCell
-                      projectId={projectId}
-                      user={user}
-                      onDeleted={onUserDeleted}
-                      key={`user_${user.id}`}
-                    />
+                    <GridItem colSpan={12} key={`user_${user.id}`}>
+                      <UserCell
+                        projectId={projectId}
+                        user={user}
+                        onDeleted={onUserDeleted}
+                      />
+                    </GridItem>
                   );
                 })}
-              </>
+              </Grid>
             ) : (
               <>
                 <Skeleton h={4} mt={2} />
@@ -285,13 +152,15 @@ export default function Members() {
           </CardBody>
         </Card>
       </DashboardLayout>
-      <NewDialog
-        projectId={projectId as string}
-        isOpen={newDialog.isOpen}
-        onClose={newDialog.onClose}
-        onOpen={newDialog.onOpen}
-        onCreated={onCreated}
-      />
+      {projectId && (
+        <NewDialog
+          projectId={projectId}
+          isOpen={newDialog.isOpen}
+          onClose={newDialog.onClose}
+          onOpen={newDialog.onOpen}
+          onCreated={onCreated}
+        />
+      )}
     </>
   );
 }

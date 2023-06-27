@@ -3,6 +3,7 @@ import { useFirebase } from "@/hooks/useFirebase";
 import { useInvitationsApi } from "@/hooks/useInvitationsApi";
 import { useValidator } from "@/hooks/useValidator";
 import { Invitation } from "@/models";
+import { CloseIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -10,6 +11,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  IconButton,
   Input,
   Modal,
   ModalBody,
@@ -94,10 +96,22 @@ export default function NewDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>Invite new project member</ModalHeader>
-          <ModalCloseButton />
-          <Divider />
-          <ModalBody bg="gray.100">
+          <ModalHeader>
+            <Flex align="center">
+              <IconButton
+                onClick={props.onClose}
+                variant="outline"
+                aria-label="Close"
+                colorScheme="blackAlpha"
+                borderColor="black"
+                color="black"
+                icon={<CloseIcon boxSize={2} />}
+                mr={4}
+              />
+              Invite new project member
+            </Flex>
+          </ModalHeader>
+          <ModalBody>
             <FormControl>
               <FormLabel fontSize="sm">Email</FormLabel>
               <Input
