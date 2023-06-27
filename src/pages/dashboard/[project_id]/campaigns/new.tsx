@@ -404,6 +404,19 @@ export default function NewCoupon() {
                         </Card>
                       );
                     })}
+                    {isAttempted && !isValidNftIds && (
+                      <Flex align="center">
+                        <Icon as={Warning} color="red" />
+                        <Text
+                          fontSize="sm"
+                          fontWeight="normal"
+                          color="red"
+                          ml={2}
+                        >
+                          At least one NFT Collection needs to be selected.
+                        </Text>
+                      </Flex>
+                    )}
                     <Button
                       size="sm"
                       fontSize="sm"
@@ -518,6 +531,19 @@ export default function NewCoupon() {
                       onUploaded={setImageUrl}
                     />
                   </Center>
+                  {isAttempted && !isValidImageUrl && (
+                    <Flex align="center">
+                      <Icon as={Warning} color="red" />
+                      <Text
+                        fontSize="sm"
+                        fontWeight="normal"
+                        color="red"
+                        ml={2}
+                      >
+                        Campaign image is requried.
+                      </Text>
+                    </Flex>
+                  )}
                 </Container>
               </GridItem>
             </Grid>

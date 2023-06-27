@@ -2,9 +2,12 @@ import { useApiClient } from "@/hooks/useApiClient";
 import { useCouponsApi } from "@/hooks/useCouponsApi";
 import { useFirebase } from "@/hooks/useFirebase";
 import { Coupon } from "@/models";
+import { CloseIcon } from "@chakra-ui/icons";
 import {
   Button,
   Divider,
+  Flex,
+  IconButton,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -63,17 +66,28 @@ export default function InvalidateDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>Invalidate Coupon</ModalHeader>
-          <ModalCloseButton />
-          <Divider />
-          <ModalBody bg="gray.100">
-            <Text fontSize="md">
+          <ModalHeader>
+            <Flex align="center">
+              <IconButton
+                onClick={props.onClose}
+                variant="outline"
+                aria-label="Close"
+                colorScheme="blackAlpha"
+                borderColor="black"
+                color="black"
+                icon={<CloseIcon boxSize={2} />}
+                mr={4}
+              />
+              Invalidate Coupon
+            </Flex>
+          </ModalHeader>
+          <ModalBody>
+            <Text fontSize="md" py={8}>
               Are you certain that you wish to invalidate this coupon? Please be
               aware that if you proceed with this action, the coupon will be
               permanently deactivated and cannot be reactivated.
             </Text>
           </ModalBody>
-          <Divider />
           <ModalFooter>
             <Button size="sm" onClick={onClose}>
               Cancel

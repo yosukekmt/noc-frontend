@@ -2,14 +2,17 @@ import { useApiClient } from "@/hooks/useApiClient";
 import { useFirebase } from "@/hooks/useFirebase";
 import { useProjectsApi } from "@/hooks/useProjectsApi";
 import { Project } from "@/models";
+import { CloseIcon } from "@chakra-ui/icons";
 import {
   Button,
   Divider,
+  IconButton,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalFooter,
+  Flex,
   ModalHeader,
   ModalOverlay,
   Text,
@@ -62,10 +65,22 @@ export default function DeleteDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>Remove project</ModalHeader>
-          <ModalCloseButton />
-          <Divider />
-          <ModalBody bg="gray.100">
+          <ModalHeader>
+            <Flex align="center">
+              <IconButton
+                onClick={props.onClose}
+                variant="outline"
+                aria-label="Close"
+                colorScheme="blackAlpha"
+                borderColor="black"
+                color="black"
+                icon={<CloseIcon boxSize={2} />}
+                mr={4}
+              />
+              Remove project
+            </Flex>
+          </ModalHeader>
+          <ModalBody>
             <Text fontSize="md">
               All members belong to this project will also lose the access.
             </Text>

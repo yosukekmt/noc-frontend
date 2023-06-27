@@ -1,3 +1,6 @@
+import ChainNameValue from "@/components/dashboard/coupons/chain-name-value";
+import CouponRewardTypeValue from "@/components/dashboard/coupons/coupon-reward-type-value";
+import CouponStatusValue from "@/components/dashboard/coupons/coupon-status-value";
 import HtmlHead from "@/components/html-head";
 import { useBlockchain } from "@/hooks/useBlockchain";
 import { useChainsApi } from "@/hooks/useChainsApi";
@@ -35,6 +38,7 @@ import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FaPlus } from "react-icons/fa";
+import { MdTrackChanges } from "react-icons/md";
 
 const CouponCell = (props: {
   chains: Chain[];
@@ -47,10 +51,6 @@ const CouponCell = (props: {
   const detailUrl = useMemo(() => {
     return `/dashboard/${props.projectId}/campaigns/${props.coupon.id}`;
   }, [props.coupon.id, props.projectId]);
-
-  const chain = useMemo(() => {
-    return props.chains.find((chain) => chain.id === props.coupon.chainId);
-  }, [props.chains, props.coupon.chainId]);
 
   const status = useMemo(() => {
     return getStatus(props.coupon);
@@ -65,7 +65,6 @@ const CouponCell = (props: {
         boxShadow="none"
         px={4}
         py={4}
-        mt={2}
       >
         <AspectRatio w="100%" ratio={1}>
           <Image
@@ -75,33 +74,21 @@ const CouponCell = (props: {
           />
         </AspectRatio>
         <Text mt={{ base: 0 }}>{props.coupon.name}</Text>
-        {props.coupon.rewardType === "cashback_gas" && (
-          <Text fontWeight="light" mt={{ base: 4 }} height={{ base: "100%" }}>
-            Gas Fee Cashback
-          </Text>
+
+        {props.coupon && props.coupon.rewardType ? (
+          <CouponRewardTypeValue rewardType={props.coupon.rewardType} />
+        ) : (
+          <Skeleton h={4} />
         )}
-        <Box>
-          {status === "processing" && (
-            <Badge colorScheme="primary">Processing</Badge>
-          )}
-          {status === "scheduled" && (
-            <Badge colorScheme="secondary">Scheduled</Badge>
-          )}
-          {status === "ongoing" && <Badge colorScheme="success">Ongoing</Badge>}
-          {status === "finished" && (
-            <Badge colorScheme="primary">Finished</Badge>
-          )}
-          {status === "failed" && (
-            <Badge colorScheme="danger">Could not process</Badge>
-          )}
-          {status === "invalidated" && (
-            <Badge colorScheme="tertiary">Invalidated</Badge>
+        {status ? <CouponStatusValue status={status!} /> : <Skeleton h={4} />}
+        <Box mt={8}>
+          {props.coupon && props.coupon.chainId ? (
+            <ChainNameValue chainId={props.coupon.chainId} />
+          ) : (
+            <Skeleton h={4} />
           )}
         </Box>
-        <Text fontWeight="light" mt={{ base: 0 }}>
-          {chain?.name || ""}
-        </Text>
-        <Text fontWeight="light" mt={{ base: 0 }}>
+        <Text fontWeight="light">
           {props.coupon.createdAt.toLocaleString()}
         </Text>
       </Card>
@@ -255,7 +242,7 @@ export default function ProjectCampaigns() {
   return (
     <>
       <HtmlHead />
-      <DashboardLayout projectId={projectId as string}>
+      <DashboardLayout projectId={projectId}>
         <Card variant="outline">
           <CardHeader>
             <Flex align="center">
@@ -281,25 +268,54 @@ export default function ProjectCampaigns() {
               </NextLink>
             </Flex>
           </CardHeader>
-          <Divider />
-          <CardBody pt={0} px={4}>
+          <CardBody minH={400}>
             {isInitialized && projectId ? (
-              <Grid templateColumns="repeat(12, 1fr)" gap={4}>
-                {items.map((item) => {
-                  return (
-                    <GridItem
-                      colSpan={{ base: 6, md: 4, lg: 3 }}
-                      key={`coupon_${item.id}`}
-                    >
-                      <CouponCell
-                        chains={chains}
-                        projectId={projectId}
-                        coupon={item}
-                      />
-                    </GridItem>
-                  );
-                })}
-              </Grid>
+              <>
+                {0 < items.length ? (
+                  <Grid templateColumns="repeat(12, 1fr)" gap={4}>
+                    {items.map((item) => {
+                      return (
+                        <GridItem
+                          colSpan={{ base: 6, md: 4, lg: 3 }}
+                          key={`coupon_${item.id}`}
+                        >
+                          <CouponCell
+                            chains={chains}
+                            projectId={projectId}
+                            coupon={item}
+                          />
+                        </GridItem>
+                      );
+                    })}
+                  </Grid>
+                ) : (
+                  <Box pt={24}>
+                    <Center>
+                      <Icon as={MdTrackChanges} boxSize={16} />
+                    </Center>
+                    <Center>
+                      <Heading as="h2">No Campaigns</Heading>
+                    </Center>
+                    <Center>
+                      <Text textAlign="center" fontWeight="light">
+                        All campaigns will display here. Click below to get
+                        started.
+                      </Text>
+                    </Center>
+                    <Center mt={4}>
+                      <NextLink href={`/dashboard/${projectId}/campaigns/new`}>
+                        <Button
+                          size="sm"
+                          w={{ base: "100%", sm: "inherit" }}
+                          leftIcon={<Icon as={FaPlus} />}
+                        >
+                          Create Campaign
+                        </Button>
+                      </NextLink>
+                    </Center>
+                  </Box>
+                )}
+              </>
             ) : (
               <>
                 <Skeleton h={4} mt={2} />

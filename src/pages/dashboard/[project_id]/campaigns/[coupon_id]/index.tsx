@@ -16,7 +16,6 @@ import { useProjectsApi } from "@/hooks/useProjectsApi";
 import { useUrl } from "@/hooks/useUrl";
 import DashboardLayout from "@/layouts/dashboard-layout";
 import { Cashback, Chain, Coupon, CouponHolder, Nft, Project } from "@/models";
-import { SearchIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -41,9 +40,9 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { Cube, DotsThree } from "phosphor-react";
+import { DotsThree } from "phosphor-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FaArrowLeft, FaTrash, FaTrashAlt } from "react-icons/fa";
+import { FaArrowLeft, FaTrash } from "react-icons/fa";
 import { FiArrowUpRight } from "react-icons/fi";
 
 const SummarySection = (props: {
@@ -781,7 +780,7 @@ export default function CouponDetail() {
   };
 
   const onDeleted = () => {
-    router.push(`/dashboard/${projectId}/coupons/`);
+    router.push(`/dashboard/${projectId}/campaigns/`);
   };
 
   return (
