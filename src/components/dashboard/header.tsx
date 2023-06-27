@@ -110,11 +110,9 @@ const ProjectMenuList = (props: {
         );
       })}
       <MenuDivider />
-      <NextLink href="/dashboard/profile">
-        <MenuItem icon={<Plus />} onClick={props.onNewProjectClicked}>
-          New Project
-        </MenuItem>
-      </NextLink>
+      <MenuItem icon={<Plus />} onClick={props.onNewProjectClicked}>
+        New Project
+      </MenuItem>
     </MenuList>
   );
 };
@@ -428,6 +426,7 @@ export default function Header({
     clearCurrentUser();
     router.push("/");
   };
+
   const onCreated = (item: Project) => {
     if (!authToken) {
       return;

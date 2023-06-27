@@ -1,6 +1,6 @@
 import { useFirebase } from "@/hooks/useFirebase";
 import { useValidator } from "@/hooks/useValidator";
-import { WarningTwoIcon } from "@chakra-ui/icons";
+import { CloseIcon, WarningTwoIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -8,6 +8,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  IconButton,
   Input,
   InputGroup,
   Modal,
@@ -90,12 +91,24 @@ export default function EditDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>パスワードの変更</ModalHeader>
-          <ModalCloseButton />
-          <Divider />
-          <ModalBody bg="gray.100">
-            <FormControl mt={8}>
-              <FormLabel fontSize="sm">現在のパスワード</FormLabel>
+          <ModalHeader>
+            <Flex align="center">
+              <IconButton
+                onClick={props.onClose}
+                variant="outline"
+                aria-label="Close"
+                colorScheme="blackAlpha"
+                borderColor="black"
+                color="black"
+                icon={<CloseIcon boxSize={2} />}
+                mr={4}
+              />
+              Change your password
+            </Flex>
+          </ModalHeader>
+          <ModalBody>
+            <FormControl mt={8} isRequired>
+              <FormLabel fontSize="sm">Current Password</FormLabel>
               <InputGroup size="lg">
                 <Input
                   type="password"
@@ -104,19 +117,9 @@ export default function EditDialog(props: {
                   onChange={(evt) => setPassword(evt.target.value)}
                 />
               </InputGroup>
-              <Box h={2} mt={2}>
-                {isAttempted && !isValidPassword && (
-                  <Flex align="center">
-                    <WarningTwoIcon color="red" />
-                    <Text fontSize="sm" fontWeight="normal" color="red" ml={2}>
-                      現在のパスワードを入力してください。
-                    </Text>
-                  </Flex>
-                )}
-              </Box>
             </FormControl>
-            <FormControl mt={8}>
-              <FormLabel fontSize="sm">新しいパスワード</FormLabel>
+            <FormControl mt={8} isRequired>
+              <FormLabel fontSize="sm">New Password</FormLabel>
               <InputGroup size="lg">
                 <Input
                   type="password"
@@ -125,19 +128,9 @@ export default function EditDialog(props: {
                   onChange={(evt) => setNewPassword(evt.target.value)}
                 />
               </InputGroup>
-              <Box h={2} mt={2}>
-                {isAttempted && !isValidNewPassword && (
-                  <Flex align="center">
-                    <WarningTwoIcon color="red" />
-                    <Text fontSize="sm" fontWeight="normal" color="red" ml={2}>
-                      新しいパスワードを入力してください。
-                    </Text>
-                  </Flex>
-                )}
-              </Box>
             </FormControl>
-            <FormControl mt={8}>
-              <FormLabel fontSize="sm">新しいパスワード（確認）</FormLabel>
+            <FormControl mt={8} isRequired>
+              <FormLabel fontSize="sm">New Password (Confirmation)</FormLabel>
               <InputGroup size="lg">
                 <Input
                   type="password"
@@ -149,49 +142,40 @@ export default function EditDialog(props: {
                 />
               </InputGroup>
               <Box h={8} mt={2}>
-                {(() => {
-                  if (isAttempted && !isValidNewPasswordConfirmation) {
-                    return (
-                      <Flex align="center">
-                        <WarningTwoIcon color="red" />
-                        <Text
-                          fontSize="sm"
-                          fontWeight="normal"
-                          color="red"
-                          ml={2}
-                        >
-                          新しいパスワード（確認）を入力してください。
-                        </Text>
-                      </Flex>
-                    );
-                  } else if (isAttempted && errorMessage) {
-                    return (
-                      <Flex align="center">
-                        <WarningTwoIcon color="red" />
-                        <Text
-                          fontSize="sm"
-                          fontWeight="normal"
-                          color="red"
-                          ml={2}
-                        >
-                          {errorMessage}
-                        </Text>
-                      </Flex>
-                    );
-                  } else {
-                    return <></>;
-                  }
-                })()}
+                {isAttempted && !isValidNewPassword && (
+                  <Flex align="center">
+                    <WarningTwoIcon color="red" />
+                    <Text fontSize="sm" fontWeight="normal" color="red" ml={2}>
+                      Enter valid password
+                    </Text>
+                  </Flex>
+                )}
+                {isAttempted && !isValidNewPasswordConfirmation && (
+                  <Flex align="center">
+                    <WarningTwoIcon color="red" />
+                    <Text fontSize="sm" fontWeight="normal" color="red" ml={2}>
+                      Enter valid password
+                    </Text>
+                  </Flex>
+                )}
+                {isAttempted && errorMessage && (
+                  <Flex align="center">
+                    <WarningTwoIcon color="red" />
+                    <Text fontSize="sm" fontWeight="normal" color="red" ml={2}>
+                      {errorMessage}
+                    </Text>
+                  </Flex>
+                )}
               </Box>
             </FormControl>
           </ModalBody>
           <Divider />
           <ModalFooter>
             <Button size="sm" onClick={onClose}>
-              キャンセル
+              Cancel
             </Button>
             <Button type="submit" size="sm" isLoading={isLoading} ml={2}>
-              パスワードの変更
+              Change Password
             </Button>
           </ModalFooter>
         </ModalContent>

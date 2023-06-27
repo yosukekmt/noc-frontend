@@ -7,7 +7,9 @@ import { User } from "@/models";
 import { EditIcon } from "@chakra-ui/icons";
 import {
   Box,
-  Divider,
+  Card,
+  CardBody,
+  CardHeader,
   Flex,
   Grid,
   GridItem,
@@ -48,49 +50,58 @@ export default function Profile() {
     <>
       <HtmlHead />
       <DashboardLayout>
-        <Box>
-          <Heading as="h3" fontSize="2xl" fontWeight="bold" py={4}>
-            Profile
-          </Heading>
-          <Divider />
-          <Grid templateColumns="repeat(12, 1fr)" gap={2}>
-            <GridItem colSpan={{ base: 12, md: 9, lg: 6 }}>
-              <Box>
-                <Flex align="center" h={8} mt={8}>
-                  <Heading w={200} fontSize="sm">
-                    Email
-                  </Heading>
-                  <Text fontSize="sm">{currentUser && currentUser.email}</Text>
-                </Flex>
-                <Flex align="center" h={8} mt={8}>
-                  <Heading w={200} fontSize="sm">
-                    Password
-                  </Heading>
-                  <Box>
-                    {currentUser && (
-                      <Flex>
-                        <Text fontSize="sm">••••••••</Text>
-                        <IconButton
-                          size="xs"
-                          onClick={clickEdit}
-                          ml={4}
-                          aria-label="Change password..."
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </Flex>
-                    )}
-                    {passwordUpdated && (
-                      <Text fontSize="sm" color="red">
-                        Your password is successfully updated.
-                      </Text>
-                    )}
-                  </Box>
-                </Flex>
-              </Box>
-            </GridItem>
-          </Grid>
-        </Box>
+        <Card variant="outline">
+          <CardHeader>
+            <Grid templateColumns="repeat(12, 1fr)" gap={4}>
+              <GridItem colSpan={{ base: 12, sm: 6 }}>
+                <Heading as="h3" fontSize="2xl" fontWeight="bold">
+                  Profile
+                </Heading>
+              </GridItem>
+            </Grid>
+          </CardHeader>
+          <CardBody>
+            <Grid templateColumns="repeat(12, 1fr)" gap={2}>
+              <GridItem colSpan={{ base: 12, md: 9, lg: 6 }}>
+                <Box>
+                  <Flex align="center" h={8} mt={8}>
+                    <Heading w={200} fontSize="sm">
+                      Email
+                    </Heading>
+                    <Text fontSize="sm">
+                      {currentUser && currentUser.email}
+                    </Text>
+                  </Flex>
+                  <Flex align="center" h={8} mt={8}>
+                    <Heading w={200} fontSize="sm">
+                      Password
+                    </Heading>
+                    <Box>
+                      {currentUser && (
+                        <Flex>
+                          <Text fontSize="sm">••••••••</Text>
+                          <IconButton
+                            size="xs"
+                            onClick={clickEdit}
+                            ml={4}
+                            aria-label="Change password..."
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        </Flex>
+                      )}
+                      {passwordUpdated && (
+                        <Text fontSize="sm" color="red">
+                          Your password is successfully updated.
+                        </Text>
+                      )}
+                    </Box>
+                  </Flex>
+                </Box>
+              </GridItem>
+            </Grid>
+          </CardBody>
+        </Card>
       </DashboardLayout>
       <EditDialog
         isOpen={editUserDialog.isOpen}

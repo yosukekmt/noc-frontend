@@ -2,7 +2,8 @@ import { useApiClient } from "@/hooks/useApiClient";
 import { useFirebase } from "@/hooks/useFirebase";
 import { useProjectsApi } from "@/hooks/useProjectsApi";
 import { useValidator } from "@/hooks/useValidator";
-import { WarningTwoIcon } from "@chakra-ui/icons";
+import { Project } from "@/models";
+import { CloseIcon, WarningTwoIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -10,10 +11,10 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  IconButton,
   Input,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
@@ -21,7 +22,6 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { FormEvent, useCallback, useMemo, useState } from "react";
-import { Project } from "@/models";
 
 export default function NewDialog(props: {
   closable: boolean;
@@ -85,11 +85,25 @@ export default function NewDialog(props: {
       <ModalOverlay />
       <form onSubmit={clickSubmit}>
         <ModalContent>
-          <ModalHeader>Create a new project</ModalHeader>
-          {props.closable && <ModalCloseButton />}
-          <Divider />
-          <ModalBody bg="gray.100">
-            <FormControl>
+          <ModalHeader>
+            <Flex align="center">
+              {props.closable && (
+                <IconButton
+                  onClick={props.onClose}
+                  variant="outline"
+                  aria-label="Close"
+                  colorScheme="blackAlpha"
+                  borderColor="black"
+                  color="black"
+                  icon={<CloseIcon boxSize={2} />}
+                  mr={4}
+                />
+              )}
+              Create a new project
+            </Flex>
+          </ModalHeader>
+          <ModalBody>
+            <FormControl isRequired>
               <FormLabel fontSize="sm">Project name</FormLabel>
               <Input
                 size="sm"

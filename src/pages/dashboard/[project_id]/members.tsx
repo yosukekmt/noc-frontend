@@ -1,6 +1,6 @@
-import InvitationCell from "@/components/dashboard/coupons/invitation-cell";
-import UserCell from "@/components/dashboard/coupons/user-cell";
+import InvitationCell from "@/components/dashboard/invitations/invitation-cell";
 import NewDialog from "@/components/dashboard/invitations/new-dialog";
+import UserCell from "@/components/dashboard/project-users/user-cell";
 import HtmlHead from "@/components/html-head";
 import { useFirebase } from "@/hooks/useFirebase";
 import { useInvitationsApi } from "@/hooks/useInvitationsApi";
@@ -12,7 +12,6 @@ import {
   Card,
   CardBody,
   CardHeader,
-  Divider,
   Flex,
   Grid,
   GridItem,
