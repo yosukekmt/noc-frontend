@@ -9,23 +9,24 @@ import {
 } from "wagmi/chains";
 
 export const useBlockchain = () => {
-  const getAlchemyApiKey = (): string => {
+  const getAlchemyApiKey = useCallback((): string => {
     return process.env.NEXT_PUBLIC_ALCHEMY_API_KEY!;
-  };
-  const getIconPathById = (chainId: number): string => {
+  }, []);
+
+  const getIconPathById = useCallback((chainId: number): string => {
     if (chainId === polygon.id) return "/chain_polygon.png";
     if (chainId === polygonMumbai.id) return "/chain_polygon.png";
     return "/chain_ethereum.png";
-  };
+  }, []);
 
-  const getChainById = (chainId: number): Chain => {
+  const getChainById = useCallback((chainId: number): Chain => {
     if (chainId === mainnet.id) return mainnet;
     if (chainId === sepolia.id) return sepolia;
     if (chainId === polygon.id) return polygon;
     if (chainId === polygonMumbai.id) return polygonMumbai;
 
     return goerli;
-  };
+  }, []);
 
   const getExplorerTxUrl = useCallback(
     (url: string, txHash: string): string => {

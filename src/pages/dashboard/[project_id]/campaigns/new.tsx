@@ -453,7 +453,7 @@ export default function NewCoupon() {
                       Campaign Start
                     </FormLabel>
                     <Grid templateColumns="repeat(12, 1fr)" gap={4}>
-                      <GridItem colSpan={{ base: 6 }}>
+                      <GridItem colSpan={6}>
                         <Input
                           size="sm"
                           bg="white"
@@ -463,7 +463,7 @@ export default function NewCoupon() {
                           onChange={(evt) => setStartDate(evt.target.value)}
                         />
                       </GridItem>
-                      <GridItem colSpan={{ base: 6 }}>
+                      <GridItem colSpan={6}>
                         <Input
                           size="sm"
                           bg="white"

@@ -60,7 +60,7 @@ export default function Dashboard() {
                 from="0 0 0"
                 to="360 0 0"
                 repeatCount="indefinite"
-              ></animateTransform>
+              />
             </Spinner>
           </Center>
         </Flex>

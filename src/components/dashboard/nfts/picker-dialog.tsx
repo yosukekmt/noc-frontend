@@ -100,19 +100,20 @@ export default function PickerDialog(props: {
       <form onSubmit={clickSubmit}>
         <ModalContent>
           <ModalHeader>
-            <IconButton
-              onClick={props.onClose}
-              variant="outline"
-              aria-label="Close"
-              colorScheme="whiteAlpha"
-              borderColor="black"
-              color="black"
-              icon={<CloseIcon boxSize={2} />}
-              mr={4}
-            />
-            Add NFT Collection
+            <Flex align="center">
+              <IconButton
+                onClick={props.onClose}
+                variant="outline"
+                aria-label="Close"
+                colorScheme="blackAlpha"
+                borderColor="black"
+                color="black"
+                icon={<CloseIcon boxSize={2} />}
+                mr={4}
+              />
+              Add NFT Collection
+            </Flex>
           </ModalHeader>
-          <ModalCloseButton />
           <Divider />
           <ModalBody>
             <FormControl>

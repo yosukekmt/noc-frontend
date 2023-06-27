@@ -2,9 +2,12 @@ import { useApiClient } from "@/hooks/useApiClient";
 import { useBlockchain } from "@/hooks/useBlockchain";
 import { useFirebase } from "@/hooks/useFirebase";
 import { Chain, Project } from "@/models";
+import { CloseIcon } from "@chakra-ui/icons";
 import {
   Button,
   Divider,
+  Flex,
+  IconButton,
   Link,
   Modal,
   ModalBody,
@@ -46,11 +49,10 @@ export default function WithdrawSubmittedDialog(props: {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Withdrawal requested</ModalHeader>
-        <ModalCloseButton />
+        <ModalHeader>Withdrawal Requested</ModalHeader>
         <Divider />
-        <ModalBody bg="gray.100">
-          <Text fontSize="md">
+        <ModalBody>
+          <Text fontSize="md" py={8}>
             Your withdrawal request has been successfully submitted. You can
             check the status of your transaction by clicking on{" "}
             <Link href={url} isExternal={true} color="green">
