@@ -50,8 +50,10 @@ export const useDatetime = () => {
   const formatDaysLeft = useCallback((date: Date) => {
     const later = DateTime.fromJSDate(date);
     const now = DateTime.now();
-    const diffDays = Interval.fromDateTimes(later, now).length("days");
 
+    const diffDays = Math.floor(
+      Interval.fromDateTimes(now, later).length("days")
+    );
     if (later < now) return -diffDays;
     else return diffDays;
   }, []);

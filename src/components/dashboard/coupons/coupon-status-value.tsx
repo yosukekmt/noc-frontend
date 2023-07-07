@@ -6,7 +6,7 @@ import { GoPrimitiveDot } from "react-icons/go";
 export default function CouponStatusValue(props: { status: CouponStatus }) {
   const label = useMemo(() => {
     if (props.status === "processing") {
-      return "Processing";
+      return "Deploying";
     }
     if (props.status === "scheduled") {
       return "Scheduled";

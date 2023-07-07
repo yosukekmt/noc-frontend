@@ -289,7 +289,7 @@ const BodyMobile = (props: {
               </Box>
               <Box mt={4}>
                 <Flex>
-                  {props.coupon && props.coupon.rewardType ? (
+                  {props.coupon && props.coupon.endAt ? (
                     <CouponDaysLeftLabel endAt={props.coupon.endAt} />
                   ) : (
                     <Skeleton h={4} mt={2} />
@@ -447,7 +447,7 @@ const BodyDesktop = (props: {
                     <Skeleton h={4} mt={2} />
                   )}
                   <Spacer />
-                  {props.coupon && props.coupon.rewardType ? (
+                  {props.coupon && props.coupon.endAt ? (
                     <CouponDaysLeftLabel endAt={props.coupon.endAt} />
                   ) : (
                     <Skeleton h={4} mt={2} />
