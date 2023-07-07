@@ -404,6 +404,12 @@ const BodyDesktop = (props: {
   chain: Chain | undefined;
   nfts: Nft[];
 }) => {
+  const { checkIfExpired } = useDatetime();
+
+  const isExpired = useMemo(() => {
+    return props.coupon && checkIfExpired(props.coupon.endAt);
+  }, [checkIfExpired, props.coupon]);
+
   return (
     <Box as="main" mb={32}>
       <Box bg="secondary.500" h={{ base: "280px" }}>
@@ -528,18 +534,31 @@ const BodyDesktop = (props: {
             <Grid templateColumns="repeat(12, 1fr)" py={4}>
               <GridItem colSpan={{ base: 3 }}></GridItem>
               <GridItem colSpan={{ base: 6 }} textAlign="center">
-                {props.chain && props.coupon ? (
-                  <ClaimButton chain={props.chain} coupon={props.coupon} />
+                {isExpired ? (
+                  <Button
+                    size="md"
+                    type="submit"
+                    isDisabled
+                    leftIcon={<Icon as={FaPlus} />}
+                  >
+                    Claim Cashback Coupon
+                  </Button>
                 ) : (
                   <>
-                    <Button
-                      size="md"
-                      type="submit"
-                      isLoading
-                      leftIcon={<Icon as={FaPlus} />}
-                    >
-                      Claim Cashback Coupon
-                    </Button>
+                    {props.chain && props.coupon ? (
+                      <ClaimButton chain={props.chain} coupon={props.coupon} />
+                    ) : (
+                      <>
+                        <Button
+                          size="md"
+                          type="submit"
+                          isLoading
+                          leftIcon={<Icon as={FaPlus} />}
+                        >
+                          Claim Cashback Coupon
+                        </Button>
+                      </>
+                    )}
                   </>
                 )}
               </GridItem>

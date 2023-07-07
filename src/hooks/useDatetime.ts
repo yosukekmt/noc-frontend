@@ -43,6 +43,10 @@ export const useDatetime = () => {
     return DateTime.fromJSDate(date).toFormat("d LLL, yyyy HH:mm");
   }, []);
 
+  const checkIfExpired = useCallback((date: Date) => {
+    return DateTime.fromJSDate(date) < DateTime.now();
+  }, []);
+
   const formatDaysLeft = useCallback((date: Date) => {
     const later = DateTime.fromJSDate(date);
     const now = DateTime.now();
@@ -95,5 +99,6 @@ export const useDatetime = () => {
     formatWithTimezone,
     formatWithoutTimezone,
     formatDaysLeft,
+    checkIfExpired,
   };
 };
