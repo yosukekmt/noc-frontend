@@ -20,7 +20,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 export default function ProjectCampaigns() {
   const router = useRouter();
-  const cellType = useBreakpointValue({ base: "grid", md: "row" });
+  const cellType = useBreakpointValue<"grid" | "row">({
+    base: "grid",
+    md: "row",
+  });
   const { project_id } = router.query;
   const { callGetChains } = useChainsApi();
   const { callGetProject } = useProjectsApi();
@@ -80,7 +83,7 @@ export default function ProjectCampaigns() {
             </Heading>
           </CardHeader>
           <CardBody>
-            {isInitialized && item ? (
+            {isInitialized && item && cellType ? (
               <Grid templateColumns="repeat(12, 1fr)" gap={2}>
                 {chains.map((chain) => {
                   return (
@@ -88,7 +91,7 @@ export default function ProjectCampaigns() {
                       <ChainCell
                         project={item}
                         chain={chain}
-                        cellType={cellType}
+                        cellType={cellType!}
                       />
                     </GridItem>
                   );
