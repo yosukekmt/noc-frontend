@@ -63,6 +63,11 @@ export default function ChainCell(props: {
                   {props.project.walletAddress}
                 </Button>
               </Link>
+              <Link href={walletExplorerUrl} isExternal>
+                <Button fontWeight="light" variant="link">
+                  Balance
+                </Button>
+              </Link>
               <Button
                 variant="link"
                 leftIcon={<Icon as={FaExternalLinkAlt} />}
@@ -80,6 +85,11 @@ export default function ChainCell(props: {
             <Link href={walletExplorerUrl} isExternal>
               <Button fontWeight="light" variant="link">
                 {props.project.walletAddress}
+              </Button>
+            </Link>
+            <Link href={walletExplorerUrl} isExternal>
+              <Button fontWeight="light" variant="link">
+                Balance
               </Button>
             </Link>
             <Box mt={{ base: 4, md: 0 }}>
