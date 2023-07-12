@@ -286,6 +286,8 @@ const CouponHoldersSection = (props: {
   projectId: string | undefined;
   couponId: string | undefined;
 }) => {
+  const { formatWithoutTimezone } = useDatetime();
+
   const items = useMemo(() => {
     return props.couponHolders.slice(0, 8);
   }, [props.couponHolders]);
@@ -335,9 +337,9 @@ const CouponHoldersSection = (props: {
                 mt={2}
               >
                 <Flex align="center">
-                  <Text>0x23e23...</Text>
+                  <Text>{item.walletAddress}</Text>
                   <Spacer />
-                  <Text>Since 17/04/2023, 17:03</Text>
+                  <Text>{formatWithoutTimezone(item.createdAt)}</Text>
                 </Flex>
               </Card>
             );

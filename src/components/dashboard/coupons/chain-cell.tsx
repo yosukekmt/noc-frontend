@@ -63,7 +63,7 @@ export default function ChainCell(props: {
                   {props.project.walletAddress}
                 </Button>
               </Link>
-              <Link href={walletExplorerUrl} isExternal>
+              <Link href={walletExplorerUrl} isExternal ml={4}>
                 <Button fontWeight="light" variant="link">
                   Balance
                 </Button>
