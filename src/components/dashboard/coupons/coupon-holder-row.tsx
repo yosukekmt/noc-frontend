@@ -42,7 +42,7 @@ export default function CouponHolderRow(props: {
           <Link href={explorerUrl} isExternal>
             <Button
               variant="link"
-              fontSize="md"
+              fontSize="sm"
               fontWeight="light"
               color="gray"
             >
@@ -51,7 +51,9 @@ export default function CouponHolderRow(props: {
           </Link>
         )}
         <Spacer />
-        <Text>{created}</Text>
+        <Text fontWeight="light" fontSize="sm">
+          {created}
+        </Text>
       </Flex>
     </Card>
   );
