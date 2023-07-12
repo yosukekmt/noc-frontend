@@ -1,7 +1,4 @@
-import {
-  CouponHoldersTableLoadingRow,
-  CouponHoldersTableRow,
-} from "@/components/dashboard/coupons/coupon-holders-section";
+import CouponHoldersSection from "@/components/dashboard/coupons/coupon-holders-section";
 import HtmlHead from "@/components/html-head";
 import { useChainsApi } from "@/hooks/useChainsApi";
 import { useCouponHoldersApi } from "@/hooks/useCouponHoldersApi";
@@ -12,29 +9,20 @@ import { Chain, Coupon, CouponHolder, PageInfo } from "@/models";
 import {
   Box,
   Button,
-  Divider,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Center,
   Flex,
-  FormControl,
-  Grid,
-  GridItem,
   Heading,
   Icon,
-  Input,
-  InputGroup,
-  InputLeftElement,
   Spacer,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tr,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { MagnifyingGlass, Spinner } from "phosphor-react";
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { MdTrackChanges } from "react-icons/md";
 
 export default function CouponCouponHolders() {
   const { project_id, coupon_id } = useRouter().query;
@@ -86,7 +74,7 @@ export default function CouponCouponHolders() {
 
   const nextEnabled = useMemo(() => {
     if (!pageInfo) return false;
-    return currentPage <= pageInfo.perPage;
+    return currentPage + 1 < pageInfo.totalPages;
   }, [pageInfo, currentPage]);
 
   const getChain = useCallback(
@@ -186,10 +174,6 @@ export default function CouponCouponHolders() {
     query,
   ]);
 
-  const clickSubmit = (evt: FormEvent) => {
-    evt.preventDefault();
-  };
-
   const clickPrevPage = () => {
     if (!prevEnabled) return;
     setCurrentPage(currentPage - 1);
@@ -205,98 +189,59 @@ export default function CouponCouponHolders() {
   return (
     <>
       <HtmlHead />
-      <DashboardLayout projectId={projectId as string}>
-        <Box>
-          <Grid templateColumns="repeat(12, 1fr)" gap={4}>
-            <GridItem colSpan={{ base: 12 }}>
-              <Heading as="h4" fontSize="2xl">
+      <DashboardLayout projectId={projectId}>
+        <Card variant="outline">
+          <CardHeader>
+            <Flex align="center">
+              <Heading as="h3" fontSize="2xl" fontWeight="bold">
                 Coupon Holders
               </Heading>
-              <Divider mt={2} />
-              <form onSubmit={clickSubmit}>
-                <FormControl>
-                  <InputGroup>
-                    <InputLeftElement>
-                      <Icon as={isLoading ? Spinner : MagnifyingGlass} />
-                    </InputLeftElement>
-                    <Input
-                      type="text"
-                      name="query"
-                      value={query}
-                      onChange={(evt) => setQuery(evt.target.value)}
-                    />
-                  </InputGroup>
-                </FormControl>
-              </form>
-              <Divider mt={2} />
-              <TableContainer>
-                <Table size="sm">
-                  <Thead>
-                    <Tr>
-                      <Th>SINCE</Th>
-                      <Th>WALLET</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {!isInitialized && (
-                      <>
-                        <CouponHoldersTableLoadingRow />
-                        <CouponHoldersTableLoadingRow />
-                        <CouponHoldersTableLoadingRow />
-                      </>
-                    )}
-                    {isInitialized && items.length === 0 && (
-                      <>
-                        <Tr key="coupon_holders_empty" h={16}>
-                          <Td colSpan={2}>No Records</Td>
-                        </Tr>
-                      </>
-                    )}
-                    {isInitialized && items.length !== 0 && (
-                      <>
-                        {items.flatMap((item) => {
-                          return (
-                            <>
-                              {chain && (
-                                <CouponHoldersTableRow
-                                  chain={chain}
-                                  item={item}
-                                />
-                              )}
-                            </>
-                          );
-                        })}
-                        <Tr key="coupon_holders_page_info_bottom" h={16}>
-                          <Td colSpan={2}>
-                            <Flex align="center">
-                              <Text>{`Viewing ${viewingMin}-${viewingMax} of ${pageInfo?.total}`}</Text>
-                              <Spacer />
-                              <Button
-                                size="sm"
-                                mr={1}
-                                isDisabled={!prevEnabled}
-                                onClick={clickPrevPage}
-                              >
-                                Previous
-                              </Button>
-                              <Button
-                                size="sm"
-                                isDisabled={!nextEnabled}
-                                onClick={clickNextPage}
-                              >
-                                Next
-                              </Button>
-                            </Flex>
-                          </Td>
-                        </Tr>
-                      </>
-                    )}
-                  </Tbody>
-                </Table>
-              </TableContainer>
-            </GridItem>
-          </Grid>
-        </Box>
+              <Spacer />
+            </Flex>
+          </CardHeader>
+          <CardBody minH={400}>
+            {isInitialized && items.length === 0 && (
+              <Box pt={24}>
+                <Center>
+                  <Icon as={MdTrackChanges} boxSize={16} />
+                </Center>
+                <Center>
+                  <Heading as="h2">No Coupon Holders</Heading>
+                </Center>
+              </Box>
+            )}
+            {isInitialized && items.length !== 0 && (
+              <CouponHoldersSection
+                isInitialized={isInitialized}
+                chain={chain}
+                couponHolders={items}
+                projectId={projectId}
+                couponId={couponId}
+              />
+            )}
+          </CardBody>
+          <CardFooter>
+            <Flex align="center" w="100%">
+              <Text>{`Viewing ${viewingMin}-${viewingMax} of ${pageInfo?.total}`}</Text>
+              <Spacer />
+              <Button
+                size="sm"
+                mr={1}
+                isDisabled={!prevEnabled}
+                onClick={clickPrevPage}
+              >
+                Previous
+              </Button>
+              <Button
+                size="sm"
+                isDisabled={!nextEnabled}
+                onClick={clickNextPage}
+              >
+                Next
+              </Button>
+            </Flex>
+          </CardFooter>
+        </Card>
       </DashboardLayout>
     </>
   );

@@ -1,4 +1,5 @@
 import ChainNameValue from "@/components/dashboard/coupons/chain-name-value";
+import CouponHoldersSection from "@/components/dashboard/coupons/coupon-holders-section";
 import CouponRewardTypeValue from "@/components/dashboard/coupons/coupon-reward-type-value";
 import CouponStatusValue from "@/components/dashboard/coupons/coupon-status-value";
 import InvalidateDialog from "@/components/dashboard/coupons/invalidate-dialog";
@@ -279,85 +280,56 @@ const TresurySection = (props: {
   );
 };
 
-const CouponHoldersSection = (props: {
-  isInitialized: boolean;
-  chain: Chain | undefined;
-  couponHolders: CouponHolder[];
-  projectId: string | undefined;
-  couponId: string | undefined;
+const CouponHoldersRow = (props: {
+  chain: Chain;
+  couponHolder: CouponHolder;
+  projectId: string;
+  couponId: string;
 }) => {
   const { formatWithoutTimezone } = useDatetime();
+  const { getExplorerAddressUrl } = useBlockchain();
 
-  const items = useMemo(() => {
-    return props.couponHolders.slice(0, 8);
-  }, [props.couponHolders]);
+  const explorerUrl = useMemo(() => {
+    if (!props.chain) return;
+    if (!props.chain.explorerUrl) return;
 
-  const isMore = useMemo(() => {
-    return 8 < props.couponHolders.length;
-  }, [props.couponHolders.length]);
+    return getExplorerAddressUrl(
+      props.chain.explorerUrl,
+      props.couponHolder.walletAddress
+    );
+  }, [props.chain, props.couponHolder, getExplorerAddressUrl]);
+
+  const created = useMemo(() => {
+    return formatWithoutTimezone(props.couponHolder.createdAt);
+  }, [formatWithoutTimezone, props.couponHolder.createdAt]);
 
   return (
-    <Box>
+    <Card
+      variant="outline"
+      borderColor="tertiary.500"
+      bgColor="tertiary.300"
+      boxShadow="none"
+      px={4}
+      py={2}
+      mt={2}
+    >
       <Flex align="center">
-        <Heading as="h3" fontSize="lg">
-          Coupon Holders
-        </Heading>
-      </Flex>
-      {!props.isInitialized && (
-        <>
-          {[0, 1, 2].flatMap((idx) => {
-            return (
-              <Card
-                variant="outline"
-                borderColor="tertiary.500"
-                bgColor="tertiary.300"
-                boxShadow="none"
-                px={4}
-                py={2}
-                mt={2}
-              >
-                <Skeleton h={4} />
-              </Card>
-            );
-          })}
-        </>
-      )}
-      {props.isInitialized && items.length === 0 && <Text>No Records</Text>}
-      {props.isInitialized && items.length !== 0 && (
-        <>
-          {items.flatMap((item) => {
-            return (
-              <Card
-                variant="outline"
-                borderColor="tertiary.500"
-                bgColor="tertiary.300"
-                boxShadow="none"
-                px={4}
-                py={2}
-                mt={2}
-              >
-                <Flex align="center">
-                  <Text>{item.walletAddress}</Text>
-                  <Spacer />
-                  <Text>{formatWithoutTimezone(item.createdAt)}</Text>
-                </Flex>
-              </Card>
-            );
-          })}
-          {props.projectId && props.couponId && isMore && (
+        {explorerUrl && (
+          <Link href={explorerUrl} isExternal>
             <Button
-              size="md"
-              mt={2}
-              w="100%"
-              variant="outline"
-              colorScheme="black"
+              variant="link"
+              fontSize="md"
+              fontWeight="light"
+              color="gray"
             >
-              Show More
+              {props.couponHolder.walletAddress}
             </Button>
-          )}
-        </>
-      )}
-    </Box>
+          </Link>
+        )}
+        <Spacer />
+        <Text>{created}</Text>
+      </Flex>
+    </Card>
   );
 };
 
@@ -396,100 +368,40 @@ export const CashbackRow = (props: {
       mt={2}
     >
       <Flex align="center">
-        <Text>Event Hash</Text>
+        {props.txHash && (
+          <Link
+            href={props.explorerTxUrl}
+            style={{ width: "100%", display: "block" }}
+            isExternal
+          >
+            <Text fontWeight="normal" fontSize="sm">
+              {truncatedTxHash}
+            </Text>
+          </Link>
+        )}
         <Spacer />
-        <Text>Status</Text>
-        <Text>Wallet Addres</Text>
-        <Text>Amount</Text>
-        <Text>17/04/2023, 17:03</Text>
-      </Flex>
-    </Card>
-  );
-};
+        <Text>{props.txHash ? "Submitted" : "Failed"}</Text>
+        <Text>{truncatedWalletAddress}</Text>
+        <Link
+          href="https://www.alchemy.com/gwei-calculator"
+          style={{ width: "100%", display: "block" }}
+          isExternal
+        >
+          <Text fontWeight="normal" fontSize="sm">
+            {`${formattedAmountWei} Wei`}
+          </Text>
+        </Link>
 
-export const CashbackRect = (props: {
-  txHash: string;
-  walletAddress: string;
-  explorerTxUrl: string;
-  explorerWalletUrl: string;
-  amountWei: number;
-  blockProducedAt: Date;
-}) => {
-  const { truncateContractAddress } = useBlockchain();
-  const { formatWithoutTimezone } = useDatetime();
-
-  const truncatedTxHash = useMemo(() => {
-    return truncateContractAddress(props.txHash);
-  }, [props.txHash, truncateContractAddress]);
-  const truncatedWalletAddress = useMemo(() => {
-    return truncateContractAddress(props.walletAddress);
-  }, [props.walletAddress, truncateContractAddress]);
-  const formattedAmountWei = useMemo(() => {
-    return Intl.NumberFormat().format(props.amountWei);
-  }, [props.amountWei]);
-  const blockProducedAtStr = useMemo(() => {
-    return formatWithoutTimezone(props.blockProducedAt);
-  }, [formatWithoutTimezone, props.blockProducedAt]);
-
-  return (
-    <Card
-      variant="outline"
-      borderColor="tertiary.500"
-      bgColor="tertiary.300"
-      boxShadow="none"
-      px={4}
-      py={2}
-      mt={2}
-    >
-      <Link
-        href={props.explorerTxUrl}
-        style={{ width: "100%", display: "block" }}
-        isExternal
-      >
-        <Text fontWeight="normal" fontSize="sm">
-          Gas fee cashback
-        </Text>
-      </Link>
-      <Link
-        href={props.explorerTxUrl || ""}
-        style={{ width: "100%", display: "block" }}
-        isExternal
-      >
-        <Text fontWeight="normal" fontSize="sm">
-          {props.txHash ? "Submitted" : "Failed"}
-        </Text>
-      </Link>
-
-      {props.txHash && (
         <Link
           href={props.explorerTxUrl}
           style={{ width: "100%", display: "block" }}
           isExternal
         >
           <Text fontWeight="normal" fontSize="sm">
-            {truncatedTxHash}
+            {blockProducedAtStr}
           </Text>
         </Link>
-      )}
-      <Link
-        href="https://www.alchemy.com/gwei-calculator"
-        style={{ width: "100%", display: "block" }}
-        isExternal
-      >
-        <Text fontWeight="normal" fontSize="sm">
-          {`${formattedAmountWei} Wei`}
-        </Text>
-      </Link>
-
-      <Link
-        href={props.explorerTxUrl}
-        style={{ width: "100%", display: "block" }}
-        isExternal
-      >
-        <Text fontWeight="normal" fontSize="sm">
-          {blockProducedAtStr}
-        </Text>
-      </Link>
+      </Flex>
     </Card>
   );
 };
@@ -507,17 +419,8 @@ export const CashbackCell = (props: { chain: Chain; item: Cashback }) => {
     );
   }, [props.chain, props.item, getExplorerAddressUrl]);
 
-  return true ? (
+  return (
     <CashbackRow
-      txHash={props.item.txHash}
-      walletAddress={props.item.walletAddress}
-      explorerTxUrl={explorerTxUrl}
-      explorerWalletUrl={explorerWalletUrl}
-      amountWei={props.item.amountWei}
-      blockProducedAt={props.item.createdAt}
-    />
-  ) : (
-    <CashbackRect
       txHash={props.item.txHash}
       walletAddress={props.item.walletAddress}
       explorerTxUrl={explorerTxUrl}
@@ -906,6 +809,11 @@ export default function CouponDetail() {
                 project={project}
               />
               <Divider my={8} />
+              <Flex align="center">
+                <Heading as="h3" fontSize="lg">
+                  Coupon Holders
+                </Heading>
+              </Flex>
               <CouponHoldersSection
                 isInitialized={isInitialized}
                 chain={chain}

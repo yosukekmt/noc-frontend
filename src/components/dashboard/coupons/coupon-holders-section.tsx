@@ -1,82 +1,16 @@
-import { useBlockchain } from "@/hooks/useBlockchain";
 import { useDatetime } from "@/hooks/useDatetime";
 import { Chain, CouponHolder } from "@/models";
 import {
   Box,
   Button,
-  Divider,
-  Grid,
-  GridItem,
+  Card,
+  Flex,
   Heading,
   Skeleton,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Link,
-  Thead,
-  Tr,
+  Text,
 } from "@chakra-ui/react";
-import * as Crypto from "crypto";
-import NextLink from "next/link";
 import { useMemo } from "react";
-
-export const CouponHoldersTableLoadingRow = (props: {}) => {
-  const uiKey = useMemo(() => {
-    return `coupon_holders_${Crypto.randomBytes(20).toString("hex")}`;
-  }, []);
-
-  return (
-    <Tr key={uiKey} h={16}>
-      <Td fontWeight="normal" fontSize="sm" colSpan={2}>
-        <Skeleton h={4} />
-      </Td>
-    </Tr>
-  );
-};
-
-export const CouponHoldersTableRow = (props: {
-  chain: Chain;
-  item: CouponHolder;
-}) => {
-  const { getExplorerAddressUrl } = useBlockchain();
-  const { formatWithoutTimezone } = useDatetime();
-
-  const explorerUrl = useMemo(() => {
-    if (!props.chain) return;
-    if (!props.chain.explorerUrl) return;
-    if (!props.item) return;
-    if (!props.item.walletAddress) return;
-    return getExplorerAddressUrl(
-      props.chain.explorerUrl,
-      props.item.walletAddress
-    );
-  }, [props.chain, props.item, getExplorerAddressUrl]);
-
-  return (
-    <Tr key={`coupon_holders_${props.item.id}`} h={8}>
-      <Td fontWeight="normal" fontSize="sm">
-        <Link
-          href={explorerUrl || ""}
-          style={{ width: "100%", display: "block" }}
-          isExternal
-        >
-          {formatWithoutTimezone(props.item.createdAt)}
-        </Link>
-      </Td>
-      <Td fontWeight="normal" fontSize="sm">
-        <Link
-          href={explorerUrl || ""}
-          style={{ width: "100%", display: "block" }}
-          isExternal
-        >
-          {props.item.walletAddress}
-        </Link>
-      </Td>
-    </Tr>
-  );
-};
+import CouponHolderRow from "./coupon-holder-row";
 
 export default function CouponHoldersSection(props: {
   isInitialized: boolean;
@@ -85,6 +19,8 @@ export default function CouponHoldersSection(props: {
   projectId: string | undefined;
   couponId: string | undefined;
 }) {
+  const { formatWithoutTimezone } = useDatetime();
+
   const items = useMemo(() => {
     return props.couponHolders.slice(0, 8);
   }, [props.couponHolders]);
@@ -95,67 +31,55 @@ export default function CouponHoldersSection(props: {
 
   return (
     <Box>
-      <Grid templateColumns="repeat(12, 1fr)" gap={4} mt={24}>
-        <GridItem colSpan={{ base: 12 }}>
-          <Heading as="h4" fontSize="2xl">
-            Coupon Holders
-          </Heading>
-          <Divider mt={2} />
-          <TableContainer>
-            <Table size="sm">
-              <Thead>
-                <Tr>
-                  <Th>SINCE</Th>
-                  <Th>WALLET</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {!props.isInitialized && (
-                  <>
-                    <CouponHoldersTableLoadingRow />
-                    <CouponHoldersTableLoadingRow />
-                    <CouponHoldersTableLoadingRow />
-                  </>
-                )}
-                {props.isInitialized && items.length === 0 && (
-                  <>
-                    <Tr key="coupon_holders_empty" h={16}>
-                      <Td colSpan={2}>No Records</Td>
-                    </Tr>
-                  </>
-                )}
-                {props.isInitialized && items.length !== 0 && (
-                  <>
-                    {items.flatMap((item) => {
-                      return (
-                        <>
-                          {props.chain && (
-                            <CouponHoldersTableRow
-                              chain={props.chain}
-                              item={item}
-                            />
-                          )}
-                        </>
-                      );
-                    })}
-                    {props.projectId && props.couponId && isMore && (
-                      <Tr key="coupon_holders_more" h={16}>
-                        <Td colSpan={2}>
-                          <NextLink
-                            href={`/dashboard/${props.projectId}/coupons/${props.couponId}/coupon_holders`}
-                          >
-                            <Button size="sm">View More</Button>
-                          </NextLink>
-                        </Td>
-                      </Tr>
-                    )}
-                  </>
-                )}
-              </Tbody>
-            </Table>
-          </TableContainer>
-        </GridItem>
-      </Grid>
+      {!props.isInitialized && (
+        <>
+          {[0, 1, 2].flatMap((idx) => {
+            return (
+              <Card
+                variant="outline"
+                borderColor="tertiary.500"
+                bgColor="tertiary.300"
+                boxShadow="none"
+                px={4}
+                py={2}
+                mt={2}
+              >
+                <Skeleton h={4} />
+              </Card>
+            );
+          })}
+        </>
+      )}
+      {props.isInitialized && items.length === 0 && <Text>No Records</Text>}
+      {props.isInitialized && items.length !== 0 && (
+        <>
+          {props.chain && props.projectId && props.couponId && (
+            <>
+              {items.flatMap((item) => {
+                return (
+                  <CouponHolderRow
+                    chain={props.chain!}
+                    couponHolder={item}
+                    projectId={props.projectId!}
+                    couponId={props.couponId!}
+                  />
+                );
+              })}
+            </>
+          )}
+          {props.projectId && props.couponId && isMore && (
+            <Button
+              size="md"
+              mt={2}
+              w="100%"
+              variant="outline"
+              colorScheme="black"
+            >
+              Show More
+            </Button>
+          )}
+        </>
+      )}
     </Box>
   );
 }
